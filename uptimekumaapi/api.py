@@ -5,6 +5,7 @@ import socketio
 from . import AuthMethod
 from . import MonitorType
 from . import NotificationType, notification_provider_options
+from . import ProxyProtocol
 
 
 class UptimeKumaApi(object):
@@ -327,8 +328,40 @@ class UptimeKumaApi(object):
     def get_proxies(self):
         return self.get_event_data("proxyList")
 
-    def add_proxy(self):
-        pass
+    def add_proxy(self, *args, **kwargs):
+        data = self._build_proxy_data(*args, **kwargs)
+        return self.sio.call('addProxy', (data, None))
+
+    def edit_proxy(self, id_: int, *args, **kwargs):
+        data = self._build_proxy_data(*args, **kwargs)
+        return self.sio.call('addProxy', (data, id_))
+
+    def delete_proxy(self, id_: int):
+        return self.sio.call('deleteProxy', id_)
+
+    def _build_proxy_data(
+            self,
+            protocol: ProxyProtocol,
+            host: str,
+            port: str,
+            auth: bool = False,
+            username: str = None,
+            password: str = None,
+            active: bool = True,
+            default: bool = False,
+            apply_existing: bool = False,
+    ):
+        return {
+            "protocol": protocol,
+            "host": host,
+            "port": port,
+            "auth": auth,
+            "username": username,
+            "password": password,
+            "active": active,
+            "default": default,
+            "applyExisting": apply_existing
+        }
 
     # status page
 
