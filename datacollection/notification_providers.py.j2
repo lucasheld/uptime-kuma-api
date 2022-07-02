@@ -1,0 +1,21 @@
+from enum import Enum
+
+
+class NotificationType(str, Enum):
+{%- for notification_provider in notification_providers %}
+    {%- set name = notification_provider["name"] %}
+    {{ name.upper().replace(".", "_") }} = "{{ name }}"
+{%- endfor %}
+
+
+notification_provider_options = {
+{%- for notification_provider in notification_providers %}
+    {%- set name = notification_provider["name"] %}
+    NotificationType.{{ name.upper().replace(".", "_") }}: [
+        {%- for input in notification_provider["inputs"] %}
+        "{{ input }}",
+        {%- endfor %}
+    ],
+{%- endfor %}
+}
+
