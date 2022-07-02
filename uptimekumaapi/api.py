@@ -6,6 +6,7 @@ from . import AuthMethod
 from . import MonitorType
 from . import NotificationType, notification_provider_options
 from . import ProxyProtocol
+from . import IncidentStyle
 
 
 class UptimeKumaApi(object):
@@ -160,6 +161,7 @@ class UptimeKumaApi(object):
             upside_down_mode: bool = False,
             tags: list = None,
             notification_ids: list[int] = None,
+
             # HTTP, KEYWORD
             url: str = None,
             certificate_expiry_notification: bool = False,
@@ -175,20 +177,26 @@ class UptimeKumaApi(object):
             auth_pass: str = None,
             auth_domain: str = None,
             auth_workstation: str = None,
+
             # KEYWORD
             keyword: str = None,
+
             # DNS, PING, STEAM, MQTT
             hostname: str = None,
+
             # DNS, STEAM, MQTT
             port: int = 53,
+
             # DNS
             dns_resolve_server: str = "1.1.1.1",
             dns_resolve_type: str = "A",
+
             # MQTT
             mqtt_username: str = None,
             mqtt_password: str = None,
             mqtt_topic: str = None,
             mqtt_success_message: str = None,
+
             # SQLSERVER
             sqlserver_connection_string: str = "Server=<hostname>,<port>;Database=<your database>;User Id=<your user id>;Password=<your password>;Encrypt=<true/false>;TrustServerCertificate=<Yes/No>;Connection Timeout=<int>",
             sqlserver_query: str = None,
@@ -368,22 +376,75 @@ class UptimeKumaApi(object):
     def get_status_pages(self):
         return self.get_event_data("statusPageList")
 
-    def post_incident(self, slug, incident):
+    def post_incident(
+            self,
+            slug: str,
+
+            # incident
+            title: str,
+            content: str,
+            style: IncidentStyle = IncidentStyle.PRIMARY
+    ):
+        incident = {
+            "title": title,
+            "content": content,
+            "style": style
+        }
         return self.sio.call('postIncident', (slug, incident))
 
-    def unpin_incident(self, slug):
+    def unpin_incident(self, slug: str):
         return self.sio.call('unpinIncident', slug)
 
-    def get_status_page(self, slug):
+    def get_status_page(self, slug: str):
         return self.sio.call('getStatusPage', slug)
 
-    def save_status_page(self, slug, config, img_data_url, public_group_list):
+    def save_status_page(
+            self,
+            slug: str,
+
+            # config
+            id_: int,
+            title: str,
+            description: str = None,
+            dark_theme: bool = False,
+            published: bool = True,
+            show_tags: bool = False,
+            domain_name_list: list[str] = None,
+            custom_css: str = "",
+            footer_text: str = None,
+            show_powered_by: bool = True,
+
+            img_data_url: str = "/icon.svg",
+            monitors: list = None
+    ):
+        if not domain_name_list:
+            domain_name_list = []
+        public_group_list = []
+        if monitors:
+            public_group_list.append({
+                "name": "Services",
+                "monitorList": monitors
+            })
+        config = {
+            "id": id_,
+            "slug": slug,
+            "title": title,
+            "description": description,
+            "icon": img_data_url,
+            "theme": "dark" if dark_theme else "light",
+            "published": published,
+            "showTags": show_tags,
+            "domainNameList": domain_name_list,
+            "customCSS": custom_css,
+            "footerText": footer_text,
+            "showPoweredBy": show_powered_by
+        }
         return self.sio.call('saveStatusPage', (slug, config, img_data_url, public_group_list))
 
-    def add_status_page(self, title, slug):
+    def add_status_page(self, title: str, slug: str):
         return self.sio.call('addStatusPage', (title, slug))
 
-    def delete_status_page(self, slug):
+    def delete_status_page(self, slug: str):
         return self.sio.call('deleteStatusPage', slug)
 
     # heartbeat
