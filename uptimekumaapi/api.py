@@ -365,8 +365,26 @@ class UptimeKumaApi(object):
 
     # status page
 
-    def get_statuspages(self):
+    def get_status_pages(self):
         return self.get_event_data("statusPageList")
+
+    def post_incident(self, slug, incident):
+        return self.sio.call('postIncident', (slug, incident))
+
+    def unpin_incident(self, slug):
+        return self.sio.call('unpinIncident', slug)
+
+    def get_status_page(self, slug):
+        return self.sio.call('getStatusPage', slug)
+
+    def save_status_page(self, slug, config, img_data_url, public_group_list):
+        return self.sio.call('saveStatusPage', (slug, config, img_data_url, public_group_list))
+
+    def add_status_page(self, title, slug):
+        return self.sio.call('addStatusPage', (title, slug))
+
+    def delete_status_page(self, slug):
+        return self.sio.call('deleteStatusPage', slug)
 
     # heartbeat
 
@@ -481,3 +499,11 @@ class UptimeKumaApi(object):
 
     def setup(self, username, password):
         return self.sio.call("setup", (username, password))
+
+    # database
+
+    def get_database_size(self):
+        return self.sio.call('getDatabaseSize')
+
+    def shrink_database(self):
+        return self.sio.call('shrinkDatabase')
