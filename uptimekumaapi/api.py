@@ -8,7 +8,7 @@ from . import MonitorType
 from . import NotificationType, notification_provider_options
 from . import ProxyProtocol
 from . import IncidentStyle
-from . import convert_from_socket, convert_to_socket, params_map_monitor, params_map_notification, params_map_proxy, params_map_status_page
+from . import convert_from_socket, convert_to_socket, params_map_monitor, params_map_notification, params_map_notification_provider, params_map_proxy, params_map_status_page
 
 
 def int_to_bool(data: list[dict] | dict, keys):
@@ -159,12 +159,7 @@ def _build_monitor_data(
 
 
 def _build_notification_data(name: str, type_: NotificationType, default: bool, **kwargs):
-    allowed_options = notification_provider_options[type_]
-    s1 = set(allowed_options)
-    s2 = set(kwargs.keys())
-    if len(s1 - s2) > 0 or len(s2 - s1) > 0:
-        raise ValueError(f"Allowed options: {allowed_options}")
-
+    kwargs = convert_to_socket(params_map_notification_provider, kwargs)
     return {
         "name": name,
         "type": type_,
@@ -424,6 +419,19 @@ class UptimeKumaApi(object):
     def edit_notification(self, id_: int, **kwargs):
         notification = self.get_notification(id_)
         kwargs_sock = convert_to_socket(params_map_notification, kwargs)
+        kwargs_sock = convert_to_socket(params_map_notification_provider, kwargs_sock)
+
+        # remove old notification provider options from notification object
+        old_type = notification["type"]
+        new_type = kwargs_sock["type"]
+        if "type" in kwargs_sock and new_type != old_type:
+            for provider in notification_provider_options:
+                provider_options = notification_provider_options[provider]
+                if provider != new_type:
+                    for option in provider_options:
+                        if option in notification:
+                            del notification[option]
+
         notification.update(kwargs_sock)
         return self.sio.call('addNotification', (notification, id_))
 
