@@ -8,7 +8,7 @@ from . import MonitorType
 from . import NotificationType, notification_provider_options
 from . import ProxyProtocol
 from . import IncidentStyle
-from . import convert_from_socket, convert_to_socket, params_map_monitor, params_map_notification, params_map_proxy
+from . import convert_from_socket, convert_to_socket, params_map_monitor, params_map_notification, params_map_proxy, params_map_status_page
 
 
 def int_to_bool(data: list[dict] | dict, keys):
@@ -195,6 +195,49 @@ def _build_proxy_data(
         "default": default,
         "applyExisting": apply_existing
     }
+
+
+def _build_status_page_data(
+        slug: str,
+
+        # config
+        id_: int,
+        title: str,
+        description: str = None,
+        dark_theme: bool = False,
+        published: bool = True,
+        show_tags: bool = False,
+        domain_name_list: list[str] = None,
+        custom_css: str = "",
+        footer_text: str = None,
+        show_powered_by: bool = True,
+
+        img_data_url: str = "/icon.svg",
+        monitors: list = None
+):
+    if not domain_name_list:
+        domain_name_list = []
+    public_group_list = []
+    if monitors:
+        public_group_list.append({
+            "name": "Services",
+            "monitorList": monitors
+        })
+    config = {
+        "id": id_,
+        "slug": slug,
+        "title": title,
+        "description": description,
+        "icon": img_data_url,
+        "theme": "dark" if dark_theme else "light",
+        "published": published,
+        "showTags": show_tags,
+        "domainNameList": domain_name_list,
+        "customCSS": custom_css,
+        "footerText": footer_text,
+        "showPoweredBy": show_powered_by
+    }
+    return slug, config, img_data_url, public_group_list
 
 
 class UptimeKumaApi(object):
@@ -430,62 +473,31 @@ class UptimeKumaApi(object):
         return list(self._get_event_data("statusPageList").values())
 
     def get_status_page(self, slug: str):
-        return self.sio.call('getStatusPage', slug)
+        r = self.sio.call('getStatusPage', slug)
+        if r["ok"]:
+            config = r["config"]
+            del r["config"]
+            r.update(config)
+        return r
 
-    def add_status_page(self, title: str, slug: str):
+    def add_status_page(self, slug: str, title: str):
         return self.sio.call('addStatusPage', (title, slug))
 
     def delete_status_page(self, slug: str):
         return self.sio.call('deleteStatusPage', slug)
 
-    def save_status_page(
-            self,
-            slug: str,
-
-            # config
-            id_: int,
-            title: str,
-            description: str = None,
-            dark_theme: bool = False,
-            published: bool = True,
-            show_tags: bool = False,
-            domain_name_list: list[str] = None,
-            custom_css: str = "",
-            footer_text: str = None,
-            show_powered_by: bool = True,
-
-            img_data_url: str = "/icon.svg",
-            monitors: list = None
-    ):
-        if not domain_name_list:
-            domain_name_list = []
-        public_group_list = []
-        if monitors:
-            public_group_list.append({
-                "name": "Services",
-                "monitorList": monitors
-            })
-        config = {
-            "id": id_,
-            "slug": slug,
-            "title": title,
-            "description": description,
-            "icon": img_data_url,
-            "theme": "dark" if dark_theme else "light",
-            "published": published,
-            "showTags": show_tags,
-            "domainNameList": domain_name_list,
-            "customCSS": custom_css,
-            "footerText": footer_text,
-            "showPoweredBy": show_powered_by
-        }
-        return self.sio.call('saveStatusPage', (slug, config, img_data_url, public_group_list))
+    def save_status_page(self, slug: str, **kwargs):
+        status_page = self.get_status_page(slug)
+        status_page.pop("ok")
+        kwargs_sock = convert_to_socket(params_map_status_page, kwargs)
+        status_page.update(kwargs_sock)
+        status_page = convert_from_socket(params_map_status_page, status_page)
+        data = _build_status_page_data(**status_page)
+        return self.sio.call('saveStatusPage', data)
 
     def post_incident(
             self,
             slug: str,
-
-            # incident
             title: str,
             content: str,
             style: IncidentStyle = IncidentStyle.PRIMARY
@@ -495,10 +507,14 @@ class UptimeKumaApi(object):
             "content": content,
             "style": style
         }
-        return self.sio.call('postIncident', (slug, incident))
+        r = self.sio.call('postIncident', (slug, incident))
+        self.save_status_page(slug)
+        return r
 
     def unpin_incident(self, slug: str):
-        return self.sio.call('unpinIncident', slug)
+        r = self.sio.call('unpinIncident', slug)
+        self.save_status_page(slug)
+        return r
 
     # heartbeat
 

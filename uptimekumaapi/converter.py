@@ -36,6 +36,21 @@ params_map_proxy = {
     "applyExisting": "apply_existing"
 }
 
+params_map_status_page = {
+    "id": "id_",
+    "slug": "slug",
+    "title": "title",
+    "description": "description",
+    "icon": "img_data_url",
+    "theme": "dark_theme",
+    "published": "published",
+    "showTags": "show_tags",
+    "domainNameList": "domain_name_list",
+    "customCSS": "custom_css",
+    "footerText": "footer_text",
+    "showPoweredBy": "show_powered_by"
+}
+
 
 def _convert_to_from_socket(params_map: dict[str, str], params: list[dict] | dict, to_socket=False):
     if type(params) == list:
