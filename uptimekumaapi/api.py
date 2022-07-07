@@ -83,13 +83,13 @@ def _build_monitor_data(
     notification_ids = dict_notification_ids
 
     data = {
-        "type": type_,
+        "type_": type_,
         "name": name,
-        "interval": heartbeat_interval,
-        "retryInterval": heartbeat_retry_interval,
-        "maxretries": retries,
-        "notificationIDList": notification_ids,
-        "upsideDown": upside_down_mode,
+        "heartbeat_interval": heartbeat_interval,
+        "heartbeat_retry_interval": heartbeat_retry_interval,
+        "retries": retries,
+        "notification_ids": notification_ids,
+        "upside_down_mode": upside_down_mode,
     }
 
     if tags:
@@ -105,27 +105,27 @@ def _build_monitor_data(
     if type_ in [MonitorType.HTTP, MonitorType.KEYWORD]:
         data.update({
             "url": url,
-            "expiryNotification": certificate_expiry_notification,
-            "ignoreTls": ignore_tls_error,
-            "maxredirects": max_redirects,
-            "accepted_statuscodes": accepted_status_codes,
-            "proxyId": proxy_id,
-            "method": http_method,
-            "body": http_body,
-            "headers": http_headers,
-            "authMethod": auth_method,
+            "certificate_expiry_notification": certificate_expiry_notification,
+            "ignore_tls_error": ignore_tls_error,
+            "max_redirects": max_redirects,
+            "accepted_status_codes": accepted_status_codes,
+            "proxy_id": proxy_id,
+            "http_method": http_method,
+            "http_body": http_body,
+            "http_headers": http_headers,
+            "auth_method": auth_method,
         })
 
         if auth_method in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
             data.update({
-                "basicauth-user": auth_user,
-                "basicauth-pass": auth_pass,
+                "auth_user": auth_user,
+                "auth_pass": auth_pass,
             })
 
         if auth_method == AuthMethod.NTLM:
             data.update({
-                "basicauth-domain": auth_domain,
-                "basicauth-workstation": auth_workstation,
+                "auth_domain": auth_domain,
+                "auth_workstation": auth_workstation,
             })
 
     if type_ in [MonitorType.DNS, MonitorType.PING, MonitorType.STEAM, MonitorType.MQTT]:
@@ -146,29 +146,32 @@ def _build_monitor_data(
 
     if type_ == MonitorType.MQTT:
         data.update({
-            "mqttUsername": mqtt_username,
-            "mqttPassword": mqtt_password,
-            "mqttTopic": mqtt_topic,
-            "mqttSuccessMessage": mqtt_success_message,
+            "mqtt_username": mqtt_username,
+            "mqtt_password": mqtt_password,
+            "mqtt_topic": mqtt_topic,
+            "mqtt_success_message": mqtt_success_message,
         })
 
     if type_ == MonitorType.SQLSERVER:
         data.update({
-            "databaseConnectionString": sqlserver_connection_string,
-            "sqlserverQuery": sqlserver_query,
+            "sqlserver_connection_string": sqlserver_connection_string,
+            "sqlserver_query": sqlserver_query,
         })
 
+    data = convert_to_socket(params_map_monitor, data)
     return data
 
 
 def _build_notification_data(name: str, type_: NotificationType, default: bool, **kwargs):
-    kwargs = convert_to_socket(params_map_notification_provider, kwargs)
-    return {
+    data = {
         "name": name,
-        "type": type_,
-        "isDefault": default,
+        "type_": type_,
+        "default": default,
         **kwargs
     }
+    data = convert_to_socket(params_map_notification, data)
+    data = convert_to_socket(params_map_notification_provider, data)
+    return data
 
 
 def _build_proxy_data(
@@ -182,7 +185,7 @@ def _build_proxy_data(
         default: bool = False,
         apply_existing: bool = False,
 ):
-    return {
+    data = {
         "protocol": protocol,
         "host": host,
         "port": port,
@@ -191,8 +194,10 @@ def _build_proxy_data(
         "password": password,
         "active": active,
         "default": default,
-        "applyExisting": apply_existing
+        "apply_existing": apply_existing
     }
+    data = convert_to_socket(params_map_proxy, data)
+    return data
 
 
 def _build_status_page_data(
@@ -202,7 +207,7 @@ def _build_status_page_data(
         id_: int,
         title: str,
         description: str = None,
-        dark_theme: bool = False,
+        theme: str = "light",
         published: bool = True,
         show_tags: bool = False,
         domain_name_list: list[str] = None,
@@ -213,6 +218,8 @@ def _build_status_page_data(
         img_data_url: str = "/icon.svg",
         monitors: list = None
 ):
+    if theme not in ["light", "dark"]:
+        raise ValueError
     if not domain_name_list:
         domain_name_list = []
     public_group_list = []
@@ -222,19 +229,20 @@ def _build_status_page_data(
             "monitorList": monitors
         })
     config = {
-        "id": id_,
+        "id_": id_,
         "slug": slug,
         "title": title,
         "description": description,
-        "icon": img_data_url,
-        "theme": "dark" if dark_theme else "light",
+        "img_data_url": img_data_url,
+        "theme": theme,
         "published": published,
-        "showTags": show_tags,
-        "domainNameList": domain_name_list,
-        "customCSS": custom_css,
-        "footerText": footer_text,
-        "showPoweredBy": show_powered_by
+        "show_tags": show_tags,
+        "domain_name_list": domain_name_list,
+        "custom_css": custom_css,
+        "footer_text": footer_text,
+        "show_powered_by": show_powered_by
     }
+    config = convert_to_socket(params_map_status_page, config)
     return slug, config, img_data_url, public_group_list
 
 
@@ -454,6 +462,8 @@ class UptimeKumaApi(object):
                             del notification[option]
 
         notification.update(kwargs)
+        notification = convert_to_socket(params_map_notification, notification)
+        notification = convert_to_socket(params_map_notification_provider, notification)
         return self._call('addNotification', (notification, id_))
 
     def delete_notification(self, id_: int):

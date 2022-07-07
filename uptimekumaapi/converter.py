@@ -175,7 +175,6 @@ params_map_status_page = {
     "title": "title",
     "description": "description",
     "icon": "img_data_url",
-    "theme": "dark_theme",
     "published": "published",
     "showTags": "show_tags",
     "domainNameList": "domain_name_list",
