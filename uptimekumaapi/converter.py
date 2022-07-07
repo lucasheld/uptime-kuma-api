@@ -24,12 +24,17 @@ params_map_monitor = {
     "mqttTopic": "mqtt_topic",
     "mqttSuccessMessage": "mqtt_success_message",
     "databaseConnectionString": "sqlserver_connection_string",
-    "sqlserverQuery": "sqlserver_query"
+    "sqlserverQuery": "sqlserver_query",
+    "authDomain": "auth_domain",
+    "authWorkstation": "auth_workstation",
+    "databaseQuery": "database_query",
+    "monitorID": "monitor_id"
 }
 
 params_map_notification = {
     "type": "type_",
-    "isDefault": "default"
+    "isDefault": "default",
+    "userId": "user_id"
 }
 
 params_map_notification_provider = {
@@ -159,7 +164,9 @@ params_map_notification_provider = {
 }
 
 params_map_proxy = {
-    "applyExisting": "apply_existing"
+    "applyExisting": "apply_existing",
+    "createdDate": "created_date",
+    "userId": "user_id"
 }
 
 params_map_status_page = {
@@ -174,7 +181,30 @@ params_map_status_page = {
     "domainNameList": "domain_name_list",
     "customCSS": "custom_css",
     "footerText": "footer_text",
-    "showPoweredBy": "show_powered_by"
+    "showPoweredBy": "show_powered_by",
+    "createdDate": "created_date"
+}
+
+params_map_info = {
+    "latestVersion": "latest_version",
+    "primaryBaseURL": "primary_base_url"
+}
+
+params_map_settings = {
+    # about
+    "checkUpdate": "check_update",
+    "checkBeta": "check_beta",
+    # monitor history
+    "keepDataPeriodDays": "keep_data_period_days",
+    # general
+    "entryPage": "entry_page",
+    "searchEngineIndex": "search_engine_index",
+    "primaryBaseURL": "primary_base_url",
+    "steamAPIKey": "steam_api_key",
+    # notifications
+    "tlsExpiryNotifyDays": "tls_expiry_notify_days",
+    # security
+    "disableAuth": "disable_auth"
 }
 
 

@@ -1,0 +1,2 @@
+class UptimeKumaException(Exception):
+    pass
