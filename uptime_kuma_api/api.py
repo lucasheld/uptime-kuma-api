@@ -102,7 +102,7 @@ def _build_monitor_data(
             "keyword": keyword,
         })
 
-    # if type_ in [MonitorType.HTTP, MonitorType.KEYWORD]:
+    # HTTP, KEYWORD
     data.update({
         "url": url,
         "certificate_expiry_notification": certificate_expiry_notification,
@@ -128,23 +128,23 @@ def _build_monitor_data(
             "auth_workstation": auth_workstation,
         })
 
-    # if type_ in [MonitorType.DNS, MonitorType.PING, MonitorType.STEAM, MonitorType.MQTT]:
+    # DNS, PING, STEAM, MQTT
     data.update({
         "hostname": hostname,
     })
 
-    if type_ in [MonitorType.DNS, MonitorType.STEAM, MonitorType.MQTT]:
-        data.update({
-            "port": port,
-        })
+    # DNS, STEAM, MQTT
+    data.update({
+        "port": port,
+    })
 
-    # if type_ == MonitorType.DNS:
+    # DNS
     data.update({
         "dns_resolve_server": dns_resolve_server,
         "dns_resolve_type": dns_resolve_type,
     })
 
-    # if type_ == MonitorType.MQTT:
+    # MQTT
     data.update({
         "mqtt_username": mqtt_username,
         "mqtt_password": mqtt_password,
@@ -152,9 +152,12 @@ def _build_monitor_data(
         "mqtt_success_message": mqtt_success_message,
     })
 
+    # SQLSERVER
+    data.update({
+        "sqlserver_connection_string": sqlserver_connection_string
+    })
     if type_ == MonitorType.SQLSERVER:
         data.update({
-            "sqlserver_connection_string": sqlserver_connection_string,
             "sqlserver_query": sqlserver_query,
         })
 
