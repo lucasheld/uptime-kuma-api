@@ -3,3 +3,4 @@ venv
 .envrc
 __pycache__
 *.egg-info
+dist

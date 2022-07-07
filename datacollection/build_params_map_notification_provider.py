@@ -1,7 +1,7 @@
 import re
 import os
 
-from uptimekumaapi import notification_provider_options
+from uptime_kuma_api import notification_provider_options
 
 
 def build_notification_provider_map():

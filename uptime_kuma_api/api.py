@@ -14,7 +14,7 @@ from . import convert_from_socket, convert_to_socket, params_map_monitor, params
 from . import UptimeKumaException
 
 
-def int_to_bool(data: list[dict] | dict, keys):
+def int_to_bool(data, keys):
     if type(data) == list:
         for d in data:
             int_to_bool(d, keys)
@@ -102,55 +102,55 @@ def _build_monitor_data(
             "keyword": keyword,
         })
 
-    if type_ in [MonitorType.HTTP, MonitorType.KEYWORD]:
+    # if type_ in [MonitorType.HTTP, MonitorType.KEYWORD]:
+    data.update({
+        "url": url,
+        "certificate_expiry_notification": certificate_expiry_notification,
+        "ignore_tls_error": ignore_tls_error,
+        "max_redirects": max_redirects,
+        "accepted_status_codes": accepted_status_codes,
+        "proxy_id": proxy_id,
+        "http_method": http_method,
+        "http_body": http_body,
+        "http_headers": http_headers,
+        "auth_method": auth_method,
+    })
+
+    if auth_method in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
         data.update({
-            "url": url,
-            "certificate_expiry_notification": certificate_expiry_notification,
-            "ignore_tls_error": ignore_tls_error,
-            "max_redirects": max_redirects,
-            "accepted_status_codes": accepted_status_codes,
-            "proxy_id": proxy_id,
-            "http_method": http_method,
-            "http_body": http_body,
-            "http_headers": http_headers,
-            "auth_method": auth_method,
+            "auth_user": auth_user,
+            "auth_pass": auth_pass,
         })
 
-        if auth_method in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
-            data.update({
-                "auth_user": auth_user,
-                "auth_pass": auth_pass,
-            })
-
-        if auth_method == AuthMethod.NTLM:
-            data.update({
-                "auth_domain": auth_domain,
-                "auth_workstation": auth_workstation,
-            })
-
-    if type_ in [MonitorType.DNS, MonitorType.PING, MonitorType.STEAM, MonitorType.MQTT]:
+    if auth_method == AuthMethod.NTLM:
         data.update({
-            "hostname": hostname,
+            "auth_domain": auth_domain,
+            "auth_workstation": auth_workstation,
         })
+
+    # if type_ in [MonitorType.DNS, MonitorType.PING, MonitorType.STEAM, MonitorType.MQTT]:
+    data.update({
+        "hostname": hostname,
+    })
 
     if type_ in [MonitorType.DNS, MonitorType.STEAM, MonitorType.MQTT]:
         data.update({
             "port": port,
         })
 
-    if type_ == MonitorType.DNS:
-        data.update({
-            "dns_resolve_server": dns_resolve_server,
-            "dns_resolve_type": dns_resolve_type,
-        })
+    # if type_ == MonitorType.DNS:
+    data.update({
+        "dns_resolve_server": dns_resolve_server,
+        "dns_resolve_type": dns_resolve_type,
+    })
 
-    if type_ == MonitorType.MQTT:
-        data.update({
-            "mqtt_username": mqtt_username,
-            "mqtt_password": mqtt_password,
-            "mqtt_topic": mqtt_topic,
-            "mqtt_success_message": mqtt_success_message,
-        })
+    # if type_ == MonitorType.MQTT:
+    data.update({
+        "mqtt_username": mqtt_username,
+        "mqtt_password": mqtt_password,
+        "mqtt_topic": mqtt_topic,
+        "mqtt_success_message": mqtt_success_message,
+    })
 
     if type_ == MonitorType.SQLSERVER:
         data.update({
@@ -286,9 +286,10 @@ class UptimeKumaApi(object):
 
     def _call(self, event, data=None):
         r = self.sio.call(event, data)
-        if type(r) == dict and not r["ok"]:
-            raise UptimeKumaException(r["msg"])
-        r.pop("ok")
+        if type(r) == dict and "ok" in r:
+            if not r["ok"]:
+                raise UptimeKumaException(r["msg"])
+            r.pop("ok")
         return r
 
     # event handlers
