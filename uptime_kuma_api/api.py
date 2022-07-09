@@ -14,6 +14,9 @@ from . import convert_from_socket, convert_to_socket, params_map_monitor, params
 from . import UptimeKumaException
 
 
+params_map_notification_and_provider = {**params_map_notification, **params_map_notification_provider}
+
+
 def int_to_bool(data, keys):
     if type(data) == list:
         for d in data:
@@ -172,8 +175,7 @@ def _build_notification_data(name: str, type_: NotificationType, default: bool, 
         "default": default,
         **kwargs
     }
-    data = convert_to_socket(params_map_notification, data)
-    data = convert_to_socket(params_map_notification_provider, data)
+    data = convert_to_socket(params_map_notification_and_provider, data)
     return data
 
 
@@ -247,6 +249,59 @@ def _build_status_page_data(
     }
     config = convert_to_socket(params_map_status_page, config)
     return slug, config, img_data_url, public_group_list
+
+
+def _raise_missing_arguments(required_params, kwargs, params_map):
+    missing_arguments = []
+    for required_param in required_params:
+        required_param_sock = convert_to_socket(params_map, required_param)
+        if kwargs.get(required_param_sock) is None:
+            missing_arguments.append(required_param)
+    if missing_arguments:
+        missing_arguments_str = ", ".join([f"'{i}'" for i in missing_arguments])
+        raise TypeError(f"missing {len(missing_arguments)} required argument: {missing_arguments_str}")
+
+
+def _check_required_arguments_monitor(kwargs):
+    required_params = [
+        "type_",
+        "name",
+        "heartbeat_interval",
+        "retries",
+        "heartbeat_retry_interval"
+    ]
+    _raise_missing_arguments(required_params, kwargs, params_map_monitor)
+
+    required_params_type_specific = {
+        MonitorType.HTTP: ["url", "max_redirects"],
+        MonitorType.PORT: ["hostname", "port"],
+        MonitorType.PING: ["hostname"],
+        MonitorType.KEYWORD: ["url", "keyword", "max_redirects"],
+        MonitorType.DNS: ["hostname", "dns_resolve_server", "port"],
+        MonitorType.PUSH: [],
+        MonitorType.STEAM: ["hostname", "port"],
+        MonitorType.MQTT: ["hostname", "port", "mqtt_topic"],
+        MonitorType.SQLSERVER: [],
+    }
+    type_key = convert_to_socket(params_map_monitor, "type")
+    required_params = required_params_type_specific[kwargs[type_key]]
+    _raise_missing_arguments(required_params, kwargs, params_map_monitor)
+
+
+def _check_required_arguments_notification(kwargs):
+    required_params = ["type_", "name"]
+    type_key = convert_to_socket(params_map_notification, "type")
+    additional_params_sock = notification_provider_options[kwargs[type_key]]
+    additional_params = convert_from_socket(params_map_notification_provider, additional_params_sock)
+    required_params.extend(additional_params)
+    _raise_missing_arguments(required_params, kwargs, params_map_notification_and_provider)
+
+
+def _check_required_arguments_proxy(kwargs):
+    required_params = ["protocol", "host", "port"]
+    if "auth" in kwargs:
+        required_params.extend(["username", "password"])
+    _raise_missing_arguments(required_params, kwargs, params_map_proxy)
 
 
 class UptimeKumaApi(object):
@@ -395,9 +450,12 @@ class UptimeKumaApi(object):
         int_to_bool(r, ["important", "status"])
         return r
 
-    def add_monitor(self, *args, **kwargs):
-        data = _build_monitor_data(*args, **kwargs)
+    def add_monitor(self, **kwargs):
+        data = _build_monitor_data(**kwargs)
+
+        _check_required_arguments_monitor(data)
         r = self._call('add', data)
+
         r = convert_from_socket(params_map_monitor, r)
         return r
 
@@ -405,7 +463,10 @@ class UptimeKumaApi(object):
         data = self.get_monitor(id_)
         data.update(kwargs)
         data = convert_to_socket(params_map_monitor, data)
+
+        _check_required_arguments_monitor(data)
         r = self._call('editMonitor', data)
+
         r = convert_from_socket(params_map_monitor, r)
         return r
 
@@ -432,8 +493,7 @@ class UptimeKumaApi(object):
             del notification["config"]
             notification.update(config)
             r.append(notification)
-        r = convert_from_socket(params_map_notification, r)
-        r = convert_from_socket(params_map_notification_provider, r)
+        r = convert_from_socket(params_map_notification_and_provider, r)
         return r
 
     def get_notification(self, id_: int):
@@ -443,12 +503,16 @@ class UptimeKumaApi(object):
                 return notification
         raise UptimeKumaException("notification does not exist")
 
-    def test_notification(self, *args, **kwargs):
-        data = _build_notification_data(*args, **kwargs)
+    def test_notification(self, **kwargs):
+        data = _build_notification_data(**kwargs)
+
+        _check_required_arguments_notification(data)
         return self._call('testNotification', data)
 
-    def add_notification(self, *args, **kwargs):
-        data = _build_notification_data(*args, **kwargs)
+    def add_notification(self, **kwargs):
+        data = _build_notification_data(**kwargs)
+
+        _check_required_arguments_notification(data)
         return self._call('addNotification', (data, None))
 
     def edit_notification(self, id_: int, **kwargs):
@@ -464,8 +528,9 @@ class UptimeKumaApi(object):
                             del notification[option]
 
         notification.update(kwargs)
-        notification = convert_to_socket(params_map_notification, notification)
-        notification = convert_to_socket(params_map_notification_provider, notification)
+        notification = convert_to_socket(params_map_notification_and_provider, notification)
+
+        _check_required_arguments_notification(notification)
         return self._call('addNotification', (notification, id_))
 
     def delete_notification(self, id_: int):
@@ -489,14 +554,18 @@ class UptimeKumaApi(object):
                 return proxy
         raise UptimeKumaException("proxy does not exist")
 
-    def add_proxy(self, *args, **kwargs):
-        data = _build_proxy_data(*args, **kwargs)
+    def add_proxy(self, **kwargs):
+        data = _build_proxy_data(**kwargs)
+
+        _check_required_arguments_proxy(data)
         return self._call('addProxy', (data, None))
 
     def edit_proxy(self, id_: int, **kwargs):
         proxy = self.get_proxy(id_)
         proxy.update(kwargs)
         proxy = convert_to_socket(params_map_proxy, proxy)
+
+        _check_required_arguments_proxy(proxy)
         return self._call('addProxy', (proxy, id_))
 
     def delete_proxy(self, id_: int):
