@@ -382,12 +382,10 @@ class UptimeKumaApi(object):
         return r
 
     def pause_monitor(self, id_: int):
-        r = self._call('pauseMonitor', id_)
-        return r
+        return self._call('pauseMonitor', id_)
 
     def resume_monitor(self, id_: int):
-        r = self._call('resumeMonitor', id_)
-        return r
+        return self._call('resumeMonitor', id_)
 
     def delete_monitor(self, id_: int):
         return self._call('deleteMonitor', id_)
@@ -405,8 +403,8 @@ class UptimeKumaApi(object):
 
     def edit_monitor(self, id_: int, **kwargs):
         data = self.get_monitor(id_)
-        kwargs_sock = convert_to_socket(params_map_monitor, kwargs)
-        data.update(kwargs_sock)
+        data.update(kwargs)
+        data = convert_to_socket(params_map_monitor, data)
         r = self._call('editMonitor', data)
         r = convert_from_socket(params_map_monitor, r)
         return r
@@ -498,6 +496,7 @@ class UptimeKumaApi(object):
     def edit_proxy(self, id_: int, **kwargs):
         proxy = self.get_proxy(id_)
         proxy.update(kwargs)
+        proxy = convert_to_socket(params_map_proxy, proxy)
         return self._call('addProxy', (proxy, id_))
 
     def delete_proxy(self, id_: int):
