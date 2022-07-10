@@ -13,7 +13,6 @@ from . import convert_from_socket, convert_to_socket, params_map_monitor, params
     params_map_settings
 from . import UptimeKumaException
 
-
 params_map_notification_and_provider = {**params_map_notification, **params_map_notification_provider}
 
 
@@ -168,7 +167,7 @@ def _build_monitor_data(
     return data
 
 
-def _build_notification_data(name: str, type_: NotificationType, default: bool, **kwargs):
+def _build_notification_data(name: str, type_: NotificationType, default: bool = False, apply_existing: bool = False, **kwargs):
     data = {
         "name": name,
         "type_": type_,
@@ -251,7 +250,7 @@ def _build_status_page_data(
     return slug, config, img_data_url, public_group_list
 
 
-def _raise_missing_arguments(required_params, kwargs, params_map):
+def _check_missing_arguments(required_params, kwargs, params_map):
     missing_arguments = []
     for required_param in required_params:
         required_param_sock = convert_to_socket(params_map, required_param)
@@ -262,17 +261,31 @@ def _raise_missing_arguments(required_params, kwargs, params_map):
         raise TypeError(f"missing {len(missing_arguments)} required argument: {missing_arguments_str}")
 
 
-def _check_required_arguments_monitor(kwargs):
-    required_params = [
+def _check_argument_conditions(valid_params, kwargs, params_map):
+    for valid_param in valid_params:
+        valid_param_sock = convert_to_socket(params_map, valid_param)
+        if valid_param_sock in kwargs:
+            value = kwargs[valid_param_sock]
+            conditions = valid_params[valid_param]
+            min_ = conditions.get("min")
+            max_ = conditions.get("max")
+            if min_ is not None and value < min_:
+                raise ValueError(f"the value of {valid_param} must not be less than {min_}")
+            if max_ is not None and value > max_:
+                raise ValueError(f"the value of {valid_param} must not be larger than {max_}")
+
+
+def _check_arguments_monitor(kwargs):
+    required_args = [
         "type_",
         "name",
         "heartbeat_interval",
         "retries",
         "heartbeat_retry_interval"
     ]
-    _raise_missing_arguments(required_params, kwargs, params_map_monitor)
+    _check_missing_arguments(required_args, kwargs, params_map_monitor)
 
-    required_params_type_specific = {
+    required_args_by_type = {
         MonitorType.HTTP: ["url", "max_redirects"],
         MonitorType.PORT: ["hostname", "port"],
         MonitorType.PING: ["hostname"],
@@ -283,25 +296,70 @@ def _check_required_arguments_monitor(kwargs):
         MonitorType.MQTT: ["hostname", "port", "mqtt_topic"],
         MonitorType.SQLSERVER: [],
     }
-    type_key = convert_to_socket(params_map_monitor, "type")
-    required_params = required_params_type_specific[kwargs[type_key]]
-    _raise_missing_arguments(required_params, kwargs, params_map_monitor)
+    type_ = kwargs[convert_to_socket(params_map_monitor, "type")]
+    required_args = required_args_by_type[type_]
+    _check_missing_arguments(required_args, kwargs, params_map_monitor)
+
+    conditions = {
+        "heartbeat_interval": {
+            "min": 20
+        },
+        "retries": {
+            "min": 0
+        },
+        "heartbeat_retry_interval": {
+            "min": 20
+        },
+        "max_redirects": {
+            "min": 0
+        },
+        "port": {
+            "min": 0,
+            "max": 65535
+        }
+    }
+    _check_argument_conditions(conditions, kwargs, params_map_monitor)
 
 
-def _check_required_arguments_notification(kwargs):
-    required_params = ["type_", "name"]
-    type_key = convert_to_socket(params_map_notification, "type")
-    additional_params_sock = notification_provider_options[kwargs[type_key]]
-    additional_params = convert_from_socket(params_map_notification_provider, additional_params_sock)
-    required_params.extend(additional_params)
-    _raise_missing_arguments(required_params, kwargs, params_map_notification_and_provider)
+def _check_arguments_notification(kwargs):
+    required_args = ["type_", "name"]
+    _check_missing_arguments(required_args, kwargs, params_map_notification_and_provider)
+
+    type_ = kwargs[convert_to_socket(params_map_notification, "type")]
+    required_args_sock = notification_provider_options[type_]
+    required_args = convert_from_socket(params_map_notification_provider, required_args_sock)
+    _check_missing_arguments(required_args, kwargs, params_map_notification_and_provider)
+
+    provider_conditions = {
+        'gotify_priority': {
+            'max': 10,
+            'min': 0
+        },
+        'ntfy_priority': {
+            'max': 5,
+            'min': 1
+        },
+        'smtp_smtp_port': {
+            'max': 65535,
+            'min': 0
+        }
+    }
+    _check_argument_conditions(provider_conditions, kwargs, params_map_notification_and_provider)
 
 
-def _check_required_arguments_proxy(kwargs):
-    required_params = ["protocol", "host", "port"]
+def _check_arguments_proxy(kwargs):
+    required_args = ["protocol", "host", "port"]
     if "auth" in kwargs:
-        required_params.extend(["username", "password"])
-    _raise_missing_arguments(required_params, kwargs, params_map_proxy)
+        required_args.extend(["username", "password"])
+    _check_missing_arguments(required_args, kwargs, params_map_proxy)
+
+    conditions = {
+        "port": {
+            "min": 0,
+            "max": 65535
+        }
+    }
+    _check_argument_conditions(conditions, kwargs, params_map_proxy)
 
 
 class UptimeKumaApi(object):
@@ -453,7 +511,7 @@ class UptimeKumaApi(object):
     def add_monitor(self, **kwargs):
         data = _build_monitor_data(**kwargs)
 
-        _check_required_arguments_monitor(data)
+        _check_arguments_monitor(data)
         r = self._call('add', data)
 
         r = convert_from_socket(params_map_monitor, r)
@@ -464,7 +522,7 @@ class UptimeKumaApi(object):
         data.update(kwargs)
         data = convert_to_socket(params_map_monitor, data)
 
-        _check_required_arguments_monitor(data)
+        _check_arguments_monitor(data)
         r = self._call('editMonitor', data)
 
         r = convert_from_socket(params_map_monitor, r)
@@ -506,13 +564,13 @@ class UptimeKumaApi(object):
     def test_notification(self, **kwargs):
         data = _build_notification_data(**kwargs)
 
-        _check_required_arguments_notification(data)
+        _check_arguments_notification(data)
         return self._call('testNotification', data)
 
     def add_notification(self, **kwargs):
         data = _build_notification_data(**kwargs)
 
-        _check_required_arguments_notification(data)
+        _check_arguments_notification(data)
         return self._call('addNotification', (data, None))
 
     def edit_notification(self, id_: int, **kwargs):
@@ -530,7 +588,7 @@ class UptimeKumaApi(object):
         notification.update(kwargs)
         notification = convert_to_socket(params_map_notification_and_provider, notification)
 
-        _check_required_arguments_notification(notification)
+        _check_arguments_notification(notification)
         return self._call('addNotification', (notification, id_))
 
     def delete_notification(self, id_: int):
@@ -557,7 +615,7 @@ class UptimeKumaApi(object):
     def add_proxy(self, **kwargs):
         data = _build_proxy_data(**kwargs)
 
-        _check_required_arguments_proxy(data)
+        _check_arguments_proxy(data)
         return self._call('addProxy', (data, None))
 
     def edit_proxy(self, id_: int, **kwargs):
@@ -565,7 +623,7 @@ class UptimeKumaApi(object):
         proxy.update(kwargs)
         proxy = convert_to_socket(params_map_proxy, proxy)
 
-        _check_required_arguments_proxy(proxy)
+        _check_arguments_proxy(proxy)
         return self._call('addProxy', (proxy, id_))
 
     def delete_proxy(self, id_: int):

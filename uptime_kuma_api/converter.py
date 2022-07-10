@@ -34,7 +34,8 @@ params_map_monitor = {
 params_map_notification = {
     "type": "type_",
     "isDefault": "default",
-    "userId": "user_id"
+    "userId": "user_id",
+    "applyExisting": "apply_existing",
 }
 
 params_map_notification_provider = {
