@@ -34,14 +34,14 @@ def _build_monitor_data(
         retries: int = 0,
         upside_down_mode: bool = False,
         tags: list = None,
-        notification_ids: list[int] = None,
+        notification_ids: list = None,
 
         # HTTP, KEYWORD
         url: str = None,
         certificate_expiry_notification: bool = False,
         ignore_tls_error: bool = False,
         max_redirects: int = 10,
-        accepted_status_codes: list[str] = None,
+        accepted_status_codes: list = None,
         proxy_id: int = None,
         http_method: str = "GET",
         http_body: str = None,
@@ -72,8 +72,14 @@ def _build_monitor_data(
         mqtt_success_message: str = None,
 
         # SQLSERVER
-        sqlserver_connection_string: str = "Server=<hostname>,<port>;Database=<your database>;User Id=<your user id>;Password=<your password>;Encrypt=<true/false>;TrustServerCertificate=<Yes/No>;Connection Timeout=<int>",
-        sqlserver_query: str = None,
+        sqlserver_connection_string: str = "Server=<hostname>,<port>;"
+                                           "Database=<your database>;"
+                                           "User Id=<your user id>;"
+                                           "Password=<your password>;"
+                                           "Encrypt=<true/false>;"
+                                           "TrustServerCertificate=<Yes/No>;"
+                                           "Connection Timeout=<int>",
+        sqlserver_query: str = None
 ):
     if not accepted_status_codes:
         accepted_status_codes = ["200-299"]
@@ -167,11 +173,18 @@ def _build_monitor_data(
     return data
 
 
-def _build_notification_data(name: str, type_: NotificationType, default: bool = False, apply_existing: bool = False, **kwargs):
+def _build_notification_data(
+        name: str,
+        type_: NotificationType,
+        default: bool = False,
+        apply_existing: bool = False,
+        **kwargs
+):
     data = {
         "name": name,
         "type_": type_,
         "default": default,
+        "apply_existing": apply_existing,
         **kwargs
     }
     data = convert_to_socket(params_map_notification_and_provider, data)
@@ -214,7 +227,7 @@ def _build_status_page_data(
         theme: str = "light",
         published: bool = True,
         show_tags: bool = False,
-        domain_name_list: list[str] = None,
+        domain_name_list: list = None,
         custom_css: str = "",
         footer_text: str = None,
         show_powered_by: bool = True,
@@ -366,7 +379,7 @@ class UptimeKumaApi(object):
     def __init__(self, url):
         self.sio = socketio.Client()
 
-        self._event_data: dict[str, any] = {
+        self._event_data = {
             "monitorList": None,
             "notificationList": None,
             "proxyList": None,
@@ -780,7 +793,7 @@ class UptimeKumaApi(object):
             steam_api_key: str = "",
 
             # notifications
-            tls_expiry_notify_days: list[int] = None,
+            tls_expiry_notify_days: list = None,
 
             # security
             disable_auth: bool = False

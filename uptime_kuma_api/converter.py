@@ -208,7 +208,7 @@ params_map_settings = {
 }
 
 
-def _convert_to_from_socket(params_map: dict[str, str], params, to_socket=False):
+def _convert_to_from_socket(params_map: dict, params, to_socket=False):
     if type(params) == list:
         out = []
         params_list = params
