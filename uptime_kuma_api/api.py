@@ -370,7 +370,7 @@ def _check_arguments_notification(kwargs):
 
 def _check_arguments_proxy(kwargs):
     required_args = ["protocol", "host", "port"]
-    if "auth" in kwargs:
+    if kwargs.get("auth"):
         required_args.extend(["username", "password"])
     _check_missing_arguments(required_args, kwargs, params_map_proxy)
 
