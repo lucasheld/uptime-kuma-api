@@ -5,7 +5,7 @@ from pprint import pprint
 import jinja2
 from bs4 import BeautifulSoup
 
-from uptime_kuma_api import convert_from_socket, params_map_notification_provider
+from uptime_kuma_api import convert_from_socket, params_map_notification_provider_options
 
 
 def deduplicate_list(l):
@@ -61,7 +61,7 @@ def build_notification_provider_conditions():
             param_name = re.match(r'\$parent.notification.(.*)$', v_model).group(1)
             if condition:
                 conditions[param_name] = condition
-    conditions = convert_from_socket(params_map_notification_provider, conditions)
+    conditions = convert_from_socket(params_map_notification_provider_options, conditions)
     return conditions
 
 

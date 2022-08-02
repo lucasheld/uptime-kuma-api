@@ -8,13 +8,18 @@ from . import MonitorType
 from . import NotificationType, notification_provider_options
 from . import ProxyProtocol
 from . import IncidentStyle
-from . import convert_from_socket, convert_to_socket, params_map_monitor, params_map_notification, \
-    params_map_notification_provider, params_map_proxy, params_map_status_page, params_map_info, \
+from . import \
+    convert_from_socket,\
+    convert_to_socket, \
+    params_map_monitor, \
+    params_map_notification,\
+    params_map_notification_providers, \
+    get_params_map_notification, \
+    params_map_proxy, \
+    params_map_status_page, \
+    params_map_info, \
     params_map_settings
 from . import UptimeKumaException
-
-params_map_notification_and_provider = {**params_map_notification, **params_map_notification_provider}
-
 
 def int_to_bool(data, keys):
     if type(data) == list:
@@ -180,6 +185,8 @@ def _build_notification_data(
         apply_existing: bool = False,
         **kwargs
 ):
+    params_map = get_params_map_notification(type_)
+    type_ = convert_to_socket(params_map, type_)
     data = {
         "name": name,
         "type_": type_,
@@ -187,7 +194,7 @@ def _build_notification_data(
         "apply_existing": apply_existing,
         **kwargs
     }
-    data = convert_to_socket(params_map_notification_and_provider, data)
+    data = convert_to_socket(params_map, data)
     return data
 
 
@@ -336,12 +343,13 @@ def _check_arguments_monitor(kwargs):
 
 def _check_arguments_notification(kwargs):
     required_args = ["type_", "name"]
-    _check_missing_arguments(required_args, kwargs, params_map_notification_and_provider)
+    _check_missing_arguments(required_args, kwargs, params_map_notification)
 
     type_ = kwargs[convert_to_socket(params_map_notification, "type")]
     required_args_sock = notification_provider_options[type_]
-    required_args = convert_from_socket(params_map_notification_provider, required_args_sock)
-    _check_missing_arguments(required_args, kwargs, params_map_notification_and_provider)
+    params_map = get_params_map_notification(type_sock=type_)
+    required_args = convert_from_socket(params_map, required_args_sock)
+    _check_missing_arguments(required_args, kwargs, params_map)
 
     provider_conditions = {
         'gotify_priority': {
@@ -357,7 +365,7 @@ def _check_arguments_notification(kwargs):
             'min': 0
         }
     }
-    _check_argument_conditions(provider_conditions, kwargs, params_map_notification_and_provider)
+    _check_argument_conditions(provider_conditions, kwargs, params_map)
 
 
 def _check_arguments_proxy(kwargs):
@@ -379,7 +387,7 @@ class UptimeKumaApi(object):
     def __init__(self, url):
         self.sio = socketio.Client()
 
-        self._event_data = {
+        self._event_data: dict = {
             "monitorList": None,
             "notificationList": None,
             "proxyList": None,
@@ -563,8 +571,11 @@ class UptimeKumaApi(object):
             config = json.loads(notification["config"])
             del notification["config"]
             notification.update(config)
+
+            notification["type"] = convert_from_socket(params_map_notification_providers, notification["type"])
+            params_map = get_params_map_notification(notification["type"])
+            notification = convert_from_socket(params_map, notification)
             r.append(notification)
-        r = convert_from_socket(params_map_notification_and_provider, r)
         return r
 
     def get_notification(self, id_: int):
@@ -589,17 +600,23 @@ class UptimeKumaApi(object):
     def edit_notification(self, id_: int, **kwargs):
         notification = self.get_notification(id_)
 
-        # remove old notification provider options from notification object
-        if "type_" in kwargs and kwargs != notification["type_"]:
+        if "type_" in kwargs and kwargs["type_"] != notification["type_"]:
+            # remove old notification provider options from notification object
             for provider in notification_provider_options:
                 provider_options = notification_provider_options[provider]
-                if provider != kwargs:
+                params_map = get_params_map_notification(type_sock=provider)
+                provider_options = convert_from_socket(params_map, provider_options)
+                if provider != kwargs["type_"]:
                     for option in provider_options:
                         if option in notification:
                             del notification[option]
 
+        # convert type from py to sock
+        kwargs["type_"] = convert_to_socket(params_map_notification_providers, kwargs["type_"])
+
         notification.update(kwargs)
-        notification = convert_to_socket(params_map_notification_and_provider, notification)
+        params_map = get_params_map_notification(type_sock=kwargs["type_"])
+        notification = convert_to_socket(params_map, notification)
 
         _check_arguments_notification(notification)
         return self._call('addNotification', (notification, id_))

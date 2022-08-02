@@ -1,0 +1,10 @@
+params_map_notification_provider_options = {
+{%- for provider in notification_provider_map %}
+    {%- set options = notification_provider_map[provider] %}
+    '{{ provider }}': {
+    {%- for key, value in options.items() %}
+        '{{ key }}': '{{ value }}',
+    {%- endfor %}
+    },
+{%- endfor %}
+}
