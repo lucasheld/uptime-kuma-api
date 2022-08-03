@@ -22,11 +22,16 @@ class TestProxy(UptimeKumaTestCase):
         proxy = self.api.get_proxy(proxy_id)
         self.compare(proxy, expected_proxy)
 
+        # get proxies
+        proxies = self.api.get_proxies()
+        proxy = self.find_by_id(proxies, proxy_id)
+        self.assertIsNotNone(proxy)
+        self.compare(proxy, expected_proxy)
+
         # edit proxy
         expected_proxy["protocol"] = "https"
         expected_proxy["host"] = "127.0.0.2"
         expected_proxy["port"] = 8888
-        expected_proxy["active"] = False
         r = self.api.edit_proxy(proxy_id, **expected_proxy)
         self.assertEqual(r["msg"], "Saved")
         proxy = self.api.get_proxy(proxy_id)

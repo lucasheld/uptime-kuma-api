@@ -31,7 +31,7 @@ class UptimeKumaTestCase(unittest.TestCase):
         cls.api.disconnect()
 
     def compare(self, superset, subset):
-        return subset.items() <= superset.items()
+        self.assertTrue(subset.items() <= superset.items())
 
     def find_by_id(self, objects, value, key="id"):
         for obj in objects:

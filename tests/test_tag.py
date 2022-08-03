@@ -30,7 +30,7 @@ class TestTag(UptimeKumaTestCase):
         r = self.api.delete_tag(tag_id)
         self.assertEqual(r["msg"], "Deleted Successfully.")
         with self.assertRaises(UptimeKumaException):
-            self.api.get_proxy(tag_id)
+            self.api.get_tag(tag_id)
 
 
 if __name__ == '__main__':
