@@ -3,17 +3,27 @@ import unittest
 from uptime_kuma_api import UptimeKumaApi
 
 
+token = None
+
+
 class UptimeKumaTestCase(unittest.TestCase):
     api = None
+    url = "http://127.0.0.1:3001"
+    username = "testuser"
     password = "zS7zhQSc"
 
     @classmethod
     def setUpClass(cls):
-        cls.api = UptimeKumaApi("http://127.0.0.1:3001")
-        username = "testuser"
-        if cls.api.need_setup():
-            cls.api.setup(username, cls.password)
-        cls.api.login(username, cls.password)
+        cls.api = UptimeKumaApi(cls.url)
+
+        global token
+        if not token:
+            if cls.api.need_setup():
+                cls.api.setup(cls.username, cls.password)
+            r = cls.api.login(cls.username, cls.password)
+            token = r["token"]
+
+        cls.api.login_by_token(token)
 
     @classmethod
     def tearDownClass(cls):
