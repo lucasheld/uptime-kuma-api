@@ -6,19 +6,19 @@ from uptime_kuma_api import UptimeKumaException
 class TestMonitor(UptimeKumaTestCase):
     def test_monitor(self):
         expected_monitor = {
-            "type_": "http",
+            "type": "http",
             "name": "monitor 1",
             "url": "http://192.168.20.135"
         }
 
         # add monitor
         r = self.api.add_monitor(
-            type_=expected_monitor["type_"],
+            type=expected_monitor["type"],
             name=expected_monitor["name"],
             url=expected_monitor["url"]
         )
         self.assertEqual(r["msg"], "Added Successfully.")
-        monitor_id = r["monitor_id"]
+        monitor_id = r["monitorID"]
 
         # get monitor
         monitor = self.api.get_monitor(monitor_id)
@@ -31,7 +31,7 @@ class TestMonitor(UptimeKumaTestCase):
         self.compare(monitor, expected_monitor)
 
         # edit monitor
-        expected_monitor["type_"] = "ping"
+        expected_monitor["type"] = "ping"
         expected_monitor["name"] = "monitor 1 new"
         expected_monitor["hostname"] = "127.0.0.1"
         del expected_monitor["url"]

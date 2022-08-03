@@ -10,7 +10,7 @@ class TestStatusPage(UptimeKumaTestCase):
             "slug": slug,
             "title": "status page 1",
             "description": "description 1",
-            "show_powered_by": False
+            "showPoweredBy": False
         }
 
         # slug must be unique

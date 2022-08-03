@@ -8,9 +8,9 @@ class TestNotification(UptimeKumaTestCase):
         expected_notification = {
             "name": "notification 1",
             "default": True,
-            "apply_existing": True,
-            "type_": "push_by_techulus",
-            "push_by_techulus_apikey": "123456789"
+            "applyExisting": True,
+            "type": "PushByTechulus",
+            "pushAPIKey": "123456789"
         }
 
         # test notification
@@ -35,14 +35,15 @@ class TestNotification(UptimeKumaTestCase):
         # edit notification
         expected_notification["name"] = "notification 1 new"
         expected_notification["default"] = False
-        expected_notification["apply_existing"] = False
-        expected_notification["type_"] = "push_deer"
-        expected_notification["push_deer_deer_key"] = "987654321"
-        del expected_notification["push_by_techulus_apikey"]
+        expected_notification["applyExisting"] = False
+        expected_notification["type"] = "PushDeer"
+        expected_notification["pushdeerKey"] = "987654321"
+        del expected_notification["pushAPIKey"]
         r = self.api.edit_notification(notification_id, **expected_notification)
         self.assertEqual(r["msg"], "Saved")
         notification = self.api.get_notification(notification_id)
         self.compare(notification, expected_notification)
+        self.assertIsNone(notification.get("pushAPIKey"))
 
         # delete notification
         r = self.api.delete_notification(notification_id)

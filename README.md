@@ -6,6 +6,8 @@ uptime-kuma-api is a Python wrapper for the Uptime Kuma WebSocket API.
 
 This package was developed to configure Uptime Kuma with Ansible. The Ansible collection can be found at https://github.com/lucasheld/ansible-uptime-kuma.
 
+Python version 3.6+ is required.
+
 Installation
 ---
 uptime-kuma-api is available on the Python Package Index (PyPI).
@@ -31,7 +33,7 @@ To do so, import `UptimeKumaApi` from the library and specify the Uptime Kuma se
 Now you can call one of the existing methods of the instance. For example create a new monitor:
 
 ```python
->>> result = api.add_monitor(type_=MonitorType.HTTP, name="new monitor", url="http://192.168.1.1")
+>>> result = api.add_monitor(type=MonitorType.HTTP, name="new monitor", url="http://192.168.1.1")
 >>> print(result)
-{'msg': 'Added Successfully.', 'monitor_id': 1}
+{'msg': 'Added Successfully.', 'monitorId': 1}
 ```

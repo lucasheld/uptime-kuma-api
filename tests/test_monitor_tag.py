@@ -6,8 +6,8 @@ class TestMonitorTag(UptimeKumaTestCase):
     def test_monitor_tag(self):
         r = self.api.add_tag(name="tag 1", color="#ffffff")
         tag_id = r["id"]
-        r = self.api.add_monitor(type_="http", name="monitor 1", url="http://127.0.0.1")
-        monitor_id = r["monitor_id"]
+        r = self.api.add_monitor(type="http", name="monitor 1", url="http://127.0.0.1")
+        monitor_id = r["monitorID"]
 
         expected_monitor_tag = {
             "tag_id": tag_id,

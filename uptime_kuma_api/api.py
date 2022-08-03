@@ -8,18 +8,8 @@ from . import MonitorType
 from . import NotificationType, notification_provider_options
 from . import ProxyProtocol
 from . import IncidentStyle
-from . import \
-    convert_from_socket,\
-    convert_to_socket, \
-    params_map_monitor, \
-    params_map_notification,\
-    params_map_notification_providers, \
-    get_params_map_notification, \
-    params_map_proxy, \
-    params_map_status_page, \
-    params_map_info, \
-    params_map_settings
 from . import UptimeKumaException
+
 
 def int_to_bool(data, keys):
     if type(data) == list:
@@ -32,30 +22,30 @@ def int_to_bool(data, keys):
 
 
 def _build_monitor_data(
-        type_: MonitorType,
+        type: MonitorType,
         name: str,
-        heartbeat_interval: int = 60,
-        heartbeat_retry_interval: int = 60,
-        retries: int = 0,
-        upside_down_mode: bool = False,
+        interval: int = 60,
+        retryInterval: int = 60,
+        maxretries: int = 0,
+        upsideDown: bool = False,
         tags: list = None,
-        notification_ids: list = None,
+        notificationIDList: list = None,
 
         # HTTP, KEYWORD
         url: str = None,
-        certificate_expiry_notification: bool = False,
-        ignore_tls_error: bool = False,
-        max_redirects: int = 10,
-        accepted_status_codes: list = None,
-        proxy_id: int = None,
-        http_method: str = "GET",
-        http_body: str = None,
-        http_headers: str = None,
-        auth_method: AuthMethod = AuthMethod.NONE,
-        auth_user: str = None,
-        auth_pass: str = None,
-        auth_domain: str = None,
-        auth_workstation: str = None,
+        expiryNotification: bool = False,
+        ignoreTls: bool = False,
+        maxredirects: int = 10,
+        accepted_statuscodes: list = None,
+        proxyId: int = None,
+        method: str = "GET",
+        body: str = None,
+        headers: str = None,
+        authMethod: AuthMethod = AuthMethod.NONE,
+        basic_auth_user: str = None,
+        basic_auth_pass: str = None,
+        authDomain: str = None,
+        authWorkstation: str = None,
 
         # KEYWORD
         keyword: str = None,
@@ -71,38 +61,38 @@ def _build_monitor_data(
         dns_resolve_type: str = "A",
 
         # MQTT
-        mqtt_username: str = None,
-        mqtt_password: str = None,
-        mqtt_topic: str = None,
-        mqtt_success_message: str = None,
+        mqttUsername: str = None,
+        mqttPassword: str = None,
+        mqttTopic: str = None,
+        mqttSuccessMessage: str = None,
 
         # SQLSERVER
-        sqlserver_connection_string: str = "Server=<hostname>,<port>;"
-                                           "Database=<your database>;"
-                                           "User Id=<your user id>;"
-                                           "Password=<your password>;"
-                                           "Encrypt=<true/false>;"
-                                           "TrustServerCertificate=<Yes/No>;"
-                                           "Connection Timeout=<int>",
-        sqlserver_query: str = None
+        databaseConnectionString: str = "Server=<hostname>,<port>;"
+                                        "Database=<your database>;"
+                                        "User Id=<your user id>;"
+                                        "Password=<your password>;"
+                                        "Encrypt=<true/false>;"
+                                        "TrustServerCertificate=<Yes/No>;"
+                                        "Connection Timeout=<int>",
+        databaseQuery: str = None
 ):
-    if not accepted_status_codes:
-        accepted_status_codes = ["200-299"]
+    if not accepted_statuscodes:
+        accepted_statuscodes = ["200-299"]
 
     dict_notification_ids = {}
-    if notification_ids:
-        for notification_id in notification_ids:
+    if notificationIDList:
+        for notification_id in notificationIDList:
             dict_notification_ids[notification_id] = True
-    notification_ids = dict_notification_ids
+    notificationIDList = dict_notification_ids
 
     data = {
-        "type_": type_,
+        "type": type,
         "name": name,
-        "heartbeat_interval": heartbeat_interval,
-        "heartbeat_retry_interval": heartbeat_retry_interval,
-        "retries": retries,
-        "notification_ids": notification_ids,
-        "upside_down_mode": upside_down_mode,
+        "interval": interval,
+        "retryInterval": retryInterval,
+        "maxretries": maxretries,
+        "notificationIDList": notificationIDList,
+        "upsideDown": upsideDown,
     }
 
     if tags:
@@ -110,7 +100,7 @@ def _build_monitor_data(
             "tags": tags
         })
 
-    if type_ == MonitorType.KEYWORD:
+    if type == MonitorType.KEYWORD:
         data.update({
             "keyword": keyword,
         })
@@ -118,27 +108,27 @@ def _build_monitor_data(
     # HTTP, KEYWORD
     data.update({
         "url": url,
-        "certificate_expiry_notification": certificate_expiry_notification,
-        "ignore_tls_error": ignore_tls_error,
-        "max_redirects": max_redirects,
-        "accepted_status_codes": accepted_status_codes,
-        "proxy_id": proxy_id,
-        "http_method": http_method,
-        "http_body": http_body,
-        "http_headers": http_headers,
-        "auth_method": auth_method,
+        "expiryNotification": expiryNotification,
+        "ignoreTls": ignoreTls,
+        "maxredirects": maxredirects,
+        "accepted_statuscodes": accepted_statuscodes,
+        "proxyId": proxyId,
+        "method": method,
+        "body": body,
+        "headers": headers,
+        "authMethod": authMethod,
     })
 
-    if auth_method in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
+    if authMethod in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
         data.update({
-            "auth_user": auth_user,
-            "auth_pass": auth_pass,
+            "basic_auth_user": basic_auth_user,
+            "basic_auth_pass": basic_auth_pass,
         })
 
-    if auth_method == AuthMethod.NTLM:
+    if authMethod == AuthMethod.NTLM:
         data.update({
-            "auth_domain": auth_domain,
-            "auth_workstation": auth_workstation,
+            "authDomain": authDomain,
+            "authWorkstation": authWorkstation,
         })
 
     # DNS, PING, STEAM, MQTT
@@ -159,42 +149,38 @@ def _build_monitor_data(
 
     # MQTT
     data.update({
-        "mqtt_username": mqtt_username,
-        "mqtt_password": mqtt_password,
-        "mqtt_topic": mqtt_topic,
-        "mqtt_success_message": mqtt_success_message,
+        "mqttUsername": mqttUsername,
+        "mqttPassword": mqttPassword,
+        "mqttTopic": mqttTopic,
+        "mqttSuccessMessage": mqttSuccessMessage,
     })
 
     # SQLSERVER
     data.update({
-        "sqlserver_connection_string": sqlserver_connection_string
+        "databaseConnectionString": databaseConnectionString
     })
-    if type_ == MonitorType.SQLSERVER:
+    if type == MonitorType.SQLSERVER:
         data.update({
-            "sqlserver_query": sqlserver_query,
+            "databaseQuery": databaseQuery,
         })
 
-    data = convert_to_socket(params_map_monitor, data)
     return data
 
 
 def _build_notification_data(
         name: str,
-        type_: NotificationType,
-        default: bool = False,
-        apply_existing: bool = False,
+        type: NotificationType,
+        isDefault: bool = False,
+        applyExisting: bool = False,
         **kwargs
 ):
-    params_map = get_params_map_notification(type_)
-    type_ = convert_to_socket(params_map, type_)
     data = {
         "name": name,
-        "type_": type_,
-        "default": default,
-        "apply_existing": apply_existing,
+        "type": type,
+        "isDefault": isDefault,
+        "applyExisting": applyExisting,
         **kwargs
     }
-    data = convert_to_socket(params_map, data)
     return data
 
 
@@ -207,7 +193,7 @@ def _build_proxy_data(
         password: str = None,
         active: bool = True,
         default: bool = False,
-        apply_existing: bool = False,
+        applyExisting: bool = False,
 ):
     data = {
         "protocol": protocol,
@@ -218,9 +204,8 @@ def _build_proxy_data(
         "password": password,
         "active": active,
         "default": default,
-        "apply_existing": apply_existing
+        "applyExisting": applyExisting
     }
-    data = convert_to_socket(params_map_proxy, data)
     return data
 
 
@@ -228,24 +213,24 @@ def _build_status_page_data(
         slug: str,
 
         # config
-        id_: int,
+        id: int,
         title: str,
         description: str = None,
         theme: str = "light",
         published: bool = True,
-        show_tags: bool = False,
-        domain_name_list: list = None,
-        custom_css: str = "",
-        footer_text: str = None,
-        show_powered_by: bool = True,
+        showTags: bool = False,
+        domainNameList: list = None,
+        customCSS: str = "",
+        footerText: str = None,
+        showPoweredBy: bool = True,
 
-        img_data_url: str = "/icon.svg",
+        icon: str = "/icon.svg",
         monitors: list = None
 ):
     if theme not in ["light", "dark"]:
         raise ValueError
-    if not domain_name_list:
-        domain_name_list = []
+    if not domainNameList:
+        domainNameList = []
     public_group_list = []
     if monitors:
         public_group_list.append({
@@ -253,39 +238,36 @@ def _build_status_page_data(
             "monitorList": monitors
         })
     config = {
-        "id_": id_,
+        "id": id,
         "slug": slug,
         "title": title,
         "description": description,
-        "img_data_url": img_data_url,
+        "icon": icon,
         "theme": theme,
         "published": published,
-        "show_tags": show_tags,
-        "domain_name_list": domain_name_list,
-        "custom_css": custom_css,
-        "footer_text": footer_text,
-        "show_powered_by": show_powered_by
+        "showTags": showTags,
+        "domainNameList": domainNameList,
+        "customCSS": customCSS,
+        "footerText": footerText,
+        "showPoweredBy": showPoweredBy
     }
-    config = convert_to_socket(params_map_status_page, config)
-    return slug, config, img_data_url, public_group_list
+    return slug, config, icon, public_group_list
 
 
-def _check_missing_arguments(required_params, kwargs, params_map):
+def _check_missing_arguments(required_params, kwargs):
     missing_arguments = []
     for required_param in required_params:
-        required_param_sock = convert_to_socket(params_map, required_param)
-        if kwargs.get(required_param_sock) is None:
+        if kwargs.get(required_param) is None:
             missing_arguments.append(required_param)
     if missing_arguments:
         missing_arguments_str = ", ".join([f"'{i}'" for i in missing_arguments])
         raise TypeError(f"missing {len(missing_arguments)} required argument: {missing_arguments_str}")
 
 
-def _check_argument_conditions(valid_params, kwargs, params_map):
+def _check_argument_conditions(valid_params, kwargs):
     for valid_param in valid_params:
-        valid_param_sock = convert_to_socket(params_map, valid_param)
-        if valid_param_sock in kwargs:
-            value = kwargs[valid_param_sock]
+        if valid_param in kwargs:
+            value = kwargs[valid_param]
             conditions = valid_params[valid_param]
             min_ = conditions.get("min")
             max_ = conditions.get("max")
@@ -297,40 +279,40 @@ def _check_argument_conditions(valid_params, kwargs, params_map):
 
 def _check_arguments_monitor(kwargs):
     required_args = [
-        "type_",
+        "type",
         "name",
-        "heartbeat_interval",
-        "retries",
-        "heartbeat_retry_interval"
+        "interval",
+        "maxretries",
+        "retryInterval"
     ]
-    _check_missing_arguments(required_args, kwargs, params_map_monitor)
+    _check_missing_arguments(required_args, kwargs)
 
     required_args_by_type = {
-        MonitorType.HTTP: ["url", "max_redirects"],
+        MonitorType.HTTP: ["url", "maxredirects"],
         MonitorType.PORT: ["hostname", "port"],
         MonitorType.PING: ["hostname"],
-        MonitorType.KEYWORD: ["url", "keyword", "max_redirects"],
+        MonitorType.KEYWORD: ["url", "keyword", "maxredirects"],
         MonitorType.DNS: ["hostname", "dns_resolve_server", "port"],
         MonitorType.PUSH: [],
         MonitorType.STEAM: ["hostname", "port"],
-        MonitorType.MQTT: ["hostname", "port", "mqtt_topic"],
+        MonitorType.MQTT: ["hostname", "port", "mqttTopic"],
         MonitorType.SQLSERVER: [],
     }
-    type_ = kwargs[convert_to_socket(params_map_monitor, "type")]
+    type_ = kwargs["type"]
     required_args = required_args_by_type[type_]
-    _check_missing_arguments(required_args, kwargs, params_map_monitor)
+    _check_missing_arguments(required_args, kwargs)
 
     conditions = {
-        "heartbeat_interval": {
+        "interval": {
             "min": 20
         },
-        "retries": {
+        "maxretries": {
             "min": 0
         },
-        "heartbeat_retry_interval": {
+        "retryInterval": {
             "min": 20
         },
-        "max_redirects": {
+        "maxredirects": {
             "min": 0
         },
         "port": {
@@ -338,41 +320,39 @@ def _check_arguments_monitor(kwargs):
             "max": 65535
         }
     }
-    _check_argument_conditions(conditions, kwargs, params_map_monitor)
+    _check_argument_conditions(conditions, kwargs)
 
 
 def _check_arguments_notification(kwargs):
-    required_args = ["type_", "name"]
-    _check_missing_arguments(required_args, kwargs, params_map_notification)
+    required_args = ["type", "name"]
+    _check_missing_arguments(required_args, kwargs)
 
-    type_ = kwargs[convert_to_socket(params_map_notification, "type")]
-    required_args_sock = notification_provider_options[type_]
-    params_map = get_params_map_notification(type_sock=type_)
-    required_args = convert_from_socket(params_map, required_args_sock)
-    _check_missing_arguments(required_args, kwargs, params_map)
+    type_ = kwargs["type"]
+    required_args = notification_provider_options[type_]
+    _check_missing_arguments(required_args, kwargs)
 
     provider_conditions = {
-        'gotify_priority': {
+        'gotifyPriority': {
             'max': 10,
             'min': 0
         },
-        'ntfy_priority': {
+        'ntfyPriority': {
             'max': 5,
             'min': 1
         },
-        'smtp_smtp_port': {
+        'smtpPort': {
             'max': 65535,
             'min': 0
         }
     }
-    _check_argument_conditions(provider_conditions, kwargs, params_map)
+    _check_argument_conditions(provider_conditions, kwargs)
 
 
 def _check_arguments_proxy(kwargs):
     required_args = ["protocol", "host", "port"]
     if kwargs.get("auth"):
         required_args.extend(["username", "password"])
-    _check_missing_arguments(required_args, kwargs, params_map_proxy)
+    _check_missing_arguments(required_args, kwargs)
 
     conditions = {
         "port": {
@@ -380,7 +360,7 @@ def _check_arguments_proxy(kwargs):
             "max": 65535
         }
     }
-    _check_argument_conditions(conditions, kwargs, params_map_proxy)
+    _check_argument_conditions(conditions, kwargs)
 
 
 class UptimeKumaApi(object):
@@ -505,13 +485,11 @@ class UptimeKumaApi(object):
 
     def get_monitors(self):
         r = list(self._get_event_data("monitorList").values())
-        r = convert_from_socket(params_map_monitor, r)
         int_to_bool(r, ["active"])
         return r
 
     def get_monitor(self, id_: int):
         r = self._call('getMonitor', id_)["monitor"]
-        r = convert_from_socket(params_map_monitor, r)
         int_to_bool(r, ["active"])
         return r
 
@@ -531,22 +509,15 @@ class UptimeKumaApi(object):
 
     def add_monitor(self, **kwargs):
         data = _build_monitor_data(**kwargs)
-
         _check_arguments_monitor(data)
         r = self._call('add', data)
-
-        r = convert_from_socket(params_map_monitor, r)
         return r
 
     def edit_monitor(self, id_: int, **kwargs):
         data = self.get_monitor(id_)
         data.update(kwargs)
-        data = convert_to_socket(params_map_monitor, data)
-
         _check_arguments_monitor(data)
         r = self._call('editMonitor', data)
-
-        r = convert_from_socket(params_map_monitor, r)
         return r
 
     # monitor tags
@@ -571,10 +542,6 @@ class UptimeKumaApi(object):
             config = json.loads(notification["config"])
             del notification["config"]
             notification.update(config)
-
-            notification["type"] = convert_from_socket(params_map_notification_providers, notification["type"])
-            params_map = get_params_map_notification(notification["type"])
-            notification = convert_from_socket(params_map, notification)
             r.append(notification)
         return r
 
@@ -600,24 +567,16 @@ class UptimeKumaApi(object):
     def edit_notification(self, id_: int, **kwargs):
         notification = self.get_notification(id_)
 
-        if "type_" in kwargs and kwargs["type_"] != notification["type_"]:
-            # remove old notification provider options from notification object
+        # remove old notification provider options from notification object
+        if "type" in kwargs and kwargs["type"] != notification["type"]:
             for provider in notification_provider_options:
                 provider_options = notification_provider_options[provider]
-                params_map = get_params_map_notification(type_sock=provider)
-                provider_options = convert_from_socket(params_map, provider_options)
-                if provider != kwargs["type_"]:
+                if provider != kwargs["type"]:
                     for option in provider_options:
                         if option in notification:
                             del notification[option]
 
-        # convert type from py to sock
-        kwargs["type_"] = convert_to_socket(params_map_notification_providers, kwargs["type_"])
-
         notification.update(kwargs)
-        params_map = get_params_map_notification(type_sock=kwargs["type_"])
-        notification = convert_to_socket(params_map, notification)
-
         _check_arguments_notification(notification)
         return self._call('addNotification', (notification, id_))
 
@@ -631,8 +590,7 @@ class UptimeKumaApi(object):
 
     def get_proxies(self):
         r = self._get_event_data("proxyList")
-        r = convert_from_socket(params_map_proxy, r)
-        int_to_bool(r, ["auth", "active", "default", "apply_existing"])
+        int_to_bool(r, ["auth", "active", "default", "applyExisting"])
         return r
 
     def get_proxy(self, id_: int):
@@ -651,8 +609,6 @@ class UptimeKumaApi(object):
     def edit_proxy(self, id_: int, **kwargs):
         proxy = self.get_proxy(id_)
         proxy.update(kwargs)
-        proxy = convert_to_socket(params_map_proxy, proxy)
-
         _check_arguments_proxy(proxy)
         return self._call('addProxy', (proxy, id_))
 
@@ -663,7 +619,6 @@ class UptimeKumaApi(object):
 
     def get_status_pages(self):
         r = list(self._get_event_data("statusPageList").values())
-        r = convert_from_socket(params_map_status_page, r)
         return r
 
     def get_status_page(self, slug: str):
@@ -671,7 +626,6 @@ class UptimeKumaApi(object):
         config = r["config"]
         del r["config"]
         r.update(config)
-        r = convert_from_socket(params_map_status_page, r)
         return r
 
     def add_status_page(self, slug: str, title: str):
@@ -699,7 +653,6 @@ class UptimeKumaApi(object):
             "style": style
         }
         r = self._call('postIncident', (slug, incident))["incident"]
-        r = convert_from_socket(params_map_status_page, r)
         self.save_status_page(slug)
         return r
 
@@ -741,7 +694,6 @@ class UptimeKumaApi(object):
 
     def info(self):
         r = self._get_event_data("info")
-        r = convert_from_socket(params_map_info, r)
         return r
 
     # clear
@@ -789,7 +741,6 @@ class UptimeKumaApi(object):
 
     def get_settings(self):
         r = self._call('getSettings')["data"]
-        r = convert_from_socket(params_map_settings, r)
         return r
 
     def set_settings(
@@ -797,39 +748,38 @@ class UptimeKumaApi(object):
             password: str,
 
             # about
-            check_update: bool = True,
-            check_beta: bool = False,
+            checkUpdate: bool = True,
+            checkBeta: bool = False,
 
             # monitor history
-            keep_data_period_days: int = 180,
+            keepDataPeriodDays: int = 180,
 
             # general
-            entry_page: str = "dashboard",
-            search_engine_index: bool = False,
-            primary_base_url: str = "",
-            steam_api_key: str = "",
+            entryPage: str = "dashboard",
+            searchEngineIndex: bool = False,
+            primaryBaseURL: str = "",
+            steamAPIKey: str = "",
 
             # notifications
-            tls_expiry_notify_days: list = None,
+            tlsExpiryNotifyDays: list = None,
 
             # security
-            disable_auth: bool = False
+            disableAuth: bool = False
     ):
-        if not tls_expiry_notify_days:
-            tls_expiry_notify_days = [7, 14, 21]
+        if not tlsExpiryNotifyDays:
+            tlsExpiryNotifyDays = [7, 14, 21]
 
         data = {
-            "check_update": check_update,
-            "check_beta": check_beta,
-            "keep_data_period_days": keep_data_period_days,
-            "entry_page": entry_page,
-            "search_engine_index": search_engine_index,
-            "primary_base_url": primary_base_url,
-            "steam_api_key": steam_api_key,
-            "tls_expiry_notify_days": tls_expiry_notify_days,
-            "disable_auth": disable_auth
+            "checkUpdate": checkUpdate,
+            "checkBeta": checkBeta,
+            "keepDataPeriodDays": keepDataPeriodDays,
+            "entryPage": entryPage,
+            "searchEngineIndex": searchEngineIndex,
+            "primaryBaseURL": primaryBaseURL,
+            "steamAPIKey": steamAPIKey,
+            "tlsExpiryNotifyDays": tlsExpiryNotifyDays,
+            "disableAuth": disableAuth
         }
-        data = convert_to_socket(params_map_settings, data)
         return self._call('setSettings', (data, password))
 
     def change_password(self, old_password: str, new_password: str):
