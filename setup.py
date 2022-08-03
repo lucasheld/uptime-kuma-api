@@ -15,10 +15,15 @@ here = os.path.abspath(os.path.dirname(__file__))
 with open(os.path.join(here, "uptime_kuma_api", "__version__.py"), "r", "utf-8") as f:
     exec(f.read(), info)
 
+with open("README.md", "r", "utf-8") as f:
+    readme = f.read()
+
 setup(
     name=info["__title__"],
     version=info["__version__"],
     description="A python wrapper for the Uptime Kuma WebSocket API",
+    long_description=readme,
+    long_description_content_type="text/markdown",
     url="https://github.com/lucasheld/uptime-kuma-api",
     author=info["__author__"],
     author_email="lucasheld@hotmail.de",
