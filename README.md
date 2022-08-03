@@ -1,8 +1,8 @@
 # uptime-kuma-api
 
-A wrapper for the Uptime Kuma WebSocket API
+A wrapper for the Uptime Kuma Socket.IO API
 ---
-uptime-kuma-api is a Python wrapper for the Uptime Kuma WebSocket API.
+uptime-kuma-api is a Python wrapper for the Uptime Kuma Socket.IO API.
 
 This package was developed to configure Uptime Kuma with Ansible. The Ansible collection can be found at https://github.com/lucasheld/ansible-uptime-kuma.
 
@@ -15,7 +15,7 @@ uptime-kuma-api is available on the Python Package Index (PyPI).
 You can install it using pip:
 
 ```
-pip install uptime_kuma_api
+pip install uptime-kuma-api
 ```
 
 Examples
