@@ -1,13 +1,12 @@
 import unittest
+
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestMonitorTag(UptimeKumaTestCase):
     def test_monitor_tag(self):
-        r = self.api.add_tag(name="tag 1", color="#ffffff")
-        tag_id = r["id"]
-        r = self.api.add_monitor(type="http", name="monitor 1", url="http://127.0.0.1")
-        monitor_id = r["monitorID"]
+        tag_id = self.add_tag()
+        monitor_id = self.add_monitor()
 
         expected_monitor_tag = {
             "tag_id": tag_id,

@@ -1,6 +1,7 @@
 import unittest
-from uptime_kuma_test_case import UptimeKumaTestCase
+
 from uptime_kuma_api import UptimeKumaException
+from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestTag(UptimeKumaTestCase):
@@ -28,7 +29,6 @@ class TestTag(UptimeKumaTestCase):
         # delete tag
         r = self.api.delete_tag(tag_id)
         self.assertEqual(r["msg"], "Deleted Successfully.")
-        print(r)
         with self.assertRaises(UptimeKumaException):
             self.api.get_proxy(tag_id)
 

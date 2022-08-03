@@ -1,6 +1,7 @@
 import unittest
-from uptime_kuma_test_case import UptimeKumaTestCase
+
 from uptime_kuma_api import UptimeKumaException
+from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestProxy(UptimeKumaTestCase):
@@ -34,7 +35,6 @@ class TestProxy(UptimeKumaTestCase):
         # delete proxy
         r = self.api.delete_proxy(proxy_id)
         self.assertEqual(r["msg"], "Deleted")
-        print(r)
         with self.assertRaises(UptimeKumaException):
             self.api.get_proxy(proxy_id)
 

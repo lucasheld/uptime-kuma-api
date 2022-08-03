@@ -1,6 +1,7 @@
 import unittest
-from uptime_kuma_test_case import UptimeKumaTestCase
+
 from uptime_kuma_api import UptimeKumaException
+from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestMonitor(UptimeKumaTestCase):
