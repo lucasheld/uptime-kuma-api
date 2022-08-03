@@ -7,7 +7,7 @@ import sys
 if sys.argv[-1] == "publish":
     os.system("rm dist/*")
     os.system("python setup.py sdist")
-    os.system("twine upload --repository-url https://test.pypi.org/legacy/ dist/*")
+    os.system("twine upload dist/*")
     sys.exit()
 
 info = {}
