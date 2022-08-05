@@ -8,6 +8,7 @@ from . import MonitorType
 from . import NotificationType, notification_provider_options
 from . import ProxyProtocol
 from . import IncidentStyle
+from . import Event
 from . import UptimeKumaException
 
 
@@ -368,40 +369,40 @@ class UptimeKumaApi(object):
         self.sio = socketio.Client()
 
         self._event_data: dict = {
-            "monitorList": None,
-            "notificationList": None,
-            "proxyList": None,
-            "statusPageList": None,
-            "heartbeatList": None,
-            "importantHeartbeatList": None,
-            "avgPing": None,
-            "uptime": None,
-            "heartbeat": None,
-            "info": None,
-            "certInfo": None
+            Event.MONITOR_LIST: None,
+            Event.NOTIFICATION_LIST: None,
+            Event.PROXY_LIST: None,
+            Event.STATUS_PAGE_LIST: None,
+            Event.HEARTBEAT_LIST: None,
+            Event.IMPORTANT_HEARTBEAT_LIST: None,
+            Event.AVG_PING: None,
+            Event.UPTIME: None,
+            Event.HEARTBEAT: None,
+            Event.INFO: None,
+            Event.CERT_INFO: None
         }
 
-        self.sio.on("connect", self._event_connect)
-        self.sio.on("disconnect", self._event_disconnect)
-        self.sio.on("monitorList", self._event_monitor_list)
-        self.sio.on("notificationList", self._event_notification_list)
-        self.sio.on("proxyList", self._event_proxy_list)
-        self.sio.on("statusPageList", self._event_status_page_list)
-        self.sio.on("heartbeatList", self._event_heartbeat_list)
-        self.sio.on("importantHeartbeatList", self._event_important_heartbeat_list)
-        self.sio.on("avgPing", self._event_avg_ping)
-        self.sio.on("uptime", self._event_uptime)
-        self.sio.on("heartbeat", self._event_heartbeat)
-        self.sio.on("info", self._event_info)
-        self.sio.on("certInfo", self._event_cert_info)
+        self.sio.on(Event.CONNECT, self._event_connect)
+        self.sio.on(Event.DISCONNECT, self._event_disconnect)
+        self.sio.on(Event.MONITOR_LIST, self._event_monitor_list)
+        self.sio.on(Event.NOTIFICATION_LIST, self._event_notification_list)
+        self.sio.on(Event.PROXY_LIST, self._event_proxy_list)
+        self.sio.on(Event.STATUS_PAGE_LIST, self._event_status_page_list)
+        self.sio.on(Event.HEARTBEAT_LIST, self._event_heartbeat_list)
+        self.sio.on(Event.IMPORTANT_HEARTBEAT_LIST, self._event_important_heartbeat_list)
+        self.sio.on(Event.AVG_PING, self._event_avg_ping)
+        self.sio.on(Event.UPTIME, self._event_uptime)
+        self.sio.on(Event.HEARTBEAT, self._event_heartbeat)
+        self.sio.on(Event.INFO, self._event_info)
+        self.sio.on(Event.CERT_INFO, self._event_cert_info)
 
         self.connect(url)
 
     def _get_event_data(self, event):
-        monitor_events = ["avgPing", "uptime", "heartbeatList", "importantHeartbeatList", "certInfo", "heartbeat"]
+        monitor_events = [Event.AVG_PING, Event.UPTIME, Event.HEARTBEAT_LIST, Event.IMPORTANT_HEARTBEAT_LIST, Event.CERT_INFO, Event.HEARTBEAT]
         while self._event_data[event] is None:
             # do not wait for events that are not sent
-            if self._event_data["monitorList"] == {} and event in monitor_events:
+            if self._event_data[Event.MONITOR_LIST] == {} and event in monitor_events:
                 return []
             time.sleep(0.01)
         time.sleep(0.01)  # wait for multiple messages
@@ -424,64 +425,64 @@ class UptimeKumaApi(object):
         pass
 
     def _event_monitor_list(self, data):
-        self._event_data["monitorList"] = data
+        self._event_data[Event.MONITOR_LIST] = data
 
     def _event_notification_list(self, data):
-        self._event_data["notificationList"] = data
+        self._event_data[Event.NOTIFICATION_LIST] = data
 
     def _event_proxy_list(self, data):
-        self._event_data["proxyList"] = data
+        self._event_data[Event.PROXY_LIST] = data
 
     def _event_status_page_list(self, data):
-        self._event_data["statusPageList"] = data
+        self._event_data[Event.STATUS_PAGE_LIST] = data
 
     def _event_heartbeat_list(self, id_, data, bool_):
-        if self._event_data["heartbeatList"] is None:
-            self._event_data["heartbeatList"] = []
-        self._event_data["heartbeatList"].append({
+        if self._event_data[Event.HEARTBEAT_LIST] is None:
+            self._event_data[Event.HEARTBEAT_LIST] = []
+        self._event_data[Event.HEARTBEAT_LIST].append({
             "id": id_,
             "data": data,
             "bool": bool_,
         })
 
     def _event_important_heartbeat_list(self, id_, data, bool_):
-        if self._event_data["importantHeartbeatList"] is None:
-            self._event_data["importantHeartbeatList"] = []
-        self._event_data["importantHeartbeatList"].append({
+        if self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] is None:
+            self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] = []
+        self._event_data[Event.IMPORTANT_HEARTBEAT_LIST].append({
             "id": id_,
             "data": data,
             "bool": bool_,
         })
 
     def _event_avg_ping(self, id_, data):
-        if self._event_data["avgPing"] is None:
-            self._event_data["avgPing"] = []
-        self._event_data["avgPing"].append({
+        if self._event_data[Event.AVG_PING] is None:
+            self._event_data[Event.AVG_PING] = []
+        self._event_data[Event.AVG_PING].append({
             "id": id_,
             "data": data,
         })
 
     def _event_uptime(self, id_, hours_24, days_30):
-        if self._event_data["uptime"] is None:
-            self._event_data["uptime"] = []
-        self._event_data["uptime"].append({
+        if self._event_data[Event.UPTIME] is None:
+            self._event_data[Event.UPTIME] = []
+        self._event_data[Event.UPTIME].append({
             "id": id_,
             "hours_24": hours_24,
             "days_30": days_30,
         })
 
     def _event_heartbeat(self, data):
-        if self._event_data["heartbeat"] is None:
-            self._event_data["heartbeat"] = []
-        self._event_data["heartbeat"].append(data)
+        if self._event_data[Event.HEARTBEAT] is None:
+            self._event_data[Event.HEARTBEAT] = []
+        self._event_data[Event.HEARTBEAT].append(data)
 
     def _event_info(self, data):
-        self._event_data["info"] = data
+        self._event_data[Event.INFO] = data
 
     def _event_cert_info(self, id_, data):
-        if self._event_data["certInfo"] is None:
-            self._event_data["certInfo"] = []
-        self._event_data["certInfo"].append({
+        if self._event_data[Event.CERT_INFO] is None:
+            self._event_data[Event.CERT_INFO] = []
+        self._event_data[Event.CERT_INFO].append({
             "id": id_,
             "data": data,
         })
@@ -498,7 +499,7 @@ class UptimeKumaApi(object):
     # monitors
 
     def get_monitors(self):
-        r = list(self._get_event_data("monitorList").values())
+        r = list(self._get_event_data(Event.MONITOR_LIST).values())
         int_to_bool(r, ["active"])
         return r
 
@@ -549,7 +550,7 @@ class UptimeKumaApi(object):
     # notifications
 
     def get_notifications(self):
-        notifications = self._get_event_data("notificationList")
+        notifications = self._get_event_data(Event.NOTIFICATION_LIST)
         r = []
         for notification_raw in notifications:
             notification = notification_raw.copy()
@@ -603,7 +604,7 @@ class UptimeKumaApi(object):
     # proxy
 
     def get_proxies(self):
-        r = self._get_event_data("proxyList")
+        r = self._get_event_data(Event.PROXY_LIST)
         int_to_bool(r, ["auth", "active", "default", "applyExisting"])
         return r
 
@@ -632,7 +633,7 @@ class UptimeKumaApi(object):
     # status page
 
     def get_status_pages(self):
-        r = list(self._get_event_data("statusPageList").values())
+        r = list(self._get_event_data(Event.STATUS_PAGE_LIST).values())
         return r
 
     def get_status_page(self, slug: str):
@@ -678,41 +679,41 @@ class UptimeKumaApi(object):
     # heartbeat
 
     def get_heartbeats(self):
-        r = self._get_event_data("heartbeatList")
+        r = self._get_event_data(Event.HEARTBEAT_LIST)
         for i in r:
             int_to_bool(i["data"], ["important", "status"])
         return r
 
     def get_important_heartbeats(self):
-        r = self._get_event_data("importantHeartbeatList")
+        r = self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
         for i in r:
             int_to_bool(i["data"], ["important", "status"])
         return r
 
     def get_heartbeat(self):
-        r = self._get_event_data("heartbeat")
+        r = self._get_event_data(Event.HEARTBEAT)
         int_to_bool(r, ["important", "status"])
         return r
 
     # avg ping
 
     def avg_ping(self):
-        return self._get_event_data("avgPing")
+        return self._get_event_data(Event.AVG_PING)
 
     # cert info
 
     def cert_info(self):
-        return self._get_event_data("certInfo")
+        return self._get_event_data(Event.CERT_INFO)
 
     # uptime
 
     def uptime(self):
-        return self._get_event_data("uptime")
+        return self._get_event_data(Event.UPTIME)
 
     # info
 
     def info(self):
-        r = self._get_event_data("info")
+        r = self._get_event_data(Event.INFO)
         return r
 
     # clear
