@@ -9,8 +9,8 @@ token = None
 class UptimeKumaTestCase(unittest.TestCase):
     api = None
     url = "http://127.0.0.1:3001"
-    username = "testuser"
-    password = "zS7zhQSc"
+    username = "admin"
+    password = "secret123"
 
     @classmethod
     def setUpClass(cls):
@@ -27,7 +27,6 @@ class UptimeKumaTestCase(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.api.logout()
         cls.api.disconnect()
 
     def compare(self, superset, subset):
