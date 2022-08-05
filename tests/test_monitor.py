@@ -49,6 +49,9 @@ class TestMonitor(UptimeKumaTestCase):
         r = self.api.resume_monitor(monitor_id)
         self.assertEqual(r["msg"], "Resumed Successfully.")
 
+        # get monitor beats
+        self.api.get_monitor_beats(monitor_id, 6)
+
         # delete monitor
         r = self.api.delete_monitor(monitor_id)
         self.assertEqual(r["msg"], "Deleted Successfully.")

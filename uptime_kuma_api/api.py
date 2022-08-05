@@ -788,7 +788,7 @@ class UptimeKumaApi(object):
             "newPassword": new_password,
         })
 
-    def upload_backup(self, json_data, import_handle: str):
+    def upload_backup(self, json_data, import_handle: str = "skip"):
         if import_handle not in ["overwrite", "skip", "keep"]:
             raise ValueError()
         return self._call('uploadBackup', (json_data, import_handle))
