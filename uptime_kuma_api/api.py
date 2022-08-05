@@ -801,6 +801,9 @@ class UptimeKumaApi(object):
     def prepare_2fa(self, password: str):
         return self._call('prepare2FA', password)
 
+    def verify_token(self, token: str, password: str):
+        return self._call('verifyToken', (token, password))
+
     def save_2fa(self, password: str):
         return self._call('save2FA', password)
 
@@ -809,18 +812,15 @@ class UptimeKumaApi(object):
 
     # login
 
-    def login(self, username: str, password: str):
+    def login(self, username: str, password: str, twofa_token: str = ""):
         return self._call('login', {
             "username": username,
             "password": password,
-            "token": ""
+            "token": twofa_token
         })
 
     def login_by_token(self, token: str):
         return self._call('loginByToken', token)
-
-    def verify_token(self, token: str, password: str):
-        return self._call('verifyToken', (token, password))
 
     def logout(self):
         return self._call('logout')
