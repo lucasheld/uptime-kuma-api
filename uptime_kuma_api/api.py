@@ -378,6 +378,7 @@ class UptimeKumaApi(object):
             "uptime": None,
             "heartbeat": None,
             "info": None,
+            "certInfo": None
         }
 
         self.sio.on("connect", self._event_connect)
@@ -392,11 +393,16 @@ class UptimeKumaApi(object):
         self.sio.on("uptime", self._event_uptime)
         self.sio.on("heartbeat", self._event_heartbeat)
         self.sio.on("info", self._event_info)
+        self.sio.on("certInfo", self._event_cert_info)
 
         self.connect(url)
 
     def _get_event_data(self, event):
+        monitor_events = ["avgPing", "uptime", "heartbeatList", "importantHeartbeatList", "certInfo", "heartbeat"]
         while self._event_data[event] is None:
+            # do not wait for events that are not sent
+            if self._event_data["monitorList"] == {} and event in monitor_events:
+                return []
             time.sleep(0.01)
         time.sleep(0.01)  # wait for multiple messages
         return self._event_data[event]
@@ -471,6 +477,14 @@ class UptimeKumaApi(object):
 
     def _event_info(self, data):
         self._event_data["info"] = data
+
+    def _event_cert_info(self, id_, data):
+        if self._event_data["certInfo"] is None:
+            self._event_data["certInfo"] = []
+        self._event_data["certInfo"].append({
+            "id": id_,
+            "data": data,
+        })
 
     # connection
 
@@ -684,6 +698,11 @@ class UptimeKumaApi(object):
 
     def avg_ping(self):
         return self._get_event_data("avgPing")
+
+    # cert info
+
+    def cert_info(self):
+        return self._get_event_data("certInfo")
 
     # uptime
 
