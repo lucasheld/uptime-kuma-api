@@ -1,6 +1,7 @@
 import json
 import time
 
+import requests
 import socketio
 
 from . import AuthMethod
@@ -226,18 +227,14 @@ def _build_status_page_data(
         showPoweredBy: bool = True,
 
         icon: str = "/icon.svg",
-        monitors: list = None
+        publicGroupList: list = None
 ):
     if theme not in ["light", "dark"]:
         raise ValueError
     if not domainNameList:
         domainNameList = []
-    public_group_list = []
-    if monitors:
-        public_group_list.append({
-            "name": "Services",
-            "monitorList": monitors
-        })
+    if not publicGroupList:
+        publicGroupList = []
     config = {
         "id": id,
         "slug": slug,
@@ -252,7 +249,7 @@ def _build_status_page_data(
         "footerText": footerText,
         "showPoweredBy": showPoweredBy
     }
-    return slug, config, icon, public_group_list
+    return slug, config, icon, publicGroupList
 
 
 def _check_missing_arguments(required_params, kwargs):
@@ -641,11 +638,16 @@ class UptimeKumaApi(object):
         return r
 
     def get_status_page(self, slug: str):
-        r = self._call('getStatusPage', slug)
-        config = r["config"]
-        del r["config"]
-        r.update(config)
-        return r
+        r1 = self._call('getStatusPage', slug)
+        r2 = requests.get(f"{self.url}/api/status-page/{slug}").json()
+
+        config = r1["config"]
+        config.update(r2["config"])
+        return {
+            **config,
+            "incident": r2["incident"],
+            "publicGroupList": r2["publicGroupList"]
+        }
 
     def add_status_page(self, slug: str, title: str):
         return self._call('addStatusPage', (title, slug))
@@ -655,6 +657,7 @@ class UptimeKumaApi(object):
 
     def save_status_page(self, slug: str, **kwargs):
         status_page = self.get_status_page(slug)
+        status_page.pop("incident")
         status_page.update(kwargs)
         data = _build_status_page_data(**status_page)
         return self._call('saveStatusPage', data)

@@ -6,6 +6,22 @@ from uptime_kuma_api import UptimeKumaApi, Event, MonitorType
 token = None
 
 
+def compare(subset, superset):
+    for key, value in subset.items():
+        value2 = superset.get(key)
+        if type(value) == list:
+            for i in range(len(value)):
+                if not value2 or not compare(value[i], value2[i]):
+                    return False
+        elif type(value) == dict:
+            if not compare(value, value2):
+                return False
+        else:
+            if value != value2:
+                return False
+    return True
+
+
 class UptimeKumaTestCase(unittest.TestCase):
     api = None
     url = "http://127.0.0.1:3001"
@@ -40,7 +56,7 @@ class UptimeKumaTestCase(unittest.TestCase):
         self.api.disconnect()
 
     def compare(self, superset, subset):
-        self.assertTrue(subset.items() <= superset.items())
+        self.assertTrue(compare(subset, superset))
 
     def find_by_id(self, objects, value, key="id"):
         for obj in objects:
@@ -48,7 +64,7 @@ class UptimeKumaTestCase(unittest.TestCase):
                 return obj
 
     def add_monitor(self):
-        r = self.api.add_monitor(type="http", name="monitor 1", url="http://127.0.0.1")
+        r = self.api.add_monitor(type=MonitorType.HTTP, name="monitor 1", url="http://127.0.0.1")
         monitor_id = r["monitorID"]
         return monitor_id
 
