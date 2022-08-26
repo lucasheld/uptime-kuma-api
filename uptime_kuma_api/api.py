@@ -839,11 +839,11 @@ class UptimeKumaApi(object):
 
     # login
 
-    def login(self, username: str, password: str, twofa_token: str = ""):
+    def login(self, username: str, password: str, token: str = ""):
         return self._call('login', {
             "username": username,
             "password": password,
-            "token": twofa_token
+            "token": token
         })
 
     def login_by_token(self, token: str):

@@ -67,9 +67,13 @@ class TestStatusPage(UptimeKumaTestCase):
         }
         incident = self.api.post_incident(slug, **incident_expected)
         self.compare(incident, incident_expected)
+        status_page = self.api.get_status_page(slug)
+        self.compare(status_page["incident"], incident)
 
         # unpin incident
         self.api.unpin_incident(slug)
+        status_page = self.api.get_status_page(slug)
+        self.assertIsNone(status_page["incident"])
 
         # delete status page
         self.api.delete_status_page(slug)
