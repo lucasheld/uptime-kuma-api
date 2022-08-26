@@ -1,23 +1,19 @@
 import unittest
 
-from uptime_kuma_api import UptimeKumaException
+from uptime_kuma_api import UptimeKumaException, MonitorType
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestMonitor(UptimeKumaTestCase):
     def test_monitor(self):
         expected_monitor = {
-            "type": "http",
+            "type": MonitorType.HTTP,
             "name": "monitor 1",
-            "url": "http://192.168.20.135"
+            "url": "http://127.0.0.1"
         }
 
         # add monitor
-        r = self.api.add_monitor(
-            type=expected_monitor["type"],
-            name=expected_monitor["name"],
-            url=expected_monitor["url"]
-        )
+        r = self.api.add_monitor(**expected_monitor)
         self.assertEqual(r["msg"], "Added Successfully.")
         monitor_id = r["monitorID"]
 
@@ -34,7 +30,7 @@ class TestMonitor(UptimeKumaTestCase):
         # edit monitor
         expected_monitor["type"] = "ping"
         expected_monitor["name"] = "monitor 1 new"
-        expected_monitor["hostname"] = "127.0.0.1"
+        expected_monitor["hostname"] = "127.0.0.10"
         del expected_monitor["url"]
         r = self.api.edit_monitor(monitor_id, **expected_monitor)
         self.assertEqual(r["msg"], "Saved.")
@@ -57,6 +53,99 @@ class TestMonitor(UptimeKumaTestCase):
         self.assertEqual(r["msg"], "Deleted Successfully.")
         with self.assertRaises(UptimeKumaException):
             self.api.get_monitor(monitor_id)
+
+    def do_test_monitor_type(self, expected_monitor):
+        r = self.api.add_monitor(**expected_monitor)
+        self.assertEqual(r["msg"], "Added Successfully.")
+        monitor_id = r["monitorID"]
+
+        monitor = self.api.get_monitor(monitor_id)
+        self.compare(monitor, expected_monitor)
+
+    def test_monitor_type_http(self):
+        expected_monitor = {
+            "type": MonitorType.HTTP,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_port(self):
+        expected_monitor = {
+            "type": MonitorType.PORT,
+            "name": "monitor 1",
+            "hostname": "127.0.0.1",
+            "port": 8888
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_ping(self):
+        expected_monitor = {
+            "type": MonitorType.PING,
+            "name": "monitor 1",
+            "hostname": "127.0.0.1",
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_keyword(self):
+        expected_monitor = {
+            "type": MonitorType.KEYWORD,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "keyword": "healthy"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_dns(self):
+        expected_monitor = {
+            "type": MonitorType.DNS,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "hostname": "127.0.0.1",
+            "port": 8888,
+            "dns_resolve_server": "1.1.1.1",
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_push(self):
+        expected_monitor = {
+            "type": MonitorType.PUSH,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_steam(self):
+        expected_monitor = {
+            "type": MonitorType.STEAM,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "hostname": "127.0.0.1",
+            "port": 8888,
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_mqtt(self):
+        expected_monitor = {
+            "type": MonitorType.MQTT,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "hostname": "127.0.0.1",
+            "port": 8888,
+            "mqttTopic": "test"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_sqlserver(self):
+        expected_monitor = {
+            "type": MonitorType.SQLSERVER,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "databaseConnectionString": "Server=127.0.0.1,8888;Database=test;User Id=1;Password=secret123;Encrypt=true;"
+                                        "TrustServerCertificate=Yes;Connection Timeout=5",
+            "databaseQuery": "select getdate()"
+        }
+        self.do_test_monitor_type(expected_monitor)
 
 
 if __name__ == '__main__':
