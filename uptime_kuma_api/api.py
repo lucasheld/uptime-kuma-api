@@ -366,6 +366,7 @@ def _check_arguments_proxy(kwargs):
 
 class UptimeKumaApi(object):
     def __init__(self, url):
+        self.url = url
         self.sio = socketio.Client()
 
         self._event_data: dict = {
@@ -396,7 +397,7 @@ class UptimeKumaApi(object):
         self.sio.on(Event.INFO, self._event_info)
         self.sio.on(Event.CERT_INFO, self._event_cert_info)
 
-        self.connect(url)
+        self.connect()
 
     def _get_event_data(self, event):
         monitor_events = [Event.AVG_PING, Event.UPTIME, Event.HEARTBEAT_LIST, Event.IMPORTANT_HEARTBEAT_LIST, Event.CERT_INFO, Event.HEARTBEAT]
@@ -489,9 +490,12 @@ class UptimeKumaApi(object):
 
     # connection
 
-    def connect(self, url: str):
-        url = url.rstrip("/")
-        self.sio.connect(f'{url}/socket.io/')
+    def connect(self):
+        url = self.url.rstrip("/")
+        try:
+            self.sio.connect(f'{url}/socket.io/')
+        except:
+            print("")
 
     def disconnect(self):
         self.sio.disconnect()

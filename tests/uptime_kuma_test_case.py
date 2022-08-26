@@ -1,7 +1,7 @@
+import json
 import unittest
 
-from uptime_kuma_api import UptimeKumaApi
-
+from uptime_kuma_api import UptimeKumaApi, Event, MonitorType
 
 token = None
 
@@ -12,22 +12,32 @@ class UptimeKumaTestCase(unittest.TestCase):
     username = "admin"
     password = "secret123"
 
-    @classmethod
-    def setUpClass(cls):
-        cls.api = UptimeKumaApi(cls.url)
+    def setUp(self):
+        self.api = UptimeKumaApi(self.url)
 
         global token
         if not token:
-            if cls.api.need_setup():
-                cls.api.setup(cls.username, cls.password)
-            r = cls.api.login(cls.username, cls.password)
+            if self.api.need_setup():
+                self.api.setup(self.username, self.password)
+            r = self.api.login(self.username, self.password)
             token = r["token"]
 
-        cls.api.login_by_token(token)
+        self.api.login_by_token(token)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.api.disconnect()
+        data = {
+            "version": "1.17.1",
+            "notificationList": [],
+            "monitorList": [],
+            "proxyList": []
+        }
+        data_str = json.dumps(data)
+        r = self.api.upload_backup(data_str, "overwrite")
+        self.assertEqual(r["msg"], "Backup successfully restored.")
+
+        self.api._event_data[Event.MONITOR_LIST] = {}
+
+    def tearDown(self):
+        self.api.disconnect()
 
     def compare(self, superset, subset):
         self.assertTrue(subset.items() <= superset.items())
