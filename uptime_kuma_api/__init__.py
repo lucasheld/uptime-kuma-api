@@ -5,4 +5,5 @@ from .notification_providers import NotificationType, notification_provider_opti
 from .proxy_protocol import ProxyProtocol
 from .incident_style import IncidentStyle
 from .exceptions import UptimeKumaException
+from .event import Event
 from .api import UptimeKumaApi

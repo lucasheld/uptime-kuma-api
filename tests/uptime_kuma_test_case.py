@@ -1,37 +1,62 @@
+import json
 import unittest
 
-from uptime_kuma_api import UptimeKumaApi
-
+from uptime_kuma_api import UptimeKumaApi, Event, MonitorType
 
 token = None
+
+
+def compare(subset, superset):
+    for key, value in subset.items():
+        value2 = superset.get(key)
+        if type(value) == list:
+            for i in range(len(value)):
+                if not value2 or not compare(value[i], value2[i]):
+                    return False
+        elif type(value) == dict:
+            if not compare(value, value2):
+                return False
+        else:
+            if value != value2:
+                return False
+    return True
 
 
 class UptimeKumaTestCase(unittest.TestCase):
     api = None
     url = "http://127.0.0.1:3001"
-    username = "testuser"
-    password = "zS7zhQSc"
+    username = "admin"
+    password = "secret123"
 
-    @classmethod
-    def setUpClass(cls):
-        cls.api = UptimeKumaApi(cls.url)
+    def setUp(self):
+        self.api = UptimeKumaApi(self.url)
 
         global token
         if not token:
-            if cls.api.need_setup():
-                cls.api.setup(cls.username, cls.password)
-            r = cls.api.login(cls.username, cls.password)
+            if self.api.need_setup():
+                self.api.setup(self.username, self.password)
+            r = self.api.login(self.username, self.password)
             token = r["token"]
 
-        cls.api.login_by_token(token)
+        self.api.login_by_token(token)
 
-    @classmethod
-    def tearDownClass(cls):
-        cls.api.logout()
-        cls.api.disconnect()
+        data = {
+            "version": "1.17.1",
+            "notificationList": [],
+            "monitorList": [],
+            "proxyList": []
+        }
+        data_str = json.dumps(data)
+        r = self.api.upload_backup(data_str, "overwrite")
+        self.assertEqual(r["msg"], "Backup successfully restored.")
+
+        self.api._event_data[Event.MONITOR_LIST] = {}
+
+    def tearDown(self):
+        self.api.disconnect()
 
     def compare(self, superset, subset):
-        self.assertTrue(subset.items() <= superset.items())
+        self.assertTrue(compare(subset, superset))
 
     def find_by_id(self, objects, value, key="id"):
         for obj in objects:
@@ -39,7 +64,7 @@ class UptimeKumaTestCase(unittest.TestCase):
                 return obj
 
     def add_monitor(self):
-        r = self.api.add_monitor(type="http", name="monitor 1", url="http://127.0.0.1")
+        r = self.api.add_monitor(type=MonitorType.HTTP, name="monitor 1", url="http://127.0.0.1")
         monitor_id = r["monitorID"]
         return monitor_id
 

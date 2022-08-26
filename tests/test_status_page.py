@@ -6,12 +6,25 @@ from uptime_kuma_test_case import UptimeKumaTestCase
 
 class TestStatusPage(UptimeKumaTestCase):
     def test_status_page(self):
+        monitor_id = self.add_monitor()
+
         slug = "slug1"
         expected_status_page = {
             "slug": slug,
             "title": "status page 1",
             "description": "description 1",
-            "showPoweredBy": False
+            "showPoweredBy": False,
+            "publicGroupList": [
+                {
+                    'name': 'Services',
+                    'weight': 1,
+                    'monitorList': [
+                        {
+                            "id": monitor_id
+                        }
+                    ]
+                }
+            ]
         }
 
         # slug must be unique
@@ -35,7 +48,9 @@ class TestStatusPage(UptimeKumaTestCase):
         status_pages = self.api.get_status_pages()
         status_page = self.find_by_id(status_pages, slug, "slug")
         self.assertIsNotNone(status_page)
-        self.compare(status_page, expected_status_page)
+        # publicGroupList and incident is not available in status pages
+        expected_status_page_config = {i: expected_status_page[i] for i in expected_status_page if i != "publicGroupList"}
+        self.compare(status_page, expected_status_page_config)
 
         # edit status page
         expected_status_page["title"] = "status page 1 new"
@@ -52,9 +67,13 @@ class TestStatusPage(UptimeKumaTestCase):
         }
         incident = self.api.post_incident(slug, **incident_expected)
         self.compare(incident, incident_expected)
+        status_page = self.api.get_status_page(slug)
+        self.compare(status_page["incident"], incident)
 
         # unpin incident
         self.api.unpin_incident(slug)
+        status_page = self.api.get_status_page(slug)
+        self.assertIsNone(status_page["incident"])
 
         # delete status page
         self.api.delete_status_page(slug)
