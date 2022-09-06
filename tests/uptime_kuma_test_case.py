@@ -11,8 +11,14 @@ def compare(subset, superset):
         value2 = superset.get(key)
         if type(value) == list:
             for i in range(len(value)):
-                if not value2 or not compare(value[i], value2[i]):
+                if not value2:
                     return False
+                elif type(value[i]) == list or type(value[i]) == dict:
+                    if not compare(value[i], value2[i]):
+                        return False
+                else:
+                    if value[i] != value2[i]:
+                        return False
         elif type(value) == dict:
             if not compare(value, value2):
                 return False
@@ -72,3 +78,8 @@ class UptimeKumaTestCase(unittest.TestCase):
         r = self.api.add_tag(name="tag 1", color="#ffffff")
         tag_id = r["id"]
         return tag_id
+
+    def add_notification(self):
+        r = self.api.add_notification(name="notification 1", type="PushByTechulus", pushAPIKey="123456789")
+        notification_id = r["id"]
+        return notification_id

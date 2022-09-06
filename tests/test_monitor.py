@@ -147,6 +147,21 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
+    def test_edit_notification_id_list(self):
+        # https://github.com/lucasheld/uptime-kuma-api/issues/3
+
+        monitor_id = self.add_monitor()
+        notification_id = self.add_notification()
+
+        expected_monitor = self.api.get_monitor(monitor_id)
+        expected_monitor["notificationIDList"] = {str(notification_id): True}
+
+        r = self.api.edit_monitor(id_=monitor_id, notificationIDList=[notification_id])
+        self.assertEqual(r["msg"], "Saved.")
+
+        monitor = self.api.get_monitor(monitor_id)
+        self.compare(monitor, expected_monitor)
+
 
 if __name__ == '__main__':
     unittest.main()

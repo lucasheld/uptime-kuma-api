@@ -23,6 +23,18 @@ def int_to_bool(data, keys):
                 data[key] = True if data[key] == 1 else False
 
 
+def _convert_monitor_data(**kwargs):
+    if not kwargs["accepted_statuscodes"]:
+        kwargs["accepted_statuscodes"] = ["200-299"]
+
+    dict_notification_ids = {}
+    if kwargs["notificationIDList"]:
+        for notification_id in kwargs["notificationIDList"]:
+            dict_notification_ids[notification_id] = True
+    kwargs["notificationIDList"] = dict_notification_ids
+    return kwargs
+
+
 def _build_monitor_data(
         type: MonitorType,
         name: str,
@@ -78,15 +90,6 @@ def _build_monitor_data(
                                         "Connection Timeout=<int>",
         databaseQuery: str = None
 ):
-    if not accepted_statuscodes:
-        accepted_statuscodes = ["200-299"]
-
-    dict_notification_ids = {}
-    if notificationIDList:
-        for notification_id in notificationIDList:
-            dict_notification_ids[notification_id] = True
-    notificationIDList = dict_notification_ids
-
     data = {
         "type": type,
         "name": name,
@@ -525,6 +528,7 @@ class UptimeKumaApi(object):
 
     def add_monitor(self, **kwargs):
         data = _build_monitor_data(**kwargs)
+        data = _convert_monitor_data(**data)
         _check_arguments_monitor(data)
         r = self._call('add', data)
         return r
@@ -532,6 +536,7 @@ class UptimeKumaApi(object):
     def edit_monitor(self, id_: int, **kwargs):
         data = self.get_monitor(id_)
         data.update(kwargs)
+        data = _convert_monitor_data(**data)
         _check_arguments_monitor(data)
         r = self._call('editMonitor', data)
         return r
