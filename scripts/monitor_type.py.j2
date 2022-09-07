@@ -1,0 +1,8 @@
+from enum import Enum
+
+
+class MonitorType(str, Enum):
+{%- for name in monitor_types %}
+    {{ name.upper() }} = "{{ name }}"
+{%- endfor %}
+

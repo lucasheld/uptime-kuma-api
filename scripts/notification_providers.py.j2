@@ -19,3 +19,13 @@ notification_provider_options = {
 {%- endfor %}
 }
 
+notification_provider_conditions = {
+    {%- for provider in notification_provider_conditions %}
+    "{{ provider }}": {
+        {%- for key, value in notification_provider_conditions[provider].items() %}
+        "{{ key }}": {{ value }},
+        {%- endfor %}
+    },
+    {%- endfor %}
+}
+

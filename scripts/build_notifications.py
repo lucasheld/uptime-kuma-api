@@ -1,19 +1,9 @@
 import glob
 import re
-from pprint import pprint
 
-import jinja2
 from bs4 import BeautifulSoup
 
-from uptime_kuma_api import convert_from_socket, params_map_notification_provider_options
-
-
-def deduplicate_list(l):
-    out = []
-    for i in l:
-        if i not in out:
-            out.append(i)
-    return out
+from utils import deduplicate_list, write_to_file
 
 
 def build_notification_providers():
@@ -61,18 +51,14 @@ def build_notification_provider_conditions():
             param_name = re.match(r'\$parent.notification.(.*)$', v_model).group(1)
             if condition:
                 conditions[param_name] = condition
-    conditions = convert_from_socket(params_map_notification_provider_options, conditions)
     return conditions
 
 
-def write_to_file(template, destination, **kwargs):
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader("./"))
-    template = env.get_template(template)
-    rendered = template.render(**kwargs)
-    with open(destination, "w") as f:
-        f.write(rendered)
+notification_providers = build_notification_providers()
+notification_provider_conditions = build_notification_provider_conditions()
 
-conditions = build_notification_provider_conditions()
-pprint(conditions)
-# notification_providers = build_notification_providers()
-# write_to_file("notification_providers.py.j2", "./../uptimekumaapi/notification_providers.py", notification_providers=notification_providers)
+write_to_file(
+    "notification_providers.py.j2", "./../uptime_kuma_api/notification_providers.py",
+    notification_providers=notification_providers,
+    notification_provider_conditions=notification_provider_conditions
+)
