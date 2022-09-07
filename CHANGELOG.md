@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 0.2.0
+
+- support for uptime kuma 1.18.0
+- convert values on monitor edit
+
 ### Release 0.1.1
 
 - implement 2FA login
