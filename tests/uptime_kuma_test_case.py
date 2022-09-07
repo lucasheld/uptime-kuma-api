@@ -1,7 +1,7 @@
 import json
 import unittest
 
-from uptime_kuma_api import UptimeKumaApi, Event, MonitorType
+from uptime_kuma_api import UptimeKumaApi, Event, MonitorType, DockerType
 
 token = None
 
@@ -83,3 +83,12 @@ class UptimeKumaTestCase(unittest.TestCase):
         r = self.api.add_notification(name="notification 1", type="PushByTechulus", pushAPIKey="123456789")
         notification_id = r["id"]
         return notification_id
+
+    def add_docker_host(self):
+        expected_docker_host = {
+            "name": "docker host 1",
+            "dockerType": DockerType.SOCKET
+        }
+        r = self.api.add_docker_host(**expected_docker_host)
+        docker_host_id = r["id"]
+        return docker_host_id

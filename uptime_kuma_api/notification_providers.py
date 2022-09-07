@@ -5,7 +5,6 @@ class NotificationType(str, Enum):
     ALERTA = "alerta"
     ALIYUNSMS = "AliyunSMS"
     APPRISE = "apprise"
-    BARK = "Bark"
     CLICKSENDSMS = "clicksendsms"
     DINGDING = "DingDing"
     DISCORD = "discord"
@@ -37,6 +36,10 @@ class NotificationType(str, Enum):
     TELEGRAM = "telegram"
     WEBHOOK = "webhook"
     WECOM = "WeCom"
+    ALERTNOW = "AlertNow"
+    BARK = "Bark"
+    HOMEASSISTANT = "HomeAssistant"
+    LINENOTIFY = "LineNotify"
 
 
 notification_provider_options = {
@@ -57,9 +60,6 @@ notification_provider_options = {
     NotificationType.APPRISE: [
         "appriseURL",
         "title",
-    ],
-    NotificationType.BARK: [
-        "barkEndpoint",
     ],
     NotificationType.CLICKSENDSMS: [
         "clicksendsmsLogin",
@@ -235,4 +235,34 @@ notification_provider_options = {
     NotificationType.WECOM: [
         "weComBotKey",
     ],
+    NotificationType.ALERTNOW: [
+        "alertNowWebhookURL",
+    ],
+    NotificationType.BARK: [
+        "barkEndpoint",
+        "barkGroup",
+        "barkSound",
+    ],
+    NotificationType.HOMEASSISTANT: [
+        "homeAssistantUrl",
+        "longLivedAccessToken",
+    ],
+    NotificationType.LINENOTIFY: [
+        "lineNotifyAccessToken",
+    ],
+}
+
+notification_provider_conditions = {
+    "gotifyPriority": {
+        "min": 0,
+        "max": 10,
+    },
+    "ntfyPriority": {
+        "min": 1,
+        "max": 5,
+    },
+    "smtpPort": {
+        "min": 0,
+        "max": 65535,
+    },
 }

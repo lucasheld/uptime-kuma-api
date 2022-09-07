@@ -3,12 +3,14 @@ import time
 
 import requests
 import socketio
+from packaging.version import parse as parse_version
 
 from . import AuthMethod
 from . import MonitorType
-from . import NotificationType, notification_provider_options
+from . import NotificationType, notification_provider_options, notification_provider_conditions
 from . import ProxyProtocol
 from . import IncidentStyle
+from . import DockerType
 from . import Event
 from . import UptimeKumaException
 
@@ -23,7 +25,7 @@ def int_to_bool(data, keys):
                 data[key] = True if data[key] == 1 else False
 
 
-def _convert_monitor_data(**kwargs):
+def _convert_monitor_data(kwargs):
     if not kwargs["accepted_statuscodes"]:
         kwargs["accepted_statuscodes"] = ["200-299"]
 
@@ -32,144 +34,13 @@ def _convert_monitor_data(**kwargs):
         for notification_id in kwargs["notificationIDList"]:
             dict_notification_ids[notification_id] = True
     kwargs["notificationIDList"] = dict_notification_ids
+
+    if not kwargs["databaseConnectionString"]:
+        if kwargs["type"] == MonitorType.SQLSERVER:
+            kwargs["databaseConnectionString"] = "Server=<hostname>,<port>;Database=<your database>;User Id=<your user id>;Password=<your password>;Encrypt=<true/false>;TrustServerCertificate=<Yes/No>;Connection Timeout=<int>"
+        elif kwargs["type"] == MonitorType.POSTGRES:
+            kwargs["databaseConnectionString"] = "postgres://username:password@host:port/database"
     return kwargs
-
-
-def _build_monitor_data(
-        type: MonitorType,
-        name: str,
-        interval: int = 60,
-        retryInterval: int = 60,
-        maxretries: int = 0,
-        upsideDown: bool = False,
-        tags: list = None,
-        notificationIDList: list = None,
-
-        # HTTP, KEYWORD
-        url: str = None,
-        expiryNotification: bool = False,
-        ignoreTls: bool = False,
-        maxredirects: int = 10,
-        accepted_statuscodes: list = None,
-        proxyId: int = None,
-        method: str = "GET",
-        body: str = None,
-        headers: str = None,
-        authMethod: AuthMethod = AuthMethod.NONE,
-        basic_auth_user: str = None,
-        basic_auth_pass: str = None,
-        authDomain: str = None,
-        authWorkstation: str = None,
-
-        # KEYWORD
-        keyword: str = None,
-
-        # DNS, PING, STEAM, MQTT
-        hostname: str = None,
-
-        # DNS, STEAM, MQTT
-        port: int = 53,
-
-        # DNS
-        dns_resolve_server: str = "1.1.1.1",
-        dns_resolve_type: str = "A",
-
-        # MQTT
-        mqttUsername: str = None,
-        mqttPassword: str = None,
-        mqttTopic: str = None,
-        mqttSuccessMessage: str = None,
-
-        # SQLSERVER
-        databaseConnectionString: str = "Server=<hostname>,<port>;"
-                                        "Database=<your database>;"
-                                        "User Id=<your user id>;"
-                                        "Password=<your password>;"
-                                        "Encrypt=<true/false>;"
-                                        "TrustServerCertificate=<Yes/No>;"
-                                        "Connection Timeout=<int>",
-        databaseQuery: str = None
-):
-    data = {
-        "type": type,
-        "name": name,
-        "interval": interval,
-        "retryInterval": retryInterval,
-        "maxretries": maxretries,
-        "notificationIDList": notificationIDList,
-        "upsideDown": upsideDown,
-    }
-
-    if tags:
-        data.update({
-            "tags": tags
-        })
-
-    if type == MonitorType.KEYWORD:
-        data.update({
-            "keyword": keyword,
-        })
-
-    # HTTP, KEYWORD
-    data.update({
-        "url": url,
-        "expiryNotification": expiryNotification,
-        "ignoreTls": ignoreTls,
-        "maxredirects": maxredirects,
-        "accepted_statuscodes": accepted_statuscodes,
-        "proxyId": proxyId,
-        "method": method,
-        "body": body,
-        "headers": headers,
-        "authMethod": authMethod,
-    })
-
-    if authMethod in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
-        data.update({
-            "basic_auth_user": basic_auth_user,
-            "basic_auth_pass": basic_auth_pass,
-        })
-
-    if authMethod == AuthMethod.NTLM:
-        data.update({
-            "authDomain": authDomain,
-            "authWorkstation": authWorkstation,
-        })
-
-    # DNS, PING, STEAM, MQTT
-    data.update({
-        "hostname": hostname,
-    })
-
-    # DNS, STEAM, MQTT
-    data.update({
-        "port": port,
-    })
-
-    # DNS
-    data.update({
-        "dns_resolve_server": dns_resolve_server,
-        "dns_resolve_type": dns_resolve_type,
-    })
-
-    # MQTT
-    data.update({
-        "mqttUsername": mqttUsername,
-        "mqttPassword": mqttPassword,
-        "mqttTopic": mqttTopic,
-        "mqttSuccessMessage": mqttSuccessMessage,
-    })
-
-    # SQLSERVER
-    data.update({
-        "databaseConnectionString": databaseConnectionString
-    })
-    if type == MonitorType.SQLSERVER:
-        data.update({
-            "databaseQuery": databaseQuery,
-        })
-
-    return data
 
 
 def _build_notification_data(
@@ -255,6 +126,28 @@ def _build_status_page_data(
     return slug, config, icon, publicGroupList
 
 
+def _convert_docker_host_data(kwargs):
+    if not kwargs["dockerDaemon"]:
+        if kwargs["dockerType"] == DockerType.SOCKET:
+            kwargs["dockerDaemon"] = "/var/run/docker.sock"
+        elif kwargs["dockerType"] == DockerType.TCP:
+            kwargs["dockerDaemon"] = "tcp://localhost:2375"
+    return kwargs
+
+
+def _build_docker_host_data(
+        name: str,
+        dockerType: DockerType,
+        dockerDaemon: str = None
+):
+    data = {
+        "name": name,
+        "dockerType": dockerType,
+        "dockerDaemon": dockerDaemon
+    }
+    return data
+
+
 def _check_missing_arguments(required_params, kwargs):
     missing_arguments = []
     for required_param in required_params:
@@ -298,6 +191,9 @@ def _check_arguments_monitor(kwargs):
         MonitorType.STEAM: ["hostname", "port"],
         MonitorType.MQTT: ["hostname", "port", "mqttTopic"],
         MonitorType.SQLSERVER: [],
+        MonitorType.POSTGRES: [],
+        MonitorType.DOCKER: ["docker_container", "docker_host"],
+        MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"]
     }
     type_ = kwargs["type"]
     required_args = required_args_by_type[type_]
@@ -331,22 +227,7 @@ def _check_arguments_notification(kwargs):
     type_ = kwargs["type"]
     required_args = notification_provider_options[type_]
     _check_missing_arguments(required_args, kwargs)
-
-    provider_conditions = {
-        'gotifyPriority': {
-            'max': 10,
-            'min': 0
-        },
-        'ntfyPriority': {
-            'max': 5,
-            'min': 1
-        },
-        'smtpPort': {
-            'max': 65535,
-            'min': 0
-        }
-    }
-    _check_argument_conditions(provider_conditions, kwargs)
+    _check_argument_conditions(notification_provider_conditions, kwargs)
 
 
 def _check_arguments_proxy(kwargs):
@@ -380,7 +261,8 @@ class UptimeKumaApi(object):
             Event.UPTIME: None,
             Event.HEARTBEAT: None,
             Event.INFO: None,
-            Event.CERT_INFO: None
+            Event.CERT_INFO: None,
+            Event.DOCKER_HOST_LIST: None
         }
 
         self.sio.on(Event.CONNECT, self._event_connect)
@@ -396,6 +278,7 @@ class UptimeKumaApi(object):
         self.sio.on(Event.HEARTBEAT, self._event_heartbeat)
         self.sio.on(Event.INFO, self._event_info)
         self.sio.on(Event.CERT_INFO, self._event_cert_info)
+        self.sio.on(Event.DOCKER_HOST_LIST, self._event_docker_host_list)
 
         self.connect()
 
@@ -488,6 +371,9 @@ class UptimeKumaApi(object):
             "data": data,
         })
 
+    def _event_docker_host_list(self, data):
+        self._event_data[Event.DOCKER_HOST_LIST] = data
+
     # connection
 
     def connect(self):
@@ -499,6 +385,178 @@ class UptimeKumaApi(object):
 
     def disconnect(self):
         self.sio.disconnect()
+
+    # builder
+
+    @property
+    def version(self):
+        info = self.info()
+        return info["version"]
+
+    def _build_monitor_data(
+            self,
+            type: MonitorType,
+            name: str,
+            interval: int = 60,
+            retryInterval: int = 60,
+            resendInterval: int = 0,
+            maxretries: int = 0,
+            upsideDown: bool = False,
+            tags: list = None,
+            notificationIDList: list = None,
+
+            # HTTP, KEYWORD
+            url: str = None,
+            expiryNotification: bool = False,
+            ignoreTls: bool = False,
+            maxredirects: int = 10,
+            accepted_statuscodes: list = None,
+            proxyId: int = None,
+            method: str = "GET",
+            body: str = None,
+            headers: str = None,
+            authMethod: AuthMethod = AuthMethod.NONE,
+            basic_auth_user: str = None,
+            basic_auth_pass: str = None,
+            authDomain: str = None,
+            authWorkstation: str = None,
+
+            # KEYWORD
+            keyword: str = None,
+
+            # DNS, PING, STEAM, MQTT
+            hostname: str = None,
+
+            # DNS, STEAM, MQTT
+            port: int = 53,
+
+            # DNS
+            dns_resolve_server: str = "1.1.1.1",
+            dns_resolve_type: str = "A",
+
+            # MQTT
+            mqttUsername: str = None,
+            mqttPassword: str = None,
+            mqttTopic: str = None,
+            mqttSuccessMessage: str = None,
+
+            # SQLSERVER, POSTGRES
+            databaseConnectionString: str = None,
+            databaseQuery: str = None,
+
+            # DOCKER
+            docker_container: str = "",
+            docker_host: int = None,
+
+            # RADIUS
+            radiusUsername: str = None,
+            radiusPassword: str = None,
+            radiusSecret: str = None,
+            radiusCalledStationId: str = None,
+            radiusCallingStationId: str = None
+    ):
+        data = {
+            "type": type,
+            "name": name,
+            "interval": interval,
+            "retryInterval": retryInterval,
+            "maxretries": maxretries,
+            "notificationIDList": notificationIDList,
+            "upsideDown": upsideDown,
+        }
+
+        if parse_version(self.version) >= parse_version("1.18"):
+            data.update({
+                "resendInterval": resendInterval
+            })
+
+        if tags:
+            data.update({
+                "tags": tags
+            })
+
+        if type == MonitorType.KEYWORD:
+            data.update({
+                "keyword": keyword,
+            })
+
+        # HTTP, KEYWORD
+        data.update({
+            "url": url,
+            "expiryNotification": expiryNotification,
+            "ignoreTls": ignoreTls,
+            "maxredirects": maxredirects,
+            "accepted_statuscodes": accepted_statuscodes,
+            "proxyId": proxyId,
+            "method": method,
+            "body": body,
+            "headers": headers,
+            "authMethod": authMethod,
+        })
+
+        if authMethod in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
+            data.update({
+                "basic_auth_user": basic_auth_user,
+                "basic_auth_pass": basic_auth_pass,
+            })
+
+        if authMethod == AuthMethod.NTLM:
+            data.update({
+                "authDomain": authDomain,
+                "authWorkstation": authWorkstation,
+            })
+
+        # DNS, PING, STEAM, MQTT
+        data.update({
+            "hostname": hostname,
+        })
+
+        # DNS, STEAM, MQTT
+        data.update({
+            "port": port,
+        })
+
+        # DNS
+        data.update({
+            "dns_resolve_server": dns_resolve_server,
+            "dns_resolve_type": dns_resolve_type,
+        })
+
+        # MQTT
+        data.update({
+            "mqttUsername": mqttUsername,
+            "mqttPassword": mqttPassword,
+            "mqttTopic": mqttTopic,
+            "mqttSuccessMessage": mqttSuccessMessage,
+        })
+
+        # SQLSERVER, POSTGRES
+        data.update({
+            "databaseConnectionString": databaseConnectionString
+        })
+        if type in [MonitorType.SQLSERVER, MonitorType.POSTGRES]:
+            data.update({
+                "databaseQuery": databaseQuery,
+            })
+
+        # DOCKER
+        if type == MonitorType.DOCKER:
+            data.update({
+                "docker_container": docker_container,
+                "docker_host": docker_host
+            })
+
+        # RADIUS
+        if type == MonitorType.RADIUS:
+            data.update({
+                "radiusUsername": radiusUsername,
+                "radiusPassword": radiusPassword,
+                "radiusSecret": radiusSecret,
+                "radiusCalledStationId": radiusCalledStationId,
+                "radiusCallingStationId": radiusCallingStationId
+            })
+
+        return data
 
     # monitors
 
@@ -527,8 +585,8 @@ class UptimeKumaApi(object):
         return r
 
     def add_monitor(self, **kwargs):
-        data = _build_monitor_data(**kwargs)
-        data = _convert_monitor_data(**data)
+        data = self._build_monitor_data(**kwargs)
+        data = _convert_monitor_data(data)
         _check_arguments_monitor(data)
         r = self._call('add', data)
         return r
@@ -536,7 +594,7 @@ class UptimeKumaApi(object):
     def edit_monitor(self, id_: int, **kwargs):
         data = self.get_monitor(id_)
         data.update(kwargs)
-        data = _convert_monitor_data(**data)
+        data = _convert_monitor_data(data)
         _check_arguments_monitor(data)
         r = self._call('editMonitor', data)
         return r
@@ -724,7 +782,7 @@ class UptimeKumaApi(object):
 
     # info
 
-    def info(self):
+    def info(self) -> dict:
         r = self._get_event_data(Event.INFO)
         return r
 
@@ -796,7 +854,10 @@ class UptimeKumaApi(object):
             tlsExpiryNotifyDays: list = None,
 
             # security
-            disableAuth: bool = False
+            disableAuth: bool = False,
+
+            # reverse proxy
+            trustProxy: bool = False
     ):
         if not tlsExpiryNotifyDays:
             tlsExpiryNotifyDays = [7, 14, 21]
@@ -812,6 +873,10 @@ class UptimeKumaApi(object):
             "tlsExpiryNotifyDays": tlsExpiryNotifyDays,
             "disableAuth": disableAuth
         }
+        if parse_version(self.version) >= parse_version("1.18"):
+            data.update({
+                "trustProxy": trustProxy
+            })
         return self._call('setSettings', (data, password))
 
     def change_password(self, old_password: str, new_password: str):
@@ -872,3 +937,34 @@ class UptimeKumaApi(object):
 
     def shrink_database(self):
         return self._call('shrinkDatabase')
+
+    # docker host
+
+    def get_docker_hosts(self):
+        r = self._get_event_data(Event.DOCKER_HOST_LIST)
+        return r
+
+    def get_docker_host(self, id_: int):
+        docker_hosts = self.get_docker_hosts()
+        for docker_host in docker_hosts:
+            if docker_host["id"] == id_:
+                return docker_host
+        raise UptimeKumaException("docker host does not exist")
+
+    def test_docker_host(self, **kwargs):
+        data = _build_docker_host_data(**kwargs)
+        return self._call('testDockerHost', data)
+
+    def add_docker_host(self, **kwargs):
+        data = _build_docker_host_data(**kwargs)
+        data = _convert_docker_host_data(data)
+        return self._call('addDockerHost', (data, None))
+
+    def edit_docker_host(self, id_: int, **kwargs):
+        data = self.get_docker_host(id_)
+        data.update(kwargs)
+        data = _convert_docker_host_data(data)
+        return self._call('addDockerHost', (data, id_))
+
+    def delete_docker_host(self, id_: int):
+        return self._call('deleteDockerHost', id_)

@@ -1,4 +1,5 @@
 import unittest
+from packaging.version import parse as parse_version
 
 from uptime_kuma_api import UptimeKumaException, MonitorType
 from uptime_kuma_test_case import UptimeKumaTestCase
@@ -63,10 +64,13 @@ class TestMonitor(UptimeKumaTestCase):
         self.compare(monitor, expected_monitor)
 
     def test_monitor_type_http(self):
+        json_data = '{"key": "value"}'
         expected_monitor = {
             "type": MonitorType.HTTP,
             "name": "monitor 1",
-            "url": "http://127.0.0.1"
+            "url": "http://127.0.0.1",
+            "body": json_data,
+            "headers": json_data
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -83,7 +87,7 @@ class TestMonitor(UptimeKumaTestCase):
         expected_monitor = {
             "type": MonitorType.PING,
             "name": "monitor 1",
-            "hostname": "127.0.0.1",
+            "hostname": "127.0.0.1"
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -100,18 +104,16 @@ class TestMonitor(UptimeKumaTestCase):
         expected_monitor = {
             "type": MonitorType.DNS,
             "name": "monitor 1",
-            "url": "http://127.0.0.1",
             "hostname": "127.0.0.1",
             "port": 8888,
-            "dns_resolve_server": "1.1.1.1",
+            "dns_resolve_server": "1.1.1.1"
         }
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_push(self):
         expected_monitor = {
             "type": MonitorType.PUSH,
-            "name": "monitor 1",
-            "url": "http://127.0.0.1"
+            "name": "monitor 1"
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -119,9 +121,8 @@ class TestMonitor(UptimeKumaTestCase):
         expected_monitor = {
             "type": MonitorType.STEAM,
             "name": "monitor 1",
-            "url": "http://127.0.0.1",
             "hostname": "127.0.0.1",
-            "port": 8888,
+            "port": 8888
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -129,7 +130,6 @@ class TestMonitor(UptimeKumaTestCase):
         expected_monitor = {
             "type": MonitorType.MQTT,
             "name": "monitor 1",
-            "url": "http://127.0.0.1",
             "hostname": "127.0.0.1",
             "port": 8888,
             "mqttTopic": "test"
@@ -140,10 +140,49 @@ class TestMonitor(UptimeKumaTestCase):
         expected_monitor = {
             "type": MonitorType.SQLSERVER,
             "name": "monitor 1",
-            "url": "http://127.0.0.1",
             "databaseConnectionString": "Server=127.0.0.1,8888;Database=test;User Id=1;Password=secret123;Encrypt=true;"
                                         "TrustServerCertificate=Yes;Connection Timeout=5",
             "databaseQuery": "select getdate()"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_postgres(self):
+        if parse_version(self.api.version) < parse_version("1.18"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.POSTGRES,
+            "name": "monitor 1",
+            "databaseConnectionString": "postgres://username:password@host:port/database",
+            "databaseQuery": "select getdate()"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_docker(self):
+        if parse_version(self.api.version) < parse_version("1.18"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        docker_host_id = self.add_docker_host()
+        expected_monitor = {
+            "type": MonitorType.DOCKER,
+            "name": "monitor 1",
+            "docker_container": "test",
+            "docker_host": docker_host_id
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_radius(self):
+        if parse_version(self.api.version) < parse_version("1.18"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.RADIUS,
+            "name": "monitor 1",
+            "radiusUsername": "123",
+            "radiusPassword": "456",
+            "radiusSecret": "789",
+            "radiusCalledStationId": "1",
+            "radiusCallingStationId": "2"
         }
         self.do_test_monitor_type(expected_monitor)
 

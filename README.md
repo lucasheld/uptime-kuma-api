@@ -8,6 +8,8 @@ This package was developed to configure Uptime Kuma with Ansible. The Ansible co
 
 Python version 3.6+ is required.
 
+Supported Uptime Kuma versions: 1.18, 1.17
+
 Installation
 ---
 uptime-kuma-api is available on the [Python Package Index (PyPI)](https://pypi.org/project/uptime-kuma-api/).

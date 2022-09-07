@@ -15,3 +15,4 @@ class Event(str, Enum):
     HEARTBEAT = "heartbeat"
     INFO = "info"
     CERT_INFO = "certInfo"
+    DOCKER_HOST_LIST = "dockerHostList"

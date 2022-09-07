@@ -1,1 +1,2 @@
 python-socketio[client]>=5.0.0
+packaging

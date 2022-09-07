@@ -30,7 +30,10 @@ setup(
     license=info["__license__"],
     packages=["uptime_kuma_api"],
     python_requires=">=3.6, <4",
-    install_requires=["python-socketio[client]>=5.0.0"],
+    install_requires=[
+        "python-socketio[client]>=5.0.0",
+        "packaging"
+    ],
     classifiers=[
         "Development Status :: 1 - Planning",
         "Environment :: Web Environment",
