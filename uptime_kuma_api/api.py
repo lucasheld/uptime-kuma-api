@@ -32,7 +32,11 @@ def gen_secret(length: int) -> str:
     return ''.join(random.choice(chars) for _ in range(length))
 
 
-def _convert_monitor_data(kwargs):
+def _convert_monitor_return(monitor):
+    monitor["notificationIDList"] = [int(i) for i in monitor["notificationIDList"].keys()]
+
+
+def _convert_monitor_input(kwargs):
     if not kwargs["accepted_statuscodes"]:
         kwargs["accepted_statuscodes"] = ["200-299"]
 
@@ -50,7 +54,6 @@ def _convert_monitor_data(kwargs):
 
     if kwargs["type"] == MonitorType.PUSH and not kwargs.get("pushToken"):
         kwargs["pushToken"] = gen_secret(10)
-    return kwargs
 
 
 def _build_notification_data(
@@ -136,13 +139,12 @@ def _build_status_page_data(
     return slug, config, icon, publicGroupList
 
 
-def _convert_docker_host_data(kwargs):
+def _convert_docker_host_input(kwargs):
     if not kwargs["dockerDaemon"]:
         if kwargs["dockerType"] == DockerType.SOCKET:
             kwargs["dockerDaemon"] = "/var/run/docker.sock"
         elif kwargs["dockerType"] == DockerType.TCP:
             kwargs["dockerDaemon"] = "tcp://localhost:2375"
-    return kwargs
 
 
 def _build_docker_host_data(
@@ -572,11 +574,14 @@ class UptimeKumaApi(object):
 
     def get_monitors(self):
         r = list(self._get_event_data(Event.MONITOR_LIST).values())
+        for monitor in r:
+            _convert_monitor_return(monitor)
         int_to_bool(r, ["active"])
         return r
 
     def get_monitor(self, id_: int):
         r = self._call('getMonitor', id_)["monitor"]
+        _convert_monitor_return(r)
         int_to_bool(r, ["active"])
         return r
 
@@ -596,7 +601,7 @@ class UptimeKumaApi(object):
 
     def add_monitor(self, **kwargs):
         data = self._build_monitor_data(**kwargs)
-        data = _convert_monitor_data(data)
+        _convert_monitor_input(data)
         _check_arguments_monitor(data)
         r = self._call('add', data)
         return r
@@ -604,7 +609,7 @@ class UptimeKumaApi(object):
     def edit_monitor(self, id_: int, **kwargs):
         data = self.get_monitor(id_)
         data.update(kwargs)
-        data = _convert_monitor_data(data)
+        _convert_monitor_input(data)
         _check_arguments_monitor(data)
         r = self._call('editMonitor', data)
         return r
@@ -967,13 +972,13 @@ class UptimeKumaApi(object):
 
     def add_docker_host(self, **kwargs):
         data = _build_docker_host_data(**kwargs)
-        data = _convert_docker_host_data(data)
+        _convert_docker_host_input(data)
         return self._call('addDockerHost', (data, None))
 
     def edit_docker_host(self, id_: int, **kwargs):
         data = self.get_docker_host(id_)
         data.update(kwargs)
-        data = _convert_docker_host_data(data)
+        _convert_docker_host_input(data)
         return self._call('addDockerHost', (data, id_))
 
     def delete_docker_host(self, id_: int):
