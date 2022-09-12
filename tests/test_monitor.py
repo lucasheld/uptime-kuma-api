@@ -62,6 +62,7 @@ class TestMonitor(UptimeKumaTestCase):
 
         monitor = self.api.get_monitor(monitor_id)
         self.compare(monitor, expected_monitor)
+        return monitor
 
     def test_monitor_type_http(self):
         json_data = '{"key": "value"}'
@@ -115,7 +116,10 @@ class TestMonitor(UptimeKumaTestCase):
             "type": MonitorType.PUSH,
             "name": "monitor 1"
         }
-        self.do_test_monitor_type(expected_monitor)
+        monitor = self.do_test_monitor_type(expected_monitor)
+
+        # https://github.com/lucasheld/ansible-uptime-kuma/issues/5
+        self.assertIsNotNone(monitor["pushToken"])
 
     def test_monitor_type_steam(self):
         expected_monitor = {

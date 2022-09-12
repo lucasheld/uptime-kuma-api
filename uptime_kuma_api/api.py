@@ -1,5 +1,7 @@
 import json
 import time
+import string
+import random
 
 import requests
 import socketio
@@ -25,6 +27,11 @@ def int_to_bool(data, keys):
                 data[key] = True if data[key] == 1 else False
 
 
+def gen_secret(length: int) -> str:
+    chars = string.ascii_uppercase + string.ascii_lowercase + string.digits
+    return ''.join(random.choice(chars) for _ in range(length))
+
+
 def _convert_monitor_data(kwargs):
     if not kwargs["accepted_statuscodes"]:
         kwargs["accepted_statuscodes"] = ["200-299"]
@@ -40,6 +47,9 @@ def _convert_monitor_data(kwargs):
             kwargs["databaseConnectionString"] = "Server=<hostname>,<port>;Database=<your database>;User Id=<your user id>;Password=<your password>;Encrypt=<true/false>;TrustServerCertificate=<Yes/No>;Connection Timeout=<int>"
         elif kwargs["type"] == MonitorType.POSTGRES:
             kwargs["databaseConnectionString"] = "postgres://username:password@host:port/database"
+
+    if kwargs["type"] == MonitorType.PUSH and not kwargs.get("pushToken"):
+        kwargs["pushToken"] = gen_secret(10)
     return kwargs
 
 
