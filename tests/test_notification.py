@@ -8,7 +8,7 @@ class TestNotification(UptimeKumaTestCase):
     def test_notification(self):
         expected_notification = {
             "name": "notification 1",
-            "default": True,
+            "isDefault": True,
             "applyExisting": True,
             "type": "PushByTechulus",
             "pushAPIKey": "123456789"

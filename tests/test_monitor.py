@@ -1,17 +1,29 @@
 import unittest
 from packaging.version import parse as parse_version
 
-from uptime_kuma_api import UptimeKumaException, MonitorType
+from uptime_kuma_api import UptimeKumaException, MonitorType, AuthMethod
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestMonitor(UptimeKumaTestCase):
     def test_monitor(self):
+        notification_id_1 = self.add_notification()
+        notification_id_2 = self.add_notification()
+
         expected_monitor = {
             "type": MonitorType.HTTP,
             "name": "monitor 1",
+            "interval": 60,
+            "retryInterval": 60,
+            "maxretries": 0,
+            "notificationIDList": [notification_id_1, notification_id_2],
+            "upsideDown": False,
             "url": "http://127.0.0.1"
         }
+        if parse_version(self.api.version) >= parse_version("1.18"):
+            expected_monitor.update({
+                "resendInterval": 0
+            })
 
         # add monitor
         r = self.api.add_monitor(**expected_monitor)
@@ -62,16 +74,55 @@ class TestMonitor(UptimeKumaTestCase):
 
         monitor = self.api.get_monitor(monitor_id)
         self.compare(monitor, expected_monitor)
+
+        r = self.api.edit_monitor(monitor_id, **expected_monitor)
+        self.assertEqual(r["msg"], "Saved.")
+        monitor = self.api.get_monitor(monitor_id)
+        self.compare(monitor, expected_monitor)
+
+        monitor = self.api.get_monitor(monitor_id)
+        self.compare(monitor, expected_monitor)
         return monitor
 
     def test_monitor_type_http(self):
+        proxy_id = self.add_proxy()
+
         json_data = '{"key": "value"}'
         expected_monitor = {
             "type": MonitorType.HTTP,
             "name": "monitor 1",
             "url": "http://127.0.0.1",
+            "expiryNotification": False,
+            "ignoreTls": False,
+            "maxredirects": 10,
+            "accepted_statuscodes": ["200-299"],
+            "proxyId": proxy_id,
+            "method": "GET",
             "body": json_data,
-            "headers": json_data
+            "headers": json_data,
+            "authMethod": AuthMethod.NONE
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_auth_method(self):
+        for auth_method in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
+            expected_monitor = {
+                "type": MonitorType.HTTP,
+                "name": "monitor 1",
+                "url": "http://127.0.0.1",
+                "authMethod": auth_method,
+                "basic_auth_user": "auth user",
+                "basic_auth_pass": "auth pass",
+            }
+            self.do_test_monitor_type(expected_monitor)
+
+        expected_monitor = {
+            "type": MonitorType.HTTP,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "authMethod": AuthMethod.NTLM,
+            "authDomain": "auth domain",
+            "authWorkstation": "auth workstation",
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -107,7 +158,8 @@ class TestMonitor(UptimeKumaTestCase):
             "name": "monitor 1",
             "hostname": "127.0.0.1",
             "port": 8888,
-            "dns_resolve_server": "1.1.1.1"
+            "dns_resolve_server": "1.1.1.1",
+            "dns_resolve_type": "A"
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -136,7 +188,10 @@ class TestMonitor(UptimeKumaTestCase):
             "name": "monitor 1",
             "hostname": "127.0.0.1",
             "port": 8888,
-            "mqttTopic": "test"
+            "mqttUsername": "mqtt username",
+            "mqttPassword": "mqtt password",
+            "mqttTopic": "mqtt topic",
+            "mqttSuccessMessage": "mqtt success message"
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -189,18 +244,6 @@ class TestMonitor(UptimeKumaTestCase):
             "radiusCallingStationId": "2"
         }
         self.do_test_monitor_type(expected_monitor)
-
-    def test_notification_id_list(self):
-        monitor_id = self.add_monitor()
-        notification_id = self.add_notification()
-
-        expected_monitor = self.api.get_monitor(monitor_id)
-        expected_monitor["notificationIDList"] = [notification_id]
-
-        r = self.api.edit_monitor(id_=monitor_id, **expected_monitor)
-        self.assertEqual(r["msg"], "Saved.")
-        monitor = self.api.get_monitor(monitor_id)
-        self.compare(monitor, expected_monitor)
 
 
 if __name__ == '__main__':

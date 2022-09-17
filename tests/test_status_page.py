@@ -13,7 +13,14 @@ class TestStatusPage(UptimeKumaTestCase):
             "slug": slug,
             "title": "status page 1",
             "description": "description 1",
+            "theme": "light",
+            "published": True,
+            "showTags": False,
+            "domainNameList": [],
+            "customCSS": "",
+            "footerText": None,
             "showPoweredBy": False,
+            "icon": "/icon.svg",
             "publicGroupList": [
                 {
                     'name': 'Services',

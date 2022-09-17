@@ -1,20 +1,24 @@
 import unittest
 
-from uptime_kuma_api import UptimeKumaException
+from uptime_kuma_api import UptimeKumaException, ProxyProtocol
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestProxy(UptimeKumaTestCase):
     def test_proxy(self):
         expected_proxy = {
-            "protocol": "http",
+            "protocol": ProxyProtocol.HTTP,
             "host": "127.0.0.1",
             "port": 8080,
-            "active": True
+            "auth": True,
+            "username": "username",
+            "password": "password",
+            "active": True,
+            "default": False
         }
 
         # add proxy
-        r = self.api.add_proxy(**expected_proxy)
+        r = self.api.add_proxy(applyExisting=False, **expected_proxy)
         self.assertEqual(r["msg"], "Saved")
         proxy_id = r["id"]
 

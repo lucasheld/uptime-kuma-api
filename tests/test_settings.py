@@ -1,18 +1,36 @@
-import unittest
 import json
+import unittest
+from packaging.version import parse as parse_version
 
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestSettings(UptimeKumaTestCase):
     def test_settings(self):
-        settings_before = self.api.get_settings()
+        expected_settings = {
+            "checkUpdate": False,
+            "checkBeta": False,
+            "keepDataPeriodDays": 180,
+            "entryPage": "dashboard",
+            "searchEngineIndex": False,
+            "primaryBaseURL": "",
+            "steamAPIKey": "",
+            "tlsExpiryNotifyDays": [7, 14, 21],
+            "disableAuth": False
+        }
 
-        expected_check_update = not settings_before.get("checkUpdate", True)
-        self.api.set_settings(self.password, checkUpdate=expected_check_update)
+        if parse_version(self.api.version) >= parse_version("1.18"):
+            expected_settings.update({
+                "trustProxy": False
+            })
 
+        # set settings
+        r = self.api.set_settings(self.password, **expected_settings)
+        self.assertEqual(r["msg"], "Saved")
+
+        # get settings
         settings = self.api.get_settings()
-        self.assertEqual(settings["checkUpdate"], expected_check_update)
+        self.compare(settings, expected_settings)
 
     def test_change_password(self):
         new_password = "321terces"

@@ -63,6 +63,14 @@ def _build_notification_data(
         applyExisting: bool = False,
         **kwargs
 ):
+    allowed_kwargs = []
+    for keys in notification_provider_options.values():
+        allowed_kwargs.extend(keys)
+
+    for key in kwargs.keys():
+        if key not in allowed_kwargs:
+            raise TypeError(f"unknown argument '{key}'")
+
     data = {
         "name": name,
         "type": type,
@@ -512,12 +520,12 @@ class UptimeKumaApi(object):
                 "authWorkstation": authWorkstation,
             })
 
-        # DNS, PING, STEAM, MQTT
+        # PORT, PING, DNS, STEAM, MQTT
         data.update({
             "hostname": hostname,
         })
 
-        # DNS, STEAM, MQTT
+        # PORT, DNS, STEAM, MQTT
         data.update({
             "port": port,
         })
