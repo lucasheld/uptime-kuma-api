@@ -414,7 +414,6 @@ class UptimeKumaApi(object):
             resendInterval: int = 0,
             maxretries: int = 0,
             upsideDown: bool = False,
-            tags: list = None,
             notificationIDList: list = None,
 
             # HTTP, KEYWORD
@@ -480,11 +479,6 @@ class UptimeKumaApi(object):
         if parse_version(self.version) >= parse_version("1.18"):
             data.update({
                 "resendInterval": resendInterval
-            })
-
-        if tags:
-            data.update({
-                "tags": tags
             })
 
         if type == MonitorType.KEYWORD:
