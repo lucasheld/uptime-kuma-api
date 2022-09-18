@@ -41,7 +41,7 @@ class TestMonitor(UptimeKumaTestCase):
         self.compare(monitor, expected_monitor)
 
         # edit monitor
-        expected_monitor["type"] = "ping"
+        expected_monitor["type"] = MonitorType.PING
         expected_monitor["name"] = "monitor 1 new"
         expected_monitor["hostname"] = "127.0.0.10"
         del expected_monitor["url"]

@@ -1,6 +1,6 @@
 import unittest
 
-from uptime_kuma_api import UptimeKumaException
+from uptime_kuma_api import UptimeKumaException, NotificationType
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
@@ -10,7 +10,7 @@ class TestNotification(UptimeKumaTestCase):
             "name": "notification 1",
             "isDefault": True,
             "applyExisting": True,
-            "type": "PushByTechulus",
+            "type": NotificationType.PUSHBYTECHULUS,
             "pushAPIKey": "123456789"
         }
 
@@ -37,7 +37,7 @@ class TestNotification(UptimeKumaTestCase):
         expected_notification["name"] = "notification 1 new"
         expected_notification["default"] = False
         expected_notification["applyExisting"] = False
-        expected_notification["type"] = "PushDeer"
+        expected_notification["type"] = NotificationType.PUSHDEER
         expected_notification["pushdeerKey"] = "987654321"
         del expected_notification["pushAPIKey"]
         r = self.api.edit_notification(notification_id, **expected_notification)

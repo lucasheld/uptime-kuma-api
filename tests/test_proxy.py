@@ -33,7 +33,7 @@ class TestProxy(UptimeKumaTestCase):
         self.compare(proxy, expected_proxy)
 
         # edit proxy
-        expected_proxy["protocol"] = "https"
+        expected_proxy["protocol"] = ProxyProtocol.HTTPS
         expected_proxy["host"] = "127.0.0.2"
         expected_proxy["port"] = 8888
         r = self.api.edit_proxy(proxy_id, **expected_proxy)
