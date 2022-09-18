@@ -34,12 +34,6 @@ class TestStatusPage(UptimeKumaTestCase):
             ]
         }
 
-        # slug must be unique
-        try:
-            self.api.delete_status_page(slug)
-        except UptimeKumaException:
-            pass
-
         # add status page
         r = self.api.add_status_page(slug, expected_status_page["title"])
         self.assertEqual(r["msg"], "OK!")

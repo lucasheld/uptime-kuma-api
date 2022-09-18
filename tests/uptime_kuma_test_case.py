@@ -1,7 +1,7 @@
-import json
 import unittest
+from packaging.version import parse as parse_version
 
-from uptime_kuma_api import UptimeKumaApi, Event, MonitorType, DockerType
+from uptime_kuma_api import UptimeKumaApi, MonitorType, DockerType
 
 token = None
 
@@ -46,17 +46,41 @@ class UptimeKumaTestCase(unittest.TestCase):
 
         self.api.login_by_token(token)
 
-        data = {
-            "version": "1.17.1",
-            "notificationList": [],
-            "monitorList": [],
-            "proxyList": []
-        }
-        data_str = json.dumps(data)
-        r = self.api.upload_backup(data_str, "overwrite")
-        self.assertEqual(r["msg"], "Backup successfully restored.")
+        # delete monitors
+        monitors = self.api.get_monitors()
+        for monitor in monitors:
+            self.api.delete_monitor(monitor["id"])
 
-        self.api._event_data[Event.MONITOR_LIST] = {}
+        # delete notifications
+        notifications = self.api.get_notifications()
+        for notification in notifications:
+            self.api.delete_notification(notification["id"])
+
+        # delete proxies
+        proxies = self.api.get_proxies()
+        for proxy in proxies:
+            self.api.delete_proxy(proxy["id"])
+
+        # delete tags
+        tags = self.api.get_tags()
+        for tag in tags:
+            self.api.delete_tag(tag["id"])
+
+        # delete status pages
+        status_pages = self.api.get_status_pages()
+        for status_page in status_pages:
+            self.api.delete_status_page(status_page["slug"])
+
+        if parse_version(self.api.version) >= parse_version("1.18"):
+            # delete docker hosts
+            docker_hosts = self.api.get_docker_hosts()
+            for docker_host in docker_hosts:
+                self.api.delete_docker_host(docker_host["id"])
+
+        # login again to receive initial messages
+        self.api.disconnect()
+        self.api = UptimeKumaApi(self.url)
+        self.api.login_by_token(token)
 
     def tearDown(self):
         self.api.disconnect()
