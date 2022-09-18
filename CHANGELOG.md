@@ -1,5 +1,11 @@
 ## Changelog
 
+### Release 0.2.2
+
+- remove `tags` from monitor input
+- create test objects with available arguments
+- convert monitor notificationIDList only once
+
 ### Release 0.2.1
 
 - generate pushToken on push monitor save
