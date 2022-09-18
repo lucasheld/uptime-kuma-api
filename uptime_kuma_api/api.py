@@ -33,7 +33,8 @@ def gen_secret(length: int) -> str:
 
 
 def _convert_monitor_return(monitor):
-    monitor["notificationIDList"] = [int(i) for i in monitor["notificationIDList"].keys()]
+    if type(monitor["notificationIDList"]) == dict:
+        monitor["notificationIDList"] = [int(i) for i in monitor["notificationIDList"].keys()]
 
 
 def _convert_monitor_input(kwargs):
