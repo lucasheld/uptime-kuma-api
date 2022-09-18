@@ -310,7 +310,7 @@ class UptimeKumaApi(object):
             if self._event_data[Event.MONITOR_LIST] == {} and event in monitor_events:
                 return []
             time.sleep(0.01)
-        time.sleep(0.01)  # wait for multiple messages
+        time.sleep(0.05)  # wait for multiple messages
         return self._event_data[event]
 
     def _call(self, event, data=None):
