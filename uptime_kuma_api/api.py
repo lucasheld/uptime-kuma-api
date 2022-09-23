@@ -853,7 +853,7 @@ class UptimeKumaApi(object):
 
     def set_settings(
             self,
-            password: str,
+            password: str = None,  # only required if disableAuth is true
 
             # about
             checkUpdate: bool = True,

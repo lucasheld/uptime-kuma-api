@@ -28,6 +28,10 @@ class TestSettings(UptimeKumaTestCase):
         r = self.api.set_settings(self.password, **expected_settings)
         self.assertEqual(r["msg"], "Saved")
 
+        # set settings without password
+        r = self.api.set_settings(**expected_settings)
+        self.assertEqual(r["msg"], "Saved")
+
         # get settings
         settings = self.api.get_settings()
         self.compare(settings, expected_settings)
