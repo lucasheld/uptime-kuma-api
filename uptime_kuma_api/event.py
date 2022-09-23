@@ -16,3 +16,4 @@ class Event(str, Enum):
     INFO = "info"
     CERT_INFO = "certInfo"
     DOCKER_HOST_LIST = "dockerHostList"
+    AUTO_LOGIN = "autoLogin"

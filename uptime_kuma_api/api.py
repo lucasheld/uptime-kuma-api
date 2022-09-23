@@ -283,7 +283,8 @@ class UptimeKumaApi(object):
             Event.HEARTBEAT: None,
             Event.INFO: None,
             Event.CERT_INFO: None,
-            Event.DOCKER_HOST_LIST: None
+            Event.DOCKER_HOST_LIST: None,
+            Event.AUTO_LOGIN: None
         }
 
         self.sio.on(Event.CONNECT, self._event_connect)
@@ -300,6 +301,7 @@ class UptimeKumaApi(object):
         self.sio.on(Event.INFO, self._event_info)
         self.sio.on(Event.CERT_INFO, self._event_cert_info)
         self.sio.on(Event.DOCKER_HOST_LIST, self._event_docker_host_list)
+        self.sio.on(Event.AUTO_LOGIN, self._event_auto_login)
 
         self.connect()
 
@@ -394,6 +396,9 @@ class UptimeKumaApi(object):
 
     def _event_docker_host_list(self, data):
         self._event_data[Event.DOCKER_HOST_LIST] = data
+
+    def _event_auto_login(self):
+        self._event_data[Event.AUTO_LOGIN] = True
 
     # connection
 
@@ -927,7 +932,16 @@ class UptimeKumaApi(object):
 
     # login
 
-    def login(self, username: str, password: str, token: str = ""):
+    def _wait_for_auto_login(self):
+        while self._event_data[Event.AUTO_LOGIN] is None:
+            time.sleep(0.01)
+
+    def login(self, username: str = None, password: str = None, token: str = ""):
+        # autologin
+        if username is None and password is None:
+            self._wait_for_auto_login()
+            return
+
         return self._call('login', {
             "username": username,
             "password": password,
