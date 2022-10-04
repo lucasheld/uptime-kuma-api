@@ -1,5 +1,17 @@
 ## Changelog
 
+### Release 0.4.0
+
+#### Feature
+- support for uptime kuma 1.18.1 / 1.18.2
+
+#### Bugfix
+- update event list data after changes
+
+#### Test
+- ignore ResourceWarning
+- add script to run tests for all supported uptime kuma versions
+
 ### Release 0.3.0
 
 #### Feature
