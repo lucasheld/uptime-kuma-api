@@ -7,6 +7,9 @@ from uptime_kuma_test_case import UptimeKumaTestCase
 
 class TestMonitor(UptimeKumaTestCase):
     def test_monitor(self):
+        # get empty list to make sure that future accesses will also work
+        self.api.get_monitors()
+
         notification_id_1 = self.add_notification()
         notification_id_2 = self.add_notification()
 
@@ -75,6 +78,9 @@ class TestMonitor(UptimeKumaTestCase):
         monitor = self.api.get_monitor(monitor_id)
         self.compare(monitor, expected_monitor)
 
+        expected_monitor.update({
+            "name": "monitor 2"
+        })
         r = self.api.edit_monitor(monitor_id, **expected_monitor)
         self.assertEqual(r["msg"], "Saved.")
         monitor = self.api.get_monitor(monitor_id)

@@ -6,6 +6,9 @@ from uptime_kuma_test_case import UptimeKumaTestCase
 
 class TestNotification(UptimeKumaTestCase):
     def test_notification(self):
+        # get empty list to make sure that future accesses will also work
+        self.api.get_notifications()
+
         expected_notification = {
             "name": "notification 1",
             "isDefault": True,

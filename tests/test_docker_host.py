@@ -13,6 +13,9 @@ class TestDockerHost(UptimeKumaTestCase):
             self.skipTest("Unsupported in this Uptime Kuma version")
 
     def test_docker_host(self):
+        # get empty list to make sure that future accesses will also work
+        self.api.get_docker_hosts()
+
         expected_docker_host = {
             "name": "name 1",
             "dockerType": DockerType.SOCKET,

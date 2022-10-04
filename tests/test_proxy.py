@@ -6,6 +6,9 @@ from uptime_kuma_test_case import UptimeKumaTestCase
 
 class TestProxy(UptimeKumaTestCase):
     def test_proxy(self):
+        # get empty list to make sure that future accesses will also work
+        self.api.get_proxies()
+
         expected_proxy = {
             "protocol": ProxyProtocol.HTTP,
             "host": "127.0.0.1",

@@ -6,6 +6,9 @@ from uptime_kuma_test_case import UptimeKumaTestCase
 
 class TestStatusPage(UptimeKumaTestCase):
     def test_status_page(self):
+        # get empty list to make sure that future accesses will also work
+        self.api.get_status_pages()
+
         monitor_id = self.add_monitor()
 
         slug = "slug1"
@@ -80,6 +83,10 @@ class TestStatusPage(UptimeKumaTestCase):
         self.api.delete_status_page(slug)
         with self.assertRaises(UptimeKumaException):
             self.api.get_status_page(slug)
+
+        status_pages = self.api.get_status_pages()
+        status_page = self.find_by_id(status_pages, slug, "slug")
+        self.assertIsNone(status_page)
 
 
 if __name__ == '__main__':
