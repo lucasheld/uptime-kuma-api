@@ -16,8 +16,6 @@ class NotificationType(str, Enum):
     LUNASEA = "lunasea"
     MATRIX = "matrix"
     MATTERMOST = "mattermost"
-    NTFY = "ntfy"
-    OCTOPUSH = "octopush"
     ONEBOT = "OneBot"
     PAGERDUTY = "PagerDuty"
     PROMOSMS = "promosms"
@@ -31,15 +29,21 @@ class NotificationType(str, Enum):
     SLACK = "slack"
     SMTP = "smtp"
     STACKFIELD = "stackfield"
-    TEAMS = "teams"
     PUSHBYTECHULUS = "PushByTechulus"
     TELEGRAM = "telegram"
     WEBHOOK = "webhook"
     WECOM = "WeCom"
     ALERTNOW = "AlertNow"
-    BARK = "Bark"
     HOMEASSISTANT = "HomeAssistant"
     LINENOTIFY = "LineNotify"
+    BARK = "Bark"
+    GOALERT = "GoAlert"
+    NTFY = "ntfy"
+    OCTOPUSH = "octopush"
+    SERVERCHAN = "ServerChan"
+    SMSMANAGER = "SMSManager"
+    SQUADCAST = "squadcast"
+    TEAMS = "teams"
 
 
 notification_provider_options = {
@@ -114,24 +118,6 @@ notification_provider_options = {
         "mattermostchannel",
         "mattermosticonemo",
         "mattermosticonurl",
-    ],
-    NotificationType.NTFY: [
-        "ntfyserverurl",
-        "ntfytopic",
-        "ntfyPriority",
-    ],
-    NotificationType.OCTOPUSH: [
-        "octopushVersion",
-        "octopushAPIKey",
-        "octopushLogin",
-        "octopushPhoneNumber",
-        "octopushSMSType",
-        "octopushSenderName",
-        "octopushDMLogin",
-        "octopushDMAPIKey",
-        "octopushDMPhoneNumber",
-        "octopushDMSenderName",
-        "octopushDMSMSType",
     ],
     NotificationType.ONEBOT: [
         "httpAddr",
@@ -218,9 +204,6 @@ notification_provider_options = {
     NotificationType.STACKFIELD: [
         "stackfieldwebhookURL",
     ],
-    NotificationType.TEAMS: [
-        "webhookUrl",
-    ],
     NotificationType.PUSHBYTECHULUS: [
         "pushAPIKey",
     ],
@@ -238,17 +221,55 @@ notification_provider_options = {
     NotificationType.ALERTNOW: [
         "alertNowWebhookURL",
     ],
-    NotificationType.BARK: [
-        "barkEndpoint",
-        "barkGroup",
-        "barkSound",
-    ],
     NotificationType.HOMEASSISTANT: [
         "homeAssistantUrl",
         "longLivedAccessToken",
     ],
     NotificationType.LINENOTIFY: [
         "lineNotifyAccessToken",
+    ],
+    NotificationType.BARK: [
+        "barkEndpoint",
+        "barkGroup",
+        "barkSound",
+    ],
+    NotificationType.GOALERT: [
+        "goAlertBaseURL",
+        "goAlertToken",
+    ],
+    NotificationType.NTFY: [
+        "ntfyusername",
+        "ntfypassword",
+        "ntfytopic",
+        "ntfyPriority",
+        "ntfyserverurl",
+    ],
+    NotificationType.OCTOPUSH: [
+        "octopushVersion",
+        "octopushAPIKey",
+        "octopushLogin",
+        "octopushPhoneNumber",
+        "octopushSMSType",
+        "octopushSenderName",
+        "octopushDMLogin",
+        "octopushDMAPIKey",
+        "octopushDMPhoneNumber",
+        "octopushDMSenderName",
+        "octopushDMSMSType",
+    ],
+    NotificationType.SERVERCHAN: [
+        "serverChanSendKey",
+    ],
+    NotificationType.SMSMANAGER: [
+        "smsmanagerApiKey",
+        "numbers",
+        "messageType",
+    ],
+    NotificationType.SQUADCAST: [
+        "squadcastWebhookURL",
+    ],
+    NotificationType.TEAMS: [
+        "webhookUrl",
     ],
 }
 
@@ -257,12 +278,12 @@ notification_provider_conditions = {
         "min": 0,
         "max": 10,
     },
-    "ntfyPriority": {
-        "min": 1,
-        "max": 5,
-    },
     "smtpPort": {
         "min": 0,
         "max": 65535,
+    },
+    "ntfyPriority": {
+        "min": 1,
+        "max": 5,
     },
 }
