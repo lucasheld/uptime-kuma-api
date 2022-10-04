@@ -1,4 +1,5 @@
 import unittest
+import warnings
 from packaging.version import parse as parse_version
 
 from uptime_kuma_api import UptimeKumaApi, MonitorType, DockerType
@@ -35,6 +36,8 @@ class UptimeKumaTestCase(unittest.TestCase):
     password = "secret123"
 
     def setUp(self):
+        warnings.simplefilter("ignore", ResourceWarning)
+
         self.api = UptimeKumaApi(self.url)
 
         global token
