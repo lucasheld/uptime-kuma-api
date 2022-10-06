@@ -38,12 +38,13 @@ class NotificationType(str, Enum):
     LINENOTIFY = "LineNotify"
     BARK = "Bark"
     GOALERT = "GoAlert"
-    NTFY = "ntfy"
     OCTOPUSH = "octopush"
     SERVERCHAN = "ServerChan"
     SMSMANAGER = "SMSManager"
     SQUADCAST = "squadcast"
     TEAMS = "teams"
+    FREEMOBILE = "FreeMobile"
+    NTFY = "ntfy"
 
 
 notification_provider_options = {
@@ -237,13 +238,6 @@ notification_provider_options = {
         "goAlertBaseURL",
         "goAlertToken",
     ],
-    NotificationType.NTFY: [
-        "ntfyusername",
-        "ntfypassword",
-        "ntfytopic",
-        "ntfyPriority",
-        "ntfyserverurl",
-    ],
     NotificationType.OCTOPUSH: [
         "octopushVersion",
         "octopushAPIKey",
@@ -270,6 +264,17 @@ notification_provider_options = {
     ],
     NotificationType.TEAMS: [
         "webhookUrl",
+    ],
+    NotificationType.FREEMOBILE: [
+        "freemobileUser",
+        "freemobilePass",
+    ],
+    NotificationType.NTFY: [
+        "ntfyusername",
+        "ntfypassword",
+        "ntfytopic",
+        "ntfyPriority",
+        "ntfyserverurl",
     ],
 }
 
