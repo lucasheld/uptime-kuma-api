@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 0.5.1
+
+#### Bugfix
+- remove required notification provider args check
+
 ### Release 0.5.0
 
 #### Feature
