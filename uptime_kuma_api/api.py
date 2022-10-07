@@ -247,9 +247,10 @@ def _check_arguments_notification(kwargs):
     required_args = ["type", "name"]
     _check_missing_arguments(required_args, kwargs)
 
-    type_ = kwargs["type"]
-    required_args = notification_provider_options[type_]
-    _check_missing_arguments(required_args, kwargs)
+    # TODO: collect required notification args from /src/components/notifications/*
+    # type_ = kwargs["type"]
+    # required_args = notification_provider_options[type_]
+    # _check_missing_arguments(required_args, kwargs)
     _check_argument_conditions(notification_provider_conditions, kwargs)
 
 
