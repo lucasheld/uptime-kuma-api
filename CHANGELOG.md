@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 0.5.2
+
+#### Bugfix
+- add type to notification provider options
+
 ### Release 0.5.1
 
 #### Bugfix
@@ -18,10 +23,6 @@
 #### Bugfix
 - update event list data after changes
 
-#### Test
-- ignore ResourceWarning
-- add script to run tests for all supported uptime kuma versions
-
 ### Release 0.3.0
 
 #### Feature
@@ -36,9 +37,6 @@
 #### Bugfix
 - remove `tags` from monitor input
 - convert monitor notificationIDList only once
-
-#### Test
-- create test objects with available arguments
 
 ### Release 0.2.1
 
