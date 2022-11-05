@@ -222,24 +222,24 @@ def _check_arguments_monitor(kwargs):
     required_args = required_args_by_type[type_]
     _check_missing_arguments(required_args, kwargs)
 
-    conditions = {
-        "interval": {
-            "min": 20
-        },
-        "maxretries": {
-            "min": 0
-        },
-        "retryInterval": {
-            "min": 20
-        },
-        "maxredirects": {
-            "min": 0
-        },
-        "port": {
-            "min": 0,
-            "max": 65535
-        }
-    }
+    conditions = dict(
+        interval=dict(
+            min=20,
+        ),
+        maxretries=dict(
+            min=0,
+        ),
+        retryInterval=dict(
+            min=20,
+        ),
+        maxredirects=dict(
+            min=0,
+        ),
+        port=dict(
+            min=0,
+            max=65535,
+        ),
+    )
     _check_argument_conditions(conditions, kwargs)
 
 
@@ -260,12 +260,12 @@ def _check_arguments_proxy(kwargs):
         required_args.extend(["username", "password"])
     _check_missing_arguments(required_args, kwargs)
 
-    conditions = {
-        "port": {
-            "min": 0,
-            "max": 65535
-        }
-    }
+    conditions = dict(
+        port=dict(
+            min=0,
+            max=65535,
+        )
+    )
     _check_argument_conditions(conditions, kwargs)
 
 
