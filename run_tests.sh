@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for version in 1.18.3 1.17.1
+for version in 1.18.5 1.17.1
 do
   echo "Starting uptime kuma $version..."
   docker run -d -it --rm -p 3001:3001 --name uptimekuma "louislam/uptime-kuma:$version" > /dev/null

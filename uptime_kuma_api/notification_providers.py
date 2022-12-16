@@ -2,49 +2,136 @@ from enum import Enum
 
 
 class NotificationType(str, Enum):
+    """Enumerate notification types."""
+
     ALERTA = "alerta"
+    """Alerta"""
+
     ALIYUNSMS = "AliyunSMS"
+    """AliyunSMS"""
+
     APPRISE = "apprise"
+    """Apprise (Support 50+ Notification services)"""
+
     CLICKSENDSMS = "clicksendsms"
+    """ClickSend SMS"""
+
     DINGDING = "DingDing"
+    """DingDing"""
+
     DISCORD = "discord"
+    """Discord"""
+
     FEISHU = "Feishu"
+    """Feishu"""
+
     GOOGLECHAT = "GoogleChat"
+    """Google Chat (Google Workspace only)"""
+
     GORUSH = "gorush"
+    """Gorush"""
+
     GOTIFY = "gotify"
+    """Gotify"""
+
     LINE = "line"
+    """Line Messenger"""
+
     LUNASEA = "lunasea"
+    """LunaSea"""
+
     MATRIX = "matrix"
+    """Matrix"""
+
     MATTERMOST = "mattermost"
+    """Mattermost"""
+
     ONEBOT = "OneBot"
+    """OneBot"""
+
     PAGERDUTY = "PagerDuty"
+    """PagerDuty"""
+
     PROMOSMS = "promosms"
+    """PromoSMS"""
+
     PUSHBULLET = "pushbullet"
+    """Pushbullet"""
+
     PUSHDEER = "PushDeer"
+    """PushDeer"""
+
     PUSHOVER = "pushover"
+    """Pushover"""
+
     PUSHY = "pushy"
+    """Pushy"""
+
     ROCKET_CHAT = "rocket.chat"
+    """Rocket.Chat"""
+
     SERWERSMS = "serwersms"
+    """SerwerSMS.pl"""
+
     SIGNAL = "signal"
+    """Signal"""
+
     SLACK = "slack"
+    """Slack"""
+
     SMTP = "smtp"
+    """Email (SMTP)"""
+
     STACKFIELD = "stackfield"
+    """Stackfield"""
+
     PUSHBYTECHULUS = "PushByTechulus"
+    """Push by Techulus"""
+
     TELEGRAM = "telegram"
+    """Telegram"""
+
     WEBHOOK = "webhook"
+    """Webhook"""
+
     WECOM = "WeCom"
+    """WeCom"""
+
     ALERTNOW = "AlertNow"
+    """AlertNow"""
+
     HOMEASSISTANT = "HomeAssistant"
+    """Home Assistant"""
+
     LINENOTIFY = "LineNotify"
+    """LineNotify"""
+
     BARK = "Bark"
+    """Bark"""
+
     GOALERT = "GoAlert"
+    """GoAlert"""
+
     OCTOPUSH = "octopush"
+    """Octopush"""
+
     SERVERCHAN = "ServerChan"
+    """ServerChan"""
+
     SMSMANAGER = "SMSManager"
+    """SMSManager"""
+
     SQUADCAST = "squadcast"
+    """Squadcast"""
+
     TEAMS = "teams"
+    """Microsoft Teams"""
+
     FREEMOBILE = "FreeMobile"
+    """FreeMobile"""
+
     NTFY = "ntfy"
+    """ntfy"""
 
 
 notification_provider_options = {
