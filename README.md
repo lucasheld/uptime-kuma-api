@@ -20,6 +20,10 @@ You can install it using pip:
 pip install uptime-kuma-api
 ```
 
+Documentation
+---
+The API Reference is available on [Read the Docs](https://uptime-kuma-api.readthedocs.io).
+
 Examples
 ---
 Once you have installed the python package, you can use it to communicate with an Uptime Kuma instance.
