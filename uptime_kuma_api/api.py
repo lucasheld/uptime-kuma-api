@@ -300,6 +300,7 @@ class UptimeKumaApi(object):
         >>> api.disconnect()
 
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
+    :raises UptimeKumaException: When connection to server failed.
     """
     def __init__(self, url: str) -> None:
         self.url = url
@@ -459,6 +460,8 @@ class UptimeKumaApi(object):
         Connects to Uptime Kuma.
 
         Called automatically when the UptimeKumaApi instance is created.
+
+        :raises UptimeKumaException: When connection to server failed.
         """
         url = self.url.rstrip("/")
         try:
@@ -647,6 +650,7 @@ class UptimeKumaApi(object):
         Get all monitors.
 
         :return: A list of monitors.
+        :rtype: list
 
         Example::
 
@@ -716,6 +720,8 @@ class UptimeKumaApi(object):
 
         :param int id_: The monitor id.
         :return: The monitor.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -782,6 +788,8 @@ class UptimeKumaApi(object):
 
         :param int id_: The monitor id.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -798,6 +806,8 @@ class UptimeKumaApi(object):
 
         :param int id_: The monitor id.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -814,6 +824,8 @@ class UptimeKumaApi(object):
 
         :param int id_: The monitor id.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -832,6 +844,8 @@ class UptimeKumaApi(object):
         :param int id_: The monitor id.
         :param int hours: Period time in hours from now.
         :return: The server response.
+        :rtype: list
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -871,9 +885,9 @@ class UptimeKumaApi(object):
         """
         Adds a new monitor.
 
-        :raises UptimeKumaException: Raises when call not successful.
         :return: The server response.
         :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -900,6 +914,8 @@ class UptimeKumaApi(object):
 
         :param int id_: The monitor id.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -926,6 +942,8 @@ class UptimeKumaApi(object):
         :param int monitor_id: Id of the monitor to add the tag to.
         :param str, optional value: Value of the tag., defaults to ""
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -955,6 +973,8 @@ class UptimeKumaApi(object):
         :param id monitor_id: Id of monitor to remove the tag from.
         :param str, optional value: Value of the tag., defaults to ""
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -979,6 +999,7 @@ class UptimeKumaApi(object):
         Get all notifications.
 
         :return: All notifications.
+        :rtype: list
 
         Example::
 
@@ -1012,6 +1033,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the notification to get.
         :return: The notification.
+        :rtype: dict
+        :raises UptimeKumaException: If the notification does not exist.
 
         Example::
 
@@ -1039,6 +1062,8 @@ class UptimeKumaApi(object):
         Test a notification.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1065,6 +1090,8 @@ class UptimeKumaApi(object):
         Add a notification.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1093,6 +1120,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the notification to edit.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1130,6 +1159,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the notification to delete.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1146,6 +1177,8 @@ class UptimeKumaApi(object):
         Check if apprise exists.
 
         :return: The server response.
+        :rtype: bool
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1161,6 +1194,7 @@ class UptimeKumaApi(object):
         Get all proxies.
 
         :return: All proxies.
+        :rtype: list
 
         Example::
 
@@ -1191,6 +1225,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the proxy to get.
         :return: The proxy.
+        :rtype: dict
+        :raises UptimeKumaException: If the proxy does not exist.
 
         Example::
 
@@ -1221,6 +1257,8 @@ class UptimeKumaApi(object):
         Add a proxy.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1253,6 +1291,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the proxy to edit.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1278,6 +1318,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the proxy to delete.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1296,6 +1338,7 @@ class UptimeKumaApi(object):
         Get all status pages.
 
         :return: All status pages.
+        :rtype: list
 
         Example::
 
@@ -1325,6 +1368,8 @@ class UptimeKumaApi(object):
 
         :param str slug: Slug
         :return: The status page.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1385,6 +1430,8 @@ class UptimeKumaApi(object):
         :param str slug: Slug
         :param str title: Title
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1402,6 +1449,7 @@ class UptimeKumaApi(object):
 
         :param str slug: Slug
         :return: The server response.
+        :rtype: dict
 
         Example::
 
@@ -1437,6 +1485,8 @@ class UptimeKumaApi(object):
         :param str, optional icon: Icon, defaults to "/icon.svg"
         :param list, optional publicGroupList: Public Group List, defaults to None
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1510,6 +1560,8 @@ class UptimeKumaApi(object):
         :param str content: Content
         :param IncidentStyle, optional style: Style, defaults to :attr:`~.IncidentStyle.PRIMARY`
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1543,6 +1595,8 @@ class UptimeKumaApi(object):
 
         :param str slug: Slug
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1560,6 +1614,7 @@ class UptimeKumaApi(object):
         Get heartbeats.
 
         :return: The heartbeats.
+        :rtype: list
 
         Example::
 
@@ -1606,6 +1661,7 @@ class UptimeKumaApi(object):
         Get important heartbeats.
 
         :return: The important heartbeats.
+        :rtype: list
 
         Example::
 
@@ -1638,6 +1694,7 @@ class UptimeKumaApi(object):
         Get heartbeat.
 
         :return: The heartbeat.
+        :rtype: list
 
         Example::
 
@@ -1664,6 +1721,7 @@ class UptimeKumaApi(object):
         Get average ping.
 
         :return: The average ping.
+        :rtype: list
 
         Example::
 
@@ -1684,6 +1742,7 @@ class UptimeKumaApi(object):
         Get certificate info.
 
         :return: Certificate info.
+        :rtype: list
 
         Example::
 
@@ -1704,6 +1763,7 @@ class UptimeKumaApi(object):
         Get monitor uptime.
 
         :return: Monitor uptime.
+        :rtype: list
 
         Example::
 
@@ -1730,6 +1790,7 @@ class UptimeKumaApi(object):
         Get server info.
 
         :return: Server info.
+        :rtype: dict
 
         Example::
 
@@ -1751,6 +1812,8 @@ class UptimeKumaApi(object):
 
         :param int monitor_id: Id of the monitor to clear events.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1765,6 +1828,8 @@ class UptimeKumaApi(object):
 
         :param int monitor_id: Id of the monitor to clear heartbeats.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1778,6 +1843,8 @@ class UptimeKumaApi(object):
         Clear statistics.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1793,6 +1860,8 @@ class UptimeKumaApi(object):
         Get all tags.
 
         :return: All tags.
+        :rtype: list
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1813,6 +1882,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the monitor to get.
         :return: The tag.
+        :rtype: dict
+        :raises UptimeKumaException: If the tag does not exist.
 
         Example::
 
@@ -1844,6 +1915,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the monitor to delete.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1861,6 +1934,8 @@ class UptimeKumaApi(object):
         :param str name: Tag name
         :param str color: Tag color
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1887,6 +1962,8 @@ class UptimeKumaApi(object):
         Get settings.
 
         :return: Settings.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1952,6 +2029,8 @@ class UptimeKumaApi(object):
         :param bool, optional disableAuth: Disable Authentication, defaults to False
         :param bool, optional trustProxy: Trust Proxy. Trust 'X-Forwarded-\*' headers. If you want to get the correct client IP and your Uptime Kuma is behind such as Nginx or Apache, you should enable this., defaults to False
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -1999,6 +2078,8 @@ class UptimeKumaApi(object):
         :param str old_password: Old password
         :param str new_password: New password
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2022,6 +2103,8 @@ class UptimeKumaApi(object):
         :param str json_data: Backup data as json string.
         :param str, optional import_handle: Choose "skip" if you want to skip every monitor or notification with the same name. "overwrite" will delete every existing monitor and notification. "keep" will keep both., defaults to "skip"
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2050,6 +2133,8 @@ class UptimeKumaApi(object):
         Get current 2FA status.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2066,6 +2151,8 @@ class UptimeKumaApi(object):
 
         :param str password: Current password.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2095,6 +2182,8 @@ class UptimeKumaApi(object):
         :param str token: 2FA token.
         :param str password: Current password.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2118,6 +2207,8 @@ class UptimeKumaApi(object):
 
         :param str password: Current password.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2134,6 +2225,8 @@ class UptimeKumaApi(object):
 
         :param str password: Current password.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2156,6 +2249,8 @@ class UptimeKumaApi(object):
         :param str, optional password: Password. Must be None if disableAuth is enabled., defaults to None
         :param str, optional token: 2FA Token. Required if 2FA is enabled., defaults to ""
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2183,6 +2278,8 @@ class UptimeKumaApi(object):
 
         :param str token: Login token generated by :meth:`~login`
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2196,6 +2293,8 @@ class UptimeKumaApi(object):
         Logout.
 
         :return: The server response.
+        :rtype: None
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2211,6 +2310,8 @@ class UptimeKumaApi(object):
         Check if the server has already been set up.
 
         :return: The server response.
+        :rtype: bool
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2226,6 +2327,8 @@ class UptimeKumaApi(object):
         :param str username: Username
         :param str password: Password
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2243,6 +2346,8 @@ class UptimeKumaApi(object):
         Get database size.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2260,6 +2365,8 @@ class UptimeKumaApi(object):
         Trigger database VACUUM for SQLite. If your database is created after 1.10.0, AUTO_VACUUM is already enabled and this action is not needed.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2275,6 +2382,7 @@ class UptimeKumaApi(object):
         Get all docker hosts.
 
         :return: All docker hosts.
+        :rtype: list
 
         Example::
 
@@ -2298,6 +2406,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the docker host to get.
         :return: The docker host.
+        :rtype: dict
+        :raises UptimeKumaException: If the docker host does not exist.
 
         Example::
 
@@ -2322,6 +2432,8 @@ class UptimeKumaApi(object):
         Test a docker host.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2343,6 +2455,8 @@ class UptimeKumaApi(object):
         Add a docker host.
 
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2368,6 +2482,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the docker host to edit.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
@@ -2389,6 +2505,8 @@ class UptimeKumaApi(object):
 
         :param int id_: Id of the docker host to delete.
         :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
 
         Example::
 
