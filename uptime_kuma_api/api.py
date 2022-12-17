@@ -299,8 +299,7 @@ class UptimeKumaApi(object):
 
         >>> api.disconnect()
 
-    :param url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
-    :type url: str
+    :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
     """
     def __init__(self, url: str) -> None:
         self.url = url
@@ -715,9 +714,7 @@ class UptimeKumaApi(object):
         """
         Get a monitor.
 
-        :param id_: The monitor id.
-        :type id_: int
-
+        :param int id_: The monitor id.
         :return: The monitor.
 
         Example::
@@ -783,9 +780,7 @@ class UptimeKumaApi(object):
         """
         Pauses a monitor.
 
-        :param id_: The monitor id.
-        :type id_: int
-
+        :param int id_: The monitor id.
         :return: The server response.
 
         Example::
@@ -801,9 +796,7 @@ class UptimeKumaApi(object):
         """
         Resumes a monitor.
 
-        :param id_: The monitor id.
-        :type id_: int
-
+        :param int id_: The monitor id.
         :return: The server response.
 
         Example::
@@ -819,9 +812,7 @@ class UptimeKumaApi(object):
         """
         Deletes a monitor.
 
-        :param id_: The monitor id.
-        :type id_: int
-
+        :param int id_: The monitor id.
         :return: The server response.
 
         Example::
@@ -838,12 +829,8 @@ class UptimeKumaApi(object):
         """
         Get monitor beats for a specific monitor in a time range.
 
-        :param id_: The monitor id.
-        :type id_: int
-
-        :param hours: Period time in hours from now.
-        :type hours: int
-
+        :param int id_: The monitor id.
+        :param int hours: Period time in hours from now.
         :return: The server response.
 
         Example::
@@ -884,7 +871,9 @@ class UptimeKumaApi(object):
         """
         Adds a new monitor.
 
+        :raises UptimeKumaException: Raises when call not successful.
         :return: The server response.
+        :rtype: dict
 
         Example::
 
@@ -909,9 +898,7 @@ class UptimeKumaApi(object):
         """
         Edits an existing monitor.
 
-        :param id_: The monitor id.
-        :type id_: int
-
+        :param int id_: The monitor id.
         :return: The server response.
 
         Example::
@@ -935,15 +922,9 @@ class UptimeKumaApi(object):
         """
         Add a tag to a monitor.
 
-        :param tag_id: Id of the tag.
-        :type tag_id: int
-
-        :param monitor_id: Id of the monitor to add the tag to.
-        :type monitor_id: int
-
-        :param value: (optional) Value of the tag.
-        :type value: str
-
+        :param int tag_id: Id of the tag.
+        :param int monitor_id: Id of the monitor to add the tag to.
+        :param str, optional value: Value of the tag., defaults to ""
         :return: The server response.
 
         Example::
@@ -970,15 +951,9 @@ class UptimeKumaApi(object):
         """
         Delete a tag from a monitor.
 
-        :param tag_id: Id of the tag to remove.
-        :type tag_id: id
-
-        :param monitor_id: Id of monitor to remove the tag from.
-        :type monitor_id: id
-
-        :param value: (optional) Value of the tag.
-        :type value: str
-
+        :param id tag_id: Id of the tag to remove.
+        :param id monitor_id: Id of monitor to remove the tag from.
+        :param str, optional value: Value of the tag., defaults to ""
         :return: The server response.
 
         Example::
@@ -1035,9 +1010,7 @@ class UptimeKumaApi(object):
         """
         Get a notification.
 
-        :param id_: Id of the notification to get.
-        :type id_: int
-
+        :param int id_: Id of the notification to get.
         :return: The notification.
 
         Example::
@@ -1118,9 +1091,7 @@ class UptimeKumaApi(object):
         """
         Edit a notification.
 
-        :param id_: Id of the notification to edit.
-        :type id_: int
-
+        :param int id_: Id of the notification to edit.
         :return: The server response.
 
         Example::
@@ -1157,9 +1128,7 @@ class UptimeKumaApi(object):
         """
         Delete a notification.
 
-        :param id_: Id of the notification to delete.
-        :type id_: int
-
+        :param int id_: Id of the notification to delete.
         :return: The server response.
 
         Example::
@@ -1220,9 +1189,7 @@ class UptimeKumaApi(object):
         """
         Get a proxy.
 
-        :param id_: Id of the proxy to get.
-        :type id_: int
-
+        :param int id_: Id of the proxy to get.
         :return: The proxy.
 
         Example::
@@ -1284,9 +1251,7 @@ class UptimeKumaApi(object):
         """
         Edit a proxy.
 
-        :param id_: Id of the proxy to edit.
-        :type id_: int
-
+        :param int id_: Id of the proxy to edit.
         :return: The server response.
 
         Example::
@@ -1311,9 +1276,7 @@ class UptimeKumaApi(object):
         """
         Delete a proxy.
 
-        :param id_: Id of the proxy to delete.
-        :type id_: int
-
+        :param int id_: Id of the proxy to delete.
         :return: The server response.
 
         Example::
@@ -1360,9 +1323,7 @@ class UptimeKumaApi(object):
         """
         Get a status page.
 
-        :param slug: Slug
-        :type slug: str
-
+        :param str slug: Slug
         :return: The status page.
 
         Example::
@@ -1421,12 +1382,8 @@ class UptimeKumaApi(object):
         """
         Add a status page.
 
-        :param slug: Slug
-        :type slug: str
-
-        :param title: Title
-        :type title: str
-
+        :param str slug: Slug
+        :param str title: Title
         :return: The server response.
 
         Example::
@@ -1443,9 +1400,7 @@ class UptimeKumaApi(object):
         """
         Delete a status page.
 
-        :param slug: Slug
-        :type slug: str
-
+        :param str slug: Slug
         :return: The server response.
 
         Example::
@@ -1468,45 +1423,19 @@ class UptimeKumaApi(object):
         """
         Save a status page.
 
-        :param slug: Slug
-        :type slug: str
-
-        :param id: Id of the status page to save
-        :type id: int
-
-        :param title: Title
-        :type title: str
-
-        :param description: (optional) Description
-        :type description: str
-
-        :param theme: (optional) Switch Theme
-        :type theme: str
-
-        :param published: (optional) Published
-        :type published: bool
-
-        :param showTags: (optional) Show Tags
-        :type showTags: bool
-
-        :param domainNameList: (optional) Domain Names
-        :type domainNameList: list
-
-        :param customCSS: (optional) Custom CSS
-        :type customCSS: str
-
-        :param footerText: (optional) Custom Footer
-        :type footerText: str
-
-        :param showPoweredBy: (optional) Show Powered By
-        :type showPoweredBy: bool
-
-        :param icon: (optional) Icon
-        :type icon: str
-
-        :param publicGroupList: (optional) Public Group List
-        :type publicGroupList: list
-
+        :param str slug: Slug
+        :param int id: Id of the status page to save
+        :param str title: Title
+        :param str, optional description: Description, defaults to None
+        :param str, optional theme: Switch Theme, defaults to "light"
+        :param bool, optional published: Published, defaults to True
+        :param bool, optional showTags: Show Tags, defaults to False
+        :param list, optional domainNameList: Domain Names, defaults to None
+        :param str, optional customCSS: Custom CSS, defaults to ""
+        :param str, optional footerText: Custom Footer, defaults to None
+        :param bool, optional showPoweredBy: Show Powered By, defaults to True
+        :param str, optional icon: Icon, defaults to "/icon.svg"
+        :param list, optional publicGroupList: Public Group List, defaults to None
         :return: The server response.
 
         Example::
@@ -1576,18 +1505,10 @@ class UptimeKumaApi(object):
         """
         Post an incident to status page.
 
-        :param slug: Slug
-        :type slug: str
-
-        :param title: Title
-        :type title: str
-
-        :param content: Content
-        :type content: str
-
-        :param style: (optional) Style
-        :type style: IncidentStyle.DANGER
-
+        :param str slug: Slug
+        :param str title: Title
+        :param str content: Content
+        :param IncidentStyle, optional style: Style, defaults to :attr:`~.IncidentStyle.PRIMARY`
         :return: The server response.
 
         Example::
@@ -1620,9 +1541,7 @@ class UptimeKumaApi(object):
         """
         Unpin an incident from a status page.
 
-        :param slug: Slug
-        :type slug: str
-
+        :param str slug: Slug
         :return: The server response.
 
         Example::
@@ -1830,9 +1749,7 @@ class UptimeKumaApi(object):
         """
         Clear monitor events.
 
-        :param monitor_id: Id of the monitor to clear events.
-        :type monitor_id: int
-
+        :param int monitor_id: Id of the monitor to clear events.
         :return: The server response.
 
         Example::
@@ -1846,9 +1763,7 @@ class UptimeKumaApi(object):
         """
         Clear monitor heartbeats.
 
-        :param monitor_id: Id of the monitor to clear heartbeats.
-        :type monitor_id: int
-
+        :param int monitor_id: Id of the monitor to clear heartbeats.
         :return: The server response.
 
         Example::
@@ -1896,9 +1811,7 @@ class UptimeKumaApi(object):
         """
         Get a tag.
 
-        :param id_: Id of the monitor to get.
-        :type id_: int
-
+        :param int id_: Id of the monitor to get.
         :return: The tag.
 
         Example::
@@ -1929,9 +1842,7 @@ class UptimeKumaApi(object):
         """
         Delete a tag.
 
-        :param id_: Id of the monitor to delete.
-        :type id_: int
-
+        :param int id_: Id of the monitor to delete.
         :return: The server response.
 
         Example::
@@ -1947,12 +1858,8 @@ class UptimeKumaApi(object):
         """
         Add a tag.
 
-        :param name: Tag name
-        :type name: str
-
-        :param color: Tag color
-        :type color: str
-
+        :param str name: Tag name
+        :param str color: Tag color
         :return: The server response.
 
         Example::
@@ -2033,39 +1940,17 @@ class UptimeKumaApi(object):
         """
         Set settings.
 
-        :param password: (optional) Password
-        :type password: str
-
-        :param checkUpdate: (optional) Show update if available
-        :type checkUpdate: bool
-
-        :param checkBeta: (optional) Also check beta release
-        :type checkBeta: bool
-
-        :param keepDataPeriodDays: (optional) Keep monitor history data for X days.
-        :type keepDataPeriodDays: int
-
-        :param entryPage: (optional) Entry Page
-        :type entryPage: str
-
-        :param searchEngineIndex: (optional) Search Engine Visibility
-        :type searchEngineIndex: bool
-
-        :param primaryBaseURL: (optional) Primary Base URL
-        :type primaryBaseURL: str
-
-        :param steamAPIKey: (optional) Steam API Key. For monitoring a Steam Game Server you need a Steam Web-API key.
-        :type steamAPIKey: str
-
-        :param tlsExpiryNotifyDays: (optional) TLS Certificate Expiry. HTTPS Monitors trigger notification when TLS certificate expires in.
-        :type tlsExpiryNotifyDays: list
-
-        :param disableAuth: (optional) Disable Authentication
-        :type disableAuth: bool
-
-        :param trustProxy: (optional) Trust Proxy. Trust 'X-Forwarded-*' headers. If you want to get the correct client IP and your Uptime Kuma is behind such as Nginx or Apache, you should enable this.
-        :type trustProxy: bool
-
+        :param str, optional password: Password, defaults to None
+        :param bool, optional checkUpdate: Show update if available, defaults to True
+        :param bool, optional checkBeta: Also check beta release, defaults to False
+        :param int, optional keepDataPeriodDays: Keep monitor history data for X days., defaults to 180
+        :param str, optional entryPage: Entry Page, defaults to "dashboard"
+        :param bool, optional searchEngineIndex: Search Engine Visibility, defaults to False
+        :param str, optional primaryBaseURL: Primary Base URL, defaults to ""
+        :param str, optional steamAPIKey: Steam API Key. For monitoring a Steam Game Server you need a Steam Web-API key., defaults to ""
+        :param list, optional tlsExpiryNotifyDays: TLS Certificate Expiry. HTTPS Monitors trigger notification when TLS certificate expires in., defaults to None
+        :param bool, optional disableAuth: Disable Authentication, defaults to False
+        :param bool, optional trustProxy: Trust Proxy. Trust 'X-Forwarded-\*' headers. If you want to get the correct client IP and your Uptime Kuma is behind such as Nginx or Apache, you should enable this., defaults to False
         :return: The server response.
 
         Example::
@@ -2111,12 +1996,8 @@ class UptimeKumaApi(object):
         """
         Change password.
 
-        :param old_password: Old password
-        :type old_password: str
-
-        :param new_password: New password
-        :type new_password: str
-
+        :param str old_password: Old password
+        :param str new_password: New password
         :return: The server response.
 
         Example::
@@ -2138,12 +2019,8 @@ class UptimeKumaApi(object):
         """
         Import Backup.
 
-        :param json_data: Backup data as json string.
-        :type json_data: str
-
-        :param import_handle: (optional) Choose "skip" if you want to skip every monitor or notification with the same name. "overwrite" will delete every existing monitor and notification. "keep" will keep both.
-        :type import_handle: str
-
+        :param str json_data: Backup data as json string.
+        :param str, optional import_handle: Choose "skip" if you want to skip every monitor or notification with the same name. "overwrite" will delete every existing monitor and notification. "keep" will keep both., defaults to "skip"
         :return: The server response.
 
         Example::
@@ -2187,9 +2064,7 @@ class UptimeKumaApi(object):
         """
         Prepare 2FA configuration.
 
-        :param password: Current password.
-        :type password: str
-
+        :param str password: Current password.
         :return: The server response.
 
         Example::
@@ -2217,12 +2092,8 @@ class UptimeKumaApi(object):
         """
         Verify the provided 2FA token.
 
-        :param token: 2FA token.
-        :type token: str
-
-        :param password: Current password.
-        :type password: str
-
+        :param str token: 2FA token.
+        :param str password: Current password.
         :return: The server response.
 
         Example::
@@ -2245,9 +2116,7 @@ class UptimeKumaApi(object):
         """
         Save the current 2FA configuration.
 
-        :param password: Current password.
-        :type password: str
-
+        :param str password: Current password.
         :return: The server response.
 
         Example::
@@ -2263,9 +2132,7 @@ class UptimeKumaApi(object):
         """
         Disable 2FA for this user.
 
-        :param password: Current password.
-        :type password: str
-
+        :param str password: Current password.
         :return: The server response.
 
         Example::
@@ -2285,15 +2152,9 @@ class UptimeKumaApi(object):
 
         If username and password is not provided, auto login is performed if disableAuth is enabled.
 
-        :param username: (optional) Username. Must be None if disableAuth is enabled.
-        :type username: str
-
-        :param password: (optional) Password. Must be None if disableAuth is enabled.
-        :type password: str
-
-        :param token: (optional) 2FA Token. Required if 2FA is enabled.
-        :type token: str
-
+        :param str, optional username: Username. Must be None if disableAuth is enabled., defaults to None
+        :param str, optional password: Password. Must be None if disableAuth is enabled., defaults to None
+        :param str, optional token: 2FA Token. Required if 2FA is enabled., defaults to ""
         :return: The server response.
 
         Example::
@@ -2320,9 +2181,7 @@ class UptimeKumaApi(object):
         """
         Login by token.
 
-        :param token: Login token generated by :meth:`~login`
-        :type token: str
-
+        :param str token: Login token generated by :meth:`~login`
         :return: The server response.
 
         Example::
@@ -2364,12 +2223,8 @@ class UptimeKumaApi(object):
         """
         Set up the server.
 
-        :param username: Username
-        :type username: str
-
-        :param password: Password
-        :type password: str
-
+        :param str username: Username
+        :param str password: Password
         :return: The server response.
 
         Example::
@@ -2441,9 +2296,7 @@ class UptimeKumaApi(object):
         """
         Get a docker host.
 
-        :param id_: Id of the docker host to get.
-        :type id_: int
-
+        :param int id_: Id of the docker host to get.
         :return: The docker host.
 
         Example::
@@ -2513,9 +2366,7 @@ class UptimeKumaApi(object):
         """
         Edit a docker host.
 
-        :param id_: Id of the docker host to edit.
-        :type id_: int
-
+        :param int id_: Id of the docker host to edit.
         :return: The server response.
 
         Example::
@@ -2536,9 +2387,7 @@ class UptimeKumaApi(object):
         """
         Delete a docker host.
 
-        :param id_: Id of the docker host to delete.
-        :type id_: int
-
+        :param int id_: Id of the docker host to delete.
         :return: The server response.
 
         Example::
