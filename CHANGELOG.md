@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 0.6.0
+
+#### Feature
+- add parameter `wait_timeout` to adjust connection timeout
+
 ### Release 0.5.2
 
 #### Bugfix
