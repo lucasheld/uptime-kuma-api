@@ -300,10 +300,16 @@ class UptimeKumaApi(object):
         >>> api.disconnect()
 
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
+    :param float wait_timeout: How many seconds the client should wait for the connection., defaults to 1
     :raises UptimeKumaException: When connection to server failed.
     """
-    def __init__(self, url: str) -> None:
+    def __init__(
+            self,
+            url: str,
+            wait_timeout: float = 1
+    ) -> None:
         self.url = url
+        self.wait_timeout = wait_timeout
         self.sio = socketio.Client()
 
         self._event_data: dict = {
@@ -465,7 +471,7 @@ class UptimeKumaApi(object):
         """
         url = self.url.rstrip("/")
         try:
-            self.sio.connect(f'{url}/socket.io/')
+            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.wait_timeout)
         except:
             raise UptimeKumaException("unable to connect")
 
