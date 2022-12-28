@@ -2,7 +2,7 @@ import unittest
 import warnings
 from packaging.version import parse as parse_version
 
-from uptime_kuma_api import UptimeKumaApi, MonitorType, DockerType
+from uptime_kuma_api import UptimeKumaApi, MonitorType, DockerType, UptimeKumaException
 
 token = None
 
@@ -96,10 +96,10 @@ class UptimeKumaTestCase(unittest.TestCase):
             if obj[key] == value:
                 return obj
 
-    def add_monitor(self):
+    def add_monitor(self, name="monitor 1"):
         r = self.api.add_monitor(
             type=MonitorType.HTTP,
-            name="monitor 1",
+            name=name,
             url="http://127.0.0.1"
         )
         monitor_id = r["monitorID"]
@@ -139,3 +139,9 @@ class UptimeKumaTestCase(unittest.TestCase):
         )
         docker_host_id = r["id"]
         return docker_host_id
+
+    def add_status_page(self, title="status page 1"):
+        slug = "statuspage1"
+        self.api.add_status_page(slug, title)
+        r = self.api.get_status_page(slug)
+        return r["id"]

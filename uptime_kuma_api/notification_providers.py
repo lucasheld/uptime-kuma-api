@@ -133,6 +133,9 @@ class NotificationType(str, Enum):
     NTFY = "ntfy"
     """ntfy"""
 
+    SMSEAGLE = "SMSEagle"
+    """SMSEagle"""
+
 
 notification_provider_options = {
     NotificationType.ALERTA: dict(
@@ -302,6 +305,7 @@ notification_provider_options = {
     ),
     NotificationType.WEBHOOK: dict(
         webhookContentType=dict(type="str"),
+        webhookAdditionalHeaders=dict(type="str"),
         webhookURL=dict(type="str"),
     ),
     NotificationType.WECOM: dict(
@@ -362,8 +366,17 @@ notification_provider_options = {
         ntfypassword=dict(type="str"),
         ntfytopic=dict(type="str"),
         ntfyPriority=dict(type="int"),
+        ntfyIcon=dict(type="str"),
         ntfyserverurl=dict(type="str"),
     ),
+    NotificationType.SMSEAGLE: dict(
+        smseagleEncoding=dict(type="bool"),
+        smseaglePriority=dict(type="int"),
+        smseagleRecipientType=dict(type="str"),
+        smseagleToken=dict(type="str"),
+        smseagleRecipient=dict(type="str"),
+        smseagleUrl=dict(type="str")
+    )
 }
 
 notification_provider_conditions = dict(
@@ -379,4 +392,8 @@ notification_provider_conditions = dict(
         min=1,
         max=5
     ),
+    smseaglePriority=dict(
+        min=0,
+        max=9
+    )
 )

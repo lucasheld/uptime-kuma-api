@@ -16,6 +16,9 @@ class MonitorType(str, Enum):
     KEYWORD = "keyword"
     """HTTP(s) - Keyword"""
 
+    GRPC_KEYWORD = "grpc-keyword"
+    """gRPC(s) - Keyword"""
+
     DNS = "dns"
     """DNS"""
 
@@ -36,6 +39,9 @@ class MonitorType(str, Enum):
 
     POSTGRES = "postgres"
     """PostgreSQL"""
+
+    MYSQL = "mysql"
+    """MySQL/MariaDB"""
 
     RADIUS = "radius"
     """Radius"""

@@ -158,6 +158,20 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
+    def test_monitor_type_grpc_keyword(self):
+        if parse_version(self.api.version) < parse_version("1.19"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.GRPC_KEYWORD,
+            "name": "monitor 1",
+            "grpcUrl": "127.0.0.1",
+            "keyword": "healthy",
+            "grpcServiceName": "health",
+            "grpcMethod": "check",
+        }
+        self.do_test_monitor_type(expected_monitor)
+
     def test_monitor_type_dns(self):
         expected_monitor = {
             "type": MonitorType.DNS,
@@ -166,6 +180,19 @@ class TestMonitor(UptimeKumaTestCase):
             "port": 8888,
             "dns_resolve_server": "1.1.1.1",
             "dns_resolve_type": "A"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_docker(self):
+        if parse_version(self.api.version) < parse_version("1.18"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        docker_host_id = self.add_docker_host()
+        expected_monitor = {
+            "type": MonitorType.DOCKER,
+            "name": "monitor 1",
+            "docker_container": "test",
+            "docker_host": docker_host_id
         }
         self.do_test_monitor_type(expected_monitor)
 
@@ -223,16 +250,15 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
-    def test_monitor_type_docker(self):
-        if parse_version(self.api.version) < parse_version("1.18"):
+    def test_monitor_type_mysql(self):
+        if parse_version(self.api.version) < parse_version("1.19"):
             self.skipTest("Unsupported in this Uptime Kuma version")
 
-        docker_host_id = self.add_docker_host()
         expected_monitor = {
-            "type": MonitorType.DOCKER,
+            "type": MonitorType.MYSQL,
             "name": "monitor 1",
-            "docker_container": "test",
-            "docker_host": docker_host_id
+            "databaseConnectionString": "mysql://username:password@host:port/database",
+            "databaseQuery": "select getdate()"
         }
         self.do_test_monitor_type(expected_monitor)
 

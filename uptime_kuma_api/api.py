@@ -1,10 +1,11 @@
+import datetime
 import json
 import random
 import string
 import time
 from contextlib import contextmanager
 from copy import deepcopy
-from typing import Any
+from typing import Any, Union
 
 import requests
 import socketio
@@ -14,12 +15,13 @@ from . import AuthMethod
 from . import DockerType
 from . import Event
 from . import IncidentStyle
+from . import MaintenanceStrategy
 from . import MonitorType
 from . import NotificationType, notification_provider_options, notification_provider_conditions
 from . import ProxyProtocol
 from . import UptimeKumaException
 from .docstrings import append_docstring, monitor_docstring, notification_docstring, proxy_docstring, \
-    docker_host_docstring
+    docker_host_docstring, maintenance_docstring
 
 
 def int_to_bool(data, keys) -> None:
@@ -63,11 +65,11 @@ def _convert_monitor_input(kwargs) -> None:
 
 
 def _build_notification_data(
-        name: str,
-        type: NotificationType,
-        isDefault: bool = False,
-        applyExisting: bool = False,
-        **kwargs
+    name: str,
+    type: NotificationType,
+    isDefault: bool = False,
+    applyExisting: bool = False,
+    **kwargs
 ) -> dict:
     allowed_kwargs = []
     for keys in notification_provider_options.values():
@@ -88,15 +90,15 @@ def _build_notification_data(
 
 
 def _build_proxy_data(
-        protocol: ProxyProtocol,
-        host: str,
-        port: str,
-        auth: bool = False,
-        username: str = None,
-        password: str = None,
-        active: bool = True,
-        default: bool = False,
-        applyExisting: bool = False,
+    protocol: ProxyProtocol,
+    host: str,
+    port: str,
+    auth: bool = False,
+    username: str = None,
+    password: str = None,
+    active: bool = True,
+    default: bool = False,
+    applyExisting: bool = False,
 ) -> dict:
     data = {
         "protocol": protocol,
@@ -113,22 +115,22 @@ def _build_proxy_data(
 
 
 def _build_status_page_data(
-        slug: str,
+    slug: str,
 
-        # config
-        id: int,
-        title: str,
-        description: str = None,
-        theme: str = "light",
-        published: bool = True,
-        showTags: bool = False,
-        domainNameList: list = None,
-        customCSS: str = "",
-        footerText: str = None,
-        showPoweredBy: bool = True,
+    # config
+    id: int,
+    title: str,
+    description: str = None,
+    theme: str = "light",
+    published: bool = True,
+    showTags: bool = False,
+    domainNameList: list = None,
+    customCSS: str = "",
+    footerText: str = None,
+    showPoweredBy: bool = True,
 
-        icon: str = "/icon.svg",
-        publicGroupList: list = None
+    icon: str = "/icon.svg",
+    publicGroupList: list = None
 ) -> (str, dict, str, list):
     if theme not in ["light", "dark"]:
         raise ValueError
@@ -162,14 +164,57 @@ def _convert_docker_host_input(kwargs) -> None:
 
 
 def _build_docker_host_data(
-        name: str,
-        dockerType: DockerType,
-        dockerDaemon: str = None
+    name: str,
+    dockerType: DockerType,
+    dockerDaemon: str = None
 ) -> dict:
     data = {
         "name": name,
         "dockerType": dockerType,
         "dockerDaemon": dockerDaemon
+    }
+    return data
+
+
+def _build_maintenance_data(
+    title: str,
+    strategy: MaintenanceStrategy,
+    active: bool = True,
+    description: str = "",
+    dateRange: list[str] = None,
+    intervalDay: int = 1,
+    weekdays: list[int] = None,
+    daysOfMonth: list[Union[int, str]] = None,
+    timeRange: list[dict] = None
+) -> dict:
+    if not dateRange:
+        dateRange = [
+            datetime.date.today().strftime("%Y-%m-%d 00:00")
+        ]
+    if not timeRange:
+        timeRange = [
+            {
+                "hours": 2,
+                "minutes": 0,
+            }, {
+                "hours": 3,
+                "minutes": 0,
+            }
+        ]
+    if not weekdays:
+        weekdays = []
+    if not daysOfMonth:
+        daysOfMonth = []
+    data = {
+        "title": title,
+        "active": active,
+        "intervalDay": intervalDay,
+        "dateRange": dateRange,
+        "description": description,
+        "strategy": strategy,
+        "weekdays": weekdays,
+        "daysOfMonth": daysOfMonth,
+        "timeRange": timeRange
     }
     return data
 
@@ -214,13 +259,15 @@ def _check_arguments_monitor(kwargs) -> None:
         MonitorType.PORT: ["hostname", "port"],
         MonitorType.PING: ["hostname"],
         MonitorType.KEYWORD: ["url", "keyword", "maxredirects"],
+        MonitorType.GRPC_KEYWORD: ["grpcUrl", "keyword", "grpcServiceName", "grpcMethod"],
         MonitorType.DNS: ["hostname", "dns_resolve_server", "port"],
+        MonitorType.DOCKER: ["docker_container", "docker_host"],
         MonitorType.PUSH: [],
         MonitorType.STEAM: ["hostname", "port"],
         MonitorType.MQTT: ["hostname", "port", "mqttTopic"],
         MonitorType.SQLSERVER: [],
         MonitorType.POSTGRES: [],
-        MonitorType.DOCKER: ["docker_container", "docker_host"],
+        MonitorType.MYSQL: [],
         MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"]
     }
     type_ = kwargs["type"]
@@ -273,6 +320,23 @@ def _check_arguments_proxy(kwargs) -> None:
     )
     _check_argument_conditions(conditions, kwargs)
 
+
+def _check_arguments_maintenance(kwargs) -> None:
+    required_args = ["title", "strategy"]
+    _check_missing_arguments(required_args, kwargs)
+
+    strategy = kwargs["strategy"]
+    if strategy in [MaintenanceStrategy.RECURRING_INTERVAL, MaintenanceStrategy.RECURRING_WEEKDAY, MaintenanceStrategy.RECURRING_DAY_OF_MONTH]:
+        required_args = ["dateRange"]
+        _check_missing_arguments(required_args, kwargs)
+
+    conditions = dict(
+        intervalDay=dict(
+            min=1,
+            max=3650,
+        )
+    )
+    _check_argument_conditions(conditions, kwargs)
 
 class UptimeKumaApi(object):
     """This class is used to communicate with Uptime Kuma.
@@ -327,7 +391,8 @@ class UptimeKumaApi(object):
             Event.INFO: None,
             Event.CERT_INFO: None,
             Event.DOCKER_HOST_LIST: None,
-            Event.AUTO_LOGIN: None
+            Event.AUTO_LOGIN: None,
+            Event.MAINTENANCE_LIST: None
         }
 
         self.sio.on(Event.CONNECT, self._event_connect)
@@ -345,6 +410,8 @@ class UptimeKumaApi(object):
         self.sio.on(Event.CERT_INFO, self._event_cert_info)
         self.sio.on(Event.DOCKER_HOST_LIST, self._event_docker_host_list)
         self.sio.on(Event.AUTO_LOGIN, self._event_auto_login)
+        self.sio.on(Event.INIT_SERVER_TIMEZONE, self._event_init_server_timezone)
+        self.sio.on(Event.MAINTENANCE_LIST, self._event_maintenance_list)
 
         self.connect()
 
@@ -461,6 +528,12 @@ class UptimeKumaApi(object):
     def _event_auto_login(self) -> None:
         self._event_data[Event.AUTO_LOGIN] = True
 
+    def _event_init_server_timezone(self) -> None:
+        pass
+
+    def _event_maintenance_list(self, data) -> None:
+        self._event_data[Event.MAINTENANCE_LIST] = data
+
     # connection
 
     def connect(self) -> None:
@@ -522,11 +595,20 @@ class UptimeKumaApi(object):
             # KEYWORD
             keyword: str = None,
 
+            # GRPC_KEYWORD
+            grpcUrl: str = None,
+            grpcEnableTls: bool = False,
+            grpcServiceName: str = None,
+            grpcMethod: str = None,
+            grpcProtobuf: str = None,
+            grpcBody: str = None,
+            grpcMetadata: str = None,
+
             # DNS, PING, STEAM, MQTT
             hostname: str = None,
 
-            # DNS, STEAM, MQTT
-            port: int = 53,
+            # DNS, STEAM, MQTT, RADIUS
+            port: int = None,
 
             # DNS
             dns_resolve_server: str = "1.1.1.1",
@@ -568,7 +650,7 @@ class UptimeKumaApi(object):
                 "resendInterval": resendInterval
             })
 
-        if type == MonitorType.KEYWORD:
+        if type in [MonitorType.KEYWORD, MonitorType.GRPC_KEYWORD]:
             data.update({
                 "keyword": keyword,
             })
@@ -599,12 +681,29 @@ class UptimeKumaApi(object):
                 "authWorkstation": authWorkstation,
             })
 
+        # GRPC_KEYWORD
+        if type == MonitorType.GRPC_KEYWORD:
+            data.update({
+                "grpcUrl": grpcUrl,
+                "grpcEnableTls": grpcEnableTls,
+                "grpcServiceName": grpcServiceName,
+                "grpcMethod": grpcMethod,
+                "grpcProtobuf": grpcProtobuf,
+                "grpcBody": grpcBody,
+                "grpcMetadata": grpcMetadata,
+            })
+
         # PORT, PING, DNS, STEAM, MQTT
         data.update({
             "hostname": hostname,
         })
 
-        # PORT, DNS, STEAM, MQTT
+        # PORT, DNS, STEAM, MQTT, RADIUS
+        if not port:
+            if type == MonitorType.DNS:
+                port = 53
+            elif type == MonitorType.RADIUS:
+                port = 1812
         data.update({
             "port": port,
         })
@@ -627,7 +726,7 @@ class UptimeKumaApi(object):
         data.update({
             "databaseConnectionString": databaseConnectionString
         })
-        if type in [MonitorType.SQLSERVER, MonitorType.POSTGRES]:
+        if type in [MonitorType.SQLSERVER, MonitorType.POSTGRES, MonitorType.MYSQL]:
             data.update({
                 "databaseQuery": databaseQuery,
             })
@@ -695,6 +794,7 @@ class UptimeKumaApi(object):
                     'proxyId': None,
                     'notificationIDList': [],
                     'tags': [],
+                    'maintenance': False,
                     'mqttUsername': None,
                     'mqttPassword': None,
                     'mqttTopic': None,
@@ -765,6 +865,7 @@ class UptimeKumaApi(object):
                 'proxyId': None,
                 'notificationIDList': [],
                 'tags': [],
+                'maintenance': False,
                 'mqttUsername': None,
                 'mqttPassword': None,
                 'mqttTopic': None,
@@ -1398,12 +1499,14 @@ class UptimeKumaApi(object):
                     'style': 'danger',
                     'title': 'title 1'
                 },
+                'maintenanceList': [],
                 'publicGroupList': [
                     {
                         'id': 1,
                         'monitorList': [
                             {
                                 'id': 1,
+                                'maintenance': False,
                                 'name': 'monitor 1',
                                 'sendUrl': 0
                             }
@@ -1425,11 +1528,17 @@ class UptimeKumaApi(object):
 
         config = r1["config"]
         config.update(r2["config"])
-        return {
+
+        data = {
             **config,
             "incident": r2["incident"],
-            "publicGroupList": r2["publicGroupList"]
+            "publicGroupList": r2["publicGroupList"],
         }
+        if parse_version(self.version) >= parse_version("1.19"):
+            data.update({
+                "maintenanceList": r2["maintenanceList"]
+            })
+        return data
 
     def add_status_page(self, slug: str, title: str) -> dict:
         """
@@ -1540,6 +1649,8 @@ class UptimeKumaApi(object):
         """
         status_page = self.get_status_page(slug)
         status_page.pop("incident")
+        if parse_version(self.version) >= parse_version("1.19"):
+            status_page.pop("maintenanceList")
         status_page.update(kwargs)
         data = _build_status_page_data(**status_page)
         r = self._call('saveStatusPage', data)
@@ -1804,9 +1915,11 @@ class UptimeKumaApi(object):
 
             >>> api.info()
             {
-                'version': '1.18.5',
-                'latestVersion': '1.18.5',
-                'primaryBaseURL': None
+                'version': '1.19.2',
+                'latestVersion': '1.19.2',
+                'primaryBaseURL': None,
+                'serverTimezone': 'Europe/Berlin',
+                'serverTimezoneOffset': '+01:00'
             }
         """
         r = self._get_event_data(Event.INFO)
@@ -1977,19 +2090,21 @@ class UptimeKumaApi(object):
 
             >>> api.get_settings()
             {
-                'checkUpdate': False,
                 'checkBeta': False,
-                'keepDataPeriodDays': 180,
+                'checkUpdate': False,
+                'disableAuth': False,
+                'dnsCache': True,
                 'entryPage': 'dashboard',
-                'searchEngineIndex': False,
+                'keepDataPeriodDays': 180,
                 'primaryBaseURL': '',
+                'searchEngineIndex': False,
+                'serverTimezone': 'Europe/Berlin',
                 'steamAPIKey': '',
                 'tlsExpiryNotifyDays': [
                     7,
                     14,
                     21
                 ],
-                'disableAuth': False,
                 'trustProxy': False
             }
         """
@@ -2008,10 +2123,12 @@ class UptimeKumaApi(object):
             keepDataPeriodDays: int = 180,
 
             # general
+            serverTimezone: str = "",
             entryPage: str = "dashboard",
             searchEngineIndex: bool = False,
             primaryBaseURL: str = "",
             steamAPIKey: str = "",
+            dnsCache: bool = False,
 
             # notifications
             tlsExpiryNotifyDays: list = None,
@@ -2029,10 +2146,12 @@ class UptimeKumaApi(object):
         :param bool, optional checkUpdate: Show update if available, defaults to True
         :param bool, optional checkBeta: Also check beta release, defaults to False
         :param int, optional keepDataPeriodDays: Keep monitor history data for X days., defaults to 180
+        :param str, optional serverTimezone: Server Timezone, defaults to ""
         :param str, optional entryPage: Entry Page, defaults to "dashboard"
         :param bool, optional searchEngineIndex: Search Engine Visibility, defaults to False
         :param str, optional primaryBaseURL: Primary Base URL, defaults to ""
         :param str, optional steamAPIKey: Steam API Key. For monitoring a Steam Game Server you need a Steam Web-API key., defaults to ""
+        :param bool, optional dnsCache: True to enable DNS Cache. It may be not working in some IPv6 environments, disable it if you encounter any issues., defaults to False
         :param list, optional tlsExpiryNotifyDays: TLS Certificate Expiry. HTTPS Monitors trigger notification when TLS certificate expires in., defaults to None
         :param bool, optional disableAuth: Disable Authentication, defaults to False
         :param bool, optional trustProxy: Trust Proxy. Trust 'X-Forwarded-\*' headers. If you want to get the correct client IP and your Uptime Kuma is behind such as Nginx or Apache, you should enable this., defaults to False
@@ -2046,11 +2165,17 @@ class UptimeKumaApi(object):
             ...     checkUpdate=False,
             ...     checkBeta=False,
             ...     keepDataPeriodDays=180,
+            ...     serverTimezone="Europe/Berlin",
             ...     entryPage="dashboard",
             ...     searchEngineIndex=False,
             ...     primaryBaseURL="",
             ...     steamAPIKey="",
-            ...     tlsExpiryNotifyDays=[7, 14, 21],
+            ...     dnsCache=False,
+            ...     tlsExpiryNotifyDays=[
+            ...         7,
+            ...         14,
+            ...         21
+            ...     ],
             ...     disableAuth=False,
             ...     trustProxy=False
             ... )
@@ -2066,10 +2191,12 @@ class UptimeKumaApi(object):
             "checkUpdate": checkUpdate,
             "checkBeta": checkBeta,
             "keepDataPeriodDays": keepDataPeriodDays,
+            "serverTimezone": serverTimezone,
             "entryPage": entryPage,
             "searchEngineIndex": searchEngineIndex,
             "primaryBaseURL": primaryBaseURL,
             "steamAPIKey": steamAPIKey,
+            "dnsCache": dnsCache,
             "tlsExpiryNotifyDays": tlsExpiryNotifyDays,
             "disableAuth": disableAuth
         }
@@ -2525,3 +2652,494 @@ class UptimeKumaApi(object):
         """
         with self.wait_for_event(Event.DOCKER_HOST_LIST):
             return self._call('deleteDockerHost', id_)
+
+
+    def get_maintenances(self) -> list:
+        """
+        Get all maintenances.
+
+        :return: All maintenances.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.get_maintenances()
+            [
+                {
+                    "id": 1,
+                    "title": "title",
+                    "description": "description",
+                    "strategy": "single",
+                    "intervalDay": 1,
+                    "active": true,
+                    "dateRange": [
+                        "2022-12-27 15:39:00",
+                        "2022-12-30 15:39:00"
+                    ],
+                    "timeRange": [
+                        {
+                            "hours": 2,
+                            "minutes": 0,
+                            "seconds": 0
+                        },
+                        {
+                            "hours": 3,
+                            "minutes": 0,
+                            "seconds": 0
+                        }
+                    ],
+                    "weekdays": [],
+                    "daysOfMonth": [],
+                    "timeslotList": [
+                        {
+                            "id": 1,
+                            "startDate": "2022-12-27 14:39:00",
+                            "endDate": "2022-12-30 14:39:00",
+                            "startDateServerTimezone": "2022-12-27 15:39",
+                            "endDateServerTimezone": "2022-12-30 15:39",
+                            "serverTimezoneOffset": "+01:00"
+                        }
+                    ],
+                    "status": "under-maintenance"
+                }
+            ]
+        """
+        return list(self._get_event_data(Event.MAINTENANCE_LIST).values())
+
+    def get_maintenance(self, id_: int) -> dict:
+        """
+        Get a maintenance.
+
+        :param id_: Id of the maintenance to get.
+        :return: The maintenance.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.get_maintenance(1)
+            {
+                "id": 1,
+                "title": "title",
+                "description": "description",
+                "strategy": "single",
+                "intervalDay": 1,
+                "active": true,
+                "dateRange": [
+                    "2022-12-27 15:39:00",
+                    "2022-12-30 15:39:00"
+                ],
+                "timeRange": [
+                    {
+                        "hours": 2,
+                        "minutes": 0,
+                        "seconds": 0
+                    },
+                    {
+                        "hours": 3,
+                        "minutes": 0,
+                        "seconds": 0
+                    }
+                ],
+                "weekdays": [],
+                "daysOfMonth": [],
+                "timeslotList": [
+                    {
+                        "id": 1,
+                        "startDate": "2022-12-27 14:39:00",
+                        "endDate": "2022-12-30 14:39:00",
+                        "startDateServerTimezone": "2022-12-27 15:39",
+                        "endDateServerTimezone": "2022-12-30 15:39",
+                        "serverTimezoneOffset": "+01:00"
+                    }
+                ],
+                "status": "under-maintenance"
+            }
+        """
+        return self._call('getMaintenance', id_)["maintenance"]
+
+    @append_docstring(maintenance_docstring("add"))
+    def add_maintenance(self, **kwargs) -> dict:
+        """
+        Adds a maintenance.
+
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.MANUAL`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.MANUAL,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 00:00:00"
+            ...     ],
+            ...     timeRange=[
+            ...         {
+            ...             "hours": 2,
+            ...             "minutes": 0
+            ...         },
+            ...         {
+            ...             "hours": 3,
+            ...             "minutes": 0
+            ...         }
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[]
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.SINGLE`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.SINGLE,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:36:00",
+            ...         "2022-12-29 22:36:00"
+            ...     ],
+            ...     timeRange=[
+            ...         {
+            ...             "hours": 2,
+            ...             "minutes": 0
+            ...         },
+            ...         {
+            ...             "hours": 3,
+            ...             "minutes": 0
+            ...         }
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[]
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.RECURRING_INTERVAL`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.RECURRING_INTERVAL,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:37:00",
+            ...         "2022-12-31 22:37:00"
+            ...     ],
+            ...     timeRange=[
+            ...         {
+            ...             "hours": 2,
+            ...             "minutes": 0
+            ...         },
+            ...         {
+            ...             "hours": 3,
+            ...             "minutes": 0
+            ...         }
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[]
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.RECURRING_WEEKDAY`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.RECURRING_WEEKDAY,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:38:00",
+            ...         "2022-12-31 22:38:00"
+            ...     ],
+            ...     timeRange=[
+            ...         {
+            ...             "hours": 2,
+            ...             "minutes": 0
+            ...         },
+            ...         {
+            ...             "hours": 3,
+            ...             "minutes": 0
+            ...         }
+            ...     ],
+            ...     weekdays=[
+            ...         1,
+            ...         3,
+            ...         5,
+            ...         0
+            ...     ],
+            ...     daysOfMonth=[]
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.RECURRING_DAY_OF_MONTH`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.RECURRING_DAY_OF_MONTH,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:39:00",
+            ...         "2022-12-31 22:39:00"
+            ...     ],
+            ...     timeRange=[
+            ...         {
+            ...             "hours": 2,
+            ...             "minutes": 0
+            ...         },
+            ...         {
+            ...             "hours": 3,
+            ...             "minutes": 0
+            ...         }
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[
+            ...         1,
+            ...         10,
+            ...         20,
+            ...         30,
+            ...         "lastDay2"
+            ...     ]
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+        """
+        data = _build_maintenance_data(**kwargs)
+        _check_arguments_maintenance(data)
+        return self._call('addMaintenance', data)
+
+    @append_docstring(maintenance_docstring("edit"))
+    def edit_maintenance(self, id_: int, **kwargs) -> dict:
+        """
+        Edits a maintenance.
+
+        :param id_: Id of the maintenance to edit.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.edit_maintenance(
+            ...     1,
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.RECURRING_INTERVAL,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:37:00",
+            ...         "2022-12-31 22:37:00"
+            ...     ],
+            ...     timeRange=[
+            ...         {
+            ...             "hours": 2,
+            ...             "minutes": 0
+            ...         },
+            ...         {
+            ...             "hours": 3,
+            ...             "minutes": 0
+            ...         }
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[]
+            ... )
+            {
+                "msg": "Saved.",
+                "maintenanceID": 1
+            }
+        """
+        maintenance = self.get_maintenance(id_)
+        maintenance.update(kwargs)
+        _check_arguments_maintenance(maintenance)
+        return self._call('editMaintenance', maintenance)
+
+    def delete_maintenance(self, id_: int) -> dict:
+        """
+        Deletes a maintenance.
+
+        :param id_: Id of the maintenance to delete.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.delete_maintenance(1)
+            {
+                "msg": "Deleted Successfully."
+            }
+        """
+        return self._call('deleteMaintenance', id_)
+
+    def pause_maintenance(self, id_: int) -> dict:
+        """
+        Pauses a maintenance.
+
+        :param id_: Id of the maintenance to pause.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.pause_maintenance(1)
+            {
+                "msg": "Paused Successfully."
+            }
+        """
+        return self._call('pauseMaintenance', id_)
+
+    def resume_maintenance(self, id_: int) -> dict:
+        """
+        Resumes a maintenance.
+
+        :param id_: Id of the maintenance to resume.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.resume_maintenance(1)
+            {
+                "msg": "Resume Successfully"
+            }
+        """
+        return self._call('resumeMaintenance', id_)
+
+    def get_monitor_maintenance(self, id_: int) -> list:
+        """
+        Gets all monitors of a maintenance.
+
+        :param id_: Id of the maintenance to get the monitors from.
+        :return: All monitors of the maintenance.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.get_monitor_maintenance(1)
+            [
+                {
+                    "id": 1,
+                    "name": "monitor 1"
+                },
+                {
+                    "id": 2,
+                    "name": "monitor 2"
+                }
+            ]
+        """
+        return self._call('getMonitorMaintenance', id_)["monitors"]
+
+    def add_monitor_maintenance(
+            self,
+            id_: int,
+            monitors: list[dict],
+    ) -> dict:
+        """
+        Adds monitors to a maintenance.
+
+        :param id_: Id of the maintenance to add the monitors to.
+        :param monitors: The list of monitors to add to the maintenance.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> monitors = [
+            ...     {
+            ...         "id": 1,
+            ...         "name": "monitor 1"
+            ...     },
+            ...     {
+            ...         "id": 2,
+            ...         "name": "monitor 2"
+            ...     }
+            ... ]
+            >>> api.add_monitor_maintenance(1, monitors)
+            {
+                "msg": "Added Successfully."
+            }
+        """
+        return self._call('addMonitorMaintenance', (id_, monitors))
+
+    def get_status_page_maintenance(self, id_: int) -> list:
+        """
+        Gets all status pages of a maintenance.
+
+        :param id_: Id of the maintenance to get the status pages from.
+        :return: All status pages of the maintenance.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.get_status_page_maintenance(1)
+            [
+                {
+                    "id": 1,
+                    "title": "test"
+                }
+            ]
+        """
+        return self._call('getMaintenanceStatusPage', id_)["statusPages"]
+
+    def add_status_page_maintenance(
+            self,
+            id_: int,
+            status_pages: list,
+    ) -> dict:
+        """
+        Adds status pages to a maintenance.
+
+        :param id_: Id of the maintenance to add the monitors to.
+        :param status_pages: The list of status pages to add to the maintenance.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> status_pages = [
+            ...     {
+            ...         "id": 1,
+            ...         "name": "status page 1"
+            ...     },
+            ...     {
+            ...         "id": 2,
+            ...         "name": "status page 2"
+            ...     }
+            ... ]
+            >>> api.add_status_page_maintenance(1, status_pages)
+            {
+                "msg": "Added Successfully."
+            }
+        """
+        return self._call('addMaintenanceStatusPage', (id_, status_pages))

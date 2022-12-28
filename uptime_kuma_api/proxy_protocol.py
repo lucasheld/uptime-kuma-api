@@ -14,7 +14,10 @@ class ProxyProtocol(str, Enum):
     """SOCKS"""
 
     SOCKS5 = "socks5"
-    """SOCKS5"""
+    """SOCKS v5"""
+
+    SOCKS5H = "socks5h"
+    """SOCKS v5 (+DNS)"""
 
     SOCKS4 = "socks4"
-    """SOCKS4"""
+    """SOCKS v4"""

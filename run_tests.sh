@@ -1,6 +1,14 @@
 #!/bin/sh
 
-for version in 1.18.5 1.17.1
+version="$1"
+if [ $version ]
+then
+  versions=("$version")
+else
+  versions=(1.19.2 1.18.5 1.17.1)
+fi
+
+for version in ${versions[*]}
 do
   echo "Starting uptime kuma $version..."
   docker run -d -it --rm -p 3001:3001 --name uptimekuma "louislam/uptime-kuma:$version" > /dev/null

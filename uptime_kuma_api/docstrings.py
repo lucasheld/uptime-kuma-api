@@ -40,7 +40,7 @@ def monitor_docstring(mode) -> str:
         :param str, optional authWorkstation: Workstation, defaults to None
         :param str, optional keyword: Keyword. Search keyword in plain HTML or JSON response. The search is case-sensitive., defaults to None
         :param str, optional hostname: Hostname, defaults to None
-        :param int, optional port: Port, defaults to 53
+        :param int, optional port: Port, ``type`` :attr:`~.MonitorType.DNS` defaults to ``53`` and ``type`` :attr:`~.MonitorType.RADIUS` defaults to ``1812``
         :param str, optional dns_resolve_server: Resolver Server, defaults to "1.1.1.1"
         :param str, optional dns_resolve_type: Resource Record Type, defaults to "A"
         :param str, optional mqttUsername: MQTT Username, defaults to None
@@ -171,6 +171,7 @@ def notification_docstring(mode) -> str:
         :param str, optional telegramBotToken: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
         :param str, optional telegramChatID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
         :param str, optional webhookContentType: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
+        :param str, optional webhookAdditionalHeaders: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
         :param str, optional webhookURL: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
         :param str, optional weComBotKey: Notification option for ``type`` :attr:`~.NotificationType.WECOM`
         :param str, optional alertNowWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.ALERTNOW`
@@ -205,7 +206,14 @@ def notification_docstring(mode) -> str:
         :param str, optional ntfypassword: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param str, optional ntfytopic: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param int, optional ntfyPriority: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
+        :param int, optional ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param str, optional ntfyserverurl: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
+        :param bool, optional smseagleEncoding: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. True to send messages in unicode.
+        :param int, optional smseaglePriority: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Message priority (0-9, default = 0).
+        :param str, optional smseagleRecipientType: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient type. Available values are "smseagle-to" (Phone number(s)), "smseagle-group" (Phonebook group name(s)) and "smseagle-contact" (Phonebook contact name(s)).
+        :param str, optional smseagleToken: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. API Access token.
+        :param str, optional smseagleRecipient: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient(s) (multiple must be separated with comma).
+        :param str, optional smseagleUrl: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Your SMSEagle device URL.
     """
 
 def proxy_docstring(mode) -> str:
@@ -226,4 +234,17 @@ def docker_host_docstring(mode) -> str:
         :param str{", optional" if mode == "edit" else ""} name: Friendly Name
         :param DockerType{", optional" if mode == "edit" else ""} dockerType: Connection Type
         :param str, optional dockerDaemon: Docker Daemon, defaults to None
+    """
+
+def maintenance_docstring(mode) -> str:
+    return f"""
+        :param str{", optional" if mode == "edit" else ""} title: Title
+        :param MaintenanceStrategy{", optional" if mode == "edit" else ""} strategy: Strategy
+        :param bool, optional active: True if maintenance is active, defaults to ``True``
+        :param str, optional description: Description, defaults to ``""``
+        :param list[str], optional dateRange: DateTime Range, defaults to ``["<current date>"]``
+        :param int, optional intervalDay: Interval (Run once every day), defaults to ``1``
+        :param list[int], optional weekdays: List that contains the days of the week on which the maintenance is enabled (Sun = ``0``, Mon = ``1``, ..., Sat = ``6``). Required for ``strategy`` :attr:`~.MaintenanceStrategy.RECURRING_WEEKDAY`., defaults to ``[]``.
+        :param list[Union[int, str]], optional daysOfMonth: List that contains the days of the month on which the maintenance is enabled (Day 1 = ``1``, Day 2 = ``2``, ..., Day 31 = ``31``) and the last day of the month (Last Day of Month = ``"lastDay1"``, 2nd Last Day of Month = ``"lastDay2"``, 3rd Last Day of Month = ``"lastDay3"``, 4th Last Day of Month = ``"lastDay4"``). Required for ``strategy`` :attr:`~.MaintenanceStrategy.RECURRING_DAY_OF_MONTH`., defaults to ``[]``.
+        :param list[dict], optional timeRange: Maintenance Time Window of a Day, defaults to ``[{{"hours": 2, "minutes": 0}}, {{"hours": 3, "minutes": 0}}]``.
     """

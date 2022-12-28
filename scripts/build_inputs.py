@@ -4,6 +4,9 @@ import re
 from utils import deduplicate_list, parse_vue_template
 
 
+ROOT = "uptime-kuma"
+
+
 def parse_model_keys(content, object_name):
     match = re.findall(object_name + r"\.[0-9a-zA-Z_$]+", content)
     keys = []
@@ -15,13 +18,13 @@ def parse_model_keys(content, object_name):
 
 
 def parse_proxy_keys():
-    content = parse_vue_template("uptime-kuma/src/components/ProxyDialog.vue")
+    content = parse_vue_template(f"{ROOT}/src/components/ProxyDialog.vue")
     keys = parse_model_keys(content, "proxy")
     return keys
 
 
 def parse_notification_keys():
-    content = parse_vue_template("uptime-kuma/src/components/NotificationDialog.vue")
+    content = parse_vue_template(f"{ROOT}/src/components/NotificationDialog.vue")
     keys = parse_model_keys(content, "notification")
     return keys
 
@@ -37,7 +40,7 @@ def parse_settings_keys():
 
 
 def parse_monitor_keys():
-    content = parse_vue_template("uptime-kuma/src/pages/EditMonitor.vue")
+    content = parse_vue_template(f"{ROOT}/src/pages/EditMonitor.vue")
     keys = parse_model_keys(content, "monitor")
     return keys
 
@@ -45,16 +48,22 @@ def parse_monitor_keys():
 def parse_status_page_keys():
     all_keys = ["id"]
 
-    content = parse_vue_template("uptime-kuma/src/pages/StatusPage.vue")
+    content = parse_vue_template(f"{ROOT}/src/pages/StatusPage.vue")
     keys = parse_model_keys(content, "config")
     all_keys.extend(keys)
 
-    content = parse_vue_template("uptime-kuma/src/pages/ManageStatusPage.vue")
+    content = parse_vue_template(f"{ROOT}/src/pages/ManageStatusPage.vue")
     keys = parse_model_keys(content, "statusPage")
     all_keys.extend(keys)
 
     all_keys = deduplicate_list(all_keys)
     return all_keys
+
+
+def parse_maintenance_keys():
+    content = parse_vue_template(f"{ROOT}/src/pages/EditMaintenance.vue")
+    keys = parse_model_keys(content, "maintenance")
+    return keys
 
 
 def main():
@@ -72,6 +81,9 @@ def main():
 
     status_page_keys = parse_status_page_keys()
     print("status_page:", status_page_keys)
+
+    maintenance_keys = parse_maintenance_keys()
+    print("maintenance:", maintenance_keys)
 
 
 if __name__ == "__main__":

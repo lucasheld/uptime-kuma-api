@@ -24,6 +24,12 @@ class TestSettings(UptimeKumaTestCase):
                 "trustProxy": False
             })
 
+        if parse_version(self.api.version) >= parse_version("1.19"):
+            expected_settings.update({
+                "serverTimezone": "Europe/Berlin",
+                "dnsCache": True,
+            })
+
         # set settings
         r = self.api.set_settings(self.password, **expected_settings)
         self.assertEqual(r["msg"], "Saved")

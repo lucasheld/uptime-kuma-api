@@ -31,6 +31,9 @@ Enums
 .. autoclass:: DockerType
     :members:
 
+.. autoclass:: MaintenanceStrategy
+    :members:
+
 
 Exceptions
 ----------

@@ -6,9 +6,9 @@ from bs4 import BeautifulSoup
 from utils import deduplicate_list, write_to_file
 
 
-def build_notification_providers():
+def build_notification_providers(root):
     providers = []
-    for path in glob.glob('uptime-kuma/server/notification-providers/*'):
+    for path in glob.glob(f'{root}/server/notification-providers/*'):
         with open(path) as f:
             content = f.read()
         match = re.search(r'class [^ ]+ extends NotificationProvider {', content)
@@ -27,9 +27,9 @@ def build_notification_providers():
     return providers
 
 
-def build_notification_provider_conditions():
+def build_notification_provider_conditions(root):
     conditions = {}
-    for path in glob.glob('uptime-kuma/src/components/notifications/*'):
+    for path in glob.glob(f'{root}/src/components/notifications/*'):
         if path.endswith("index.js"):
             continue
         with open(path) as f:
@@ -54,11 +54,26 @@ def build_notification_provider_conditions():
     return conditions
 
 
-notification_providers = build_notification_providers()
-notification_provider_conditions = build_notification_provider_conditions()
+def diff(old, new):
+    for i in new:
+        if i not in old:
+            print("+", i)
+    for i in old:
+        if i not in new:
+            print("-", i)
+    print("")
 
-write_to_file(
-    "notification_providers.py.j2", "./../uptime_kuma_api/notification_providers.py",
-    notification_providers=notification_providers,
-    notification_provider_conditions=notification_provider_conditions
-)
+
+# write_to_file(
+#     "notification_providers.py.j2", "./../uptime_kuma_api/notification_providers.py",
+#     notification_providers=notification_providers,
+#     notification_provider_conditions=notification_provider_conditions
+# )
+
+notification_providers_old = build_notification_providers("uptime-kuma-old")
+notification_providers_new = build_notification_providers("uptime-kuma")
+diff(notification_providers_old, notification_providers_new)
+
+notification_provider_conditions_old = build_notification_provider_conditions("uptime-kuma-old")
+notification_provider_conditions_new = build_notification_provider_conditions("uptime-kuma")
+diff(notification_provider_conditions_old, notification_provider_conditions_new)

@@ -5,6 +5,7 @@ from .notification_providers import NotificationType, notification_provider_opti
 from .proxy_protocol import ProxyProtocol
 from .incident_style import IncidentStyle
 from .docker_type import DockerType
+from .maintenance_strategy import MaintenanceStrategy
 from .exceptions import UptimeKumaException
 from .event import Event
 from .api import UptimeKumaApi
