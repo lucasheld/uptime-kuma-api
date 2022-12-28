@@ -188,6 +188,8 @@ def _check_argument_conditions(valid_params, kwargs) -> None:
     for valid_param in valid_params:
         if valid_param in kwargs:
             value = kwargs[valid_param]
+            if value is None:
+                continue
             conditions = valid_params[valid_param]
             min_ = conditions.get("min")
             max_ = conditions.get("max")
