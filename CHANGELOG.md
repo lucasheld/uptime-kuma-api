@@ -1,5 +1,13 @@
 ## Changelog
 
+### Release 0.7.0
+
+#### Feature
+- add support for uptime kuma 1.19.2
+
+#### Bugfix
+- skip condition check for None values
+
 ### Release 0.6.0
 
 #### Feature
