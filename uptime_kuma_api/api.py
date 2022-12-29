@@ -5,7 +5,7 @@ import string
 import time
 from contextlib import contextmanager
 from copy import deepcopy
-from typing import Any, Union
+from typing import Any
 
 import requests
 import socketio
@@ -181,10 +181,10 @@ def _build_maintenance_data(
     strategy: MaintenanceStrategy,
     active: bool = True,
     description: str = "",
-    dateRange: list[str] = None,
+    dateRange: list = None,
     intervalDay: int = 1,
-    weekdays: list[int] = None,
-    daysOfMonth: list[Union[int, str]] = None,
+    weekdays: list = None,
+    daysOfMonth: list = None,
     timeRange: list = None
 ) -> dict:
     if not dateRange:
