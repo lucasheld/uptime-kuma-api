@@ -185,7 +185,7 @@ def _build_maintenance_data(
     intervalDay: int = 1,
     weekdays: list[int] = None,
     daysOfMonth: list[Union[int, str]] = None,
-    timeRange: list[dict] = None
+    timeRange: list = None
 ) -> dict:
     if not dateRange:
         dateRange = [
@@ -1078,8 +1078,8 @@ class UptimeKumaApi(object):
         """
         Delete a tag from a monitor.
 
-        :param id tag_id: Id of the tag to remove.
-        :param id monitor_id: Id of monitor to remove the tag from.
+        :param int tag_id: Id of the tag to remove.
+        :param int monitor_id: Id of monitor to remove the tag from.
         :param str, optional value: Value of the tag., defaults to ""
         :return: The server response.
         :rtype: dict
@@ -2711,7 +2711,7 @@ class UptimeKumaApi(object):
         """
         Get a maintenance.
 
-        :param id_: Id of the maintenance to get.
+        :param int id_: Id of the maintenance to get.
         :return: The maintenance.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -2937,7 +2937,7 @@ class UptimeKumaApi(object):
         """
         Edits a maintenance.
 
-        :param id_: Id of the maintenance to edit.
+        :param int id_: Id of the maintenance to edit.
         :return: The server response.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -2982,7 +2982,7 @@ class UptimeKumaApi(object):
         """
         Deletes a maintenance.
 
-        :param id_: Id of the maintenance to delete.
+        :param int id_: Id of the maintenance to delete.
         :return: The server response.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -3000,7 +3000,7 @@ class UptimeKumaApi(object):
         """
         Pauses a maintenance.
 
-        :param id_: Id of the maintenance to pause.
+        :param int id_: Id of the maintenance to pause.
         :return: The server response.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -3018,7 +3018,7 @@ class UptimeKumaApi(object):
         """
         Resumes a maintenance.
 
-        :param id_: Id of the maintenance to resume.
+        :param int id_: Id of the maintenance to resume.
         :return: The server response.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -3036,7 +3036,7 @@ class UptimeKumaApi(object):
         """
         Gets all monitors of a maintenance.
 
-        :param id_: Id of the maintenance to get the monitors from.
+        :param int id_: Id of the maintenance to get the monitors from.
         :return: All monitors of the maintenance.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -3060,13 +3060,13 @@ class UptimeKumaApi(object):
     def add_monitor_maintenance(
             self,
             id_: int,
-            monitors: list[dict],
+            monitors: list,
     ) -> dict:
         """
         Adds monitors to a maintenance.
 
-        :param id_: Id of the maintenance to add the monitors to.
-        :param monitors: The list of monitors to add to the maintenance.
+        :param int id_: Id of the maintenance to add the monitors to.
+        :param list monitors: The list of monitors to add to the maintenance.
         :return: The server response.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -3094,7 +3094,7 @@ class UptimeKumaApi(object):
         """
         Gets all status pages of a maintenance.
 
-        :param id_: Id of the maintenance to get the status pages from.
+        :param int id_: Id of the maintenance to get the status pages from.
         :return: All status pages of the maintenance.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
@@ -3119,8 +3119,8 @@ class UptimeKumaApi(object):
         """
         Adds status pages to a maintenance.
 
-        :param id_: Id of the maintenance to add the monitors to.
-        :param status_pages: The list of status pages to add to the maintenance.
+        :param int id_: Id of the maintenance to add the monitors to.
+        :param list status_pages: The list of status pages to add to the maintenance.
         :return: The server response.
         :rtype: dict
         :raises UptimeKumaException: If the server returns an error.
