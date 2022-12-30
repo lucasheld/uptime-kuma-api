@@ -764,55 +764,61 @@ class UptimeKumaApi(object):
             >>> api.get_monitors()
             [
                 {
-                    'id': 1,
-                    'name': 'Google',
-                    'url': 'https://google.com',
-                    'method': 'GET',
-                    'hostname': None,
-                    'port': 53,
-                    'maxretries': 0,
-                    'weight': 2000,
+                    'accepted_statuscodes': ['200-299'],
                     'active': True,
-                    'type': 'http',
-                    'interval': 60,
-                    'retryInterval': 60,
-                    'resendInterval': 0,
-                    'keyword': None,
-                    'expiryNotification': False,
-                    'ignoreTls': False,
-                    'upsideDown': False,
-                    'maxredirects': 10,
-                    'accepted_statuscodes': [
-                        '200-299'
-                    ],
-                    'dns_resolve_type': 'A',
-                    'dns_resolve_server': '1.1.1.1',
-                    'dns_last_result': None,
-                    'pushToken': None,
-                    'docker_container': None,
-                    'docker_host': None,
-                    'proxyId': None,
-                    'notificationIDList': [],
-                    'tags': [],
-                    'maintenance': False,
-                    'mqttUsername': None,
-                    'mqttPassword': None,
-                    'mqttTopic': None,
-                    'mqttSuccessMessage': None,
-                    'databaseConnectionString': None,
-                    'databaseQuery': None,
+                    'authDomain': None,
                     'authMethod': '',
                     'authWorkstation': None,
-                    'authDomain': None,
-                    'radiusUsername': None,
-                    'radiusPassword': None,
+                    'basic_auth_pass': None,
+                    'basic_auth_user': None,
+                    'body': None,
+                    'databaseConnectionString': None,
+                    'databaseQuery': None,
+                    'dns_last_result': None,
+                    'dns_resolve_server': '1.1.1.1',
+                    'dns_resolve_type': 'A',
+                    'docker_container': None,
+                    'docker_host': None,
+                    'expiryNotification': False,
+                    'grpcBody': None,
+                    'grpcEnableTls': False,
+                    'grpcMetadata': None,
+                    'grpcMethod': None,
+                    'grpcProtobuf': None,
+                    'grpcServiceName': None,
+                    'grpcUrl': None,
+                    'headers': None,
+                    'hostname': None,
+                    'id': 1,
+                    'ignoreTls': False,
+                    'includeSensitiveData': True,
+                    'interval': 60,
+                    'keyword': None,
+                    'maintenance': False,
+                    'maxredirects': 10,
+                    'maxretries': 0,
+                    'method': 'GET',
+                    'mqttPassword': None,
+                    'mqttSuccessMessage': None,
+                    'mqttTopic': None,
+                    'mqttUsername': None,
+                    'name': 'monitor 1',
+                    'notificationIDList': [1, 2],
+                    'port': None,
+                    'proxyId': None,
+                    'pushToken': None,
                     'radiusCalledStationId': None,
                     'radiusCallingStationId': None,
+                    'radiusPassword': None,
                     'radiusSecret': None,
-                    'headers': None,
-                    'body': None,
-                    'basic_auth_user': None,
-                    'basic_auth_pass': None
+                    'radiusUsername': None,
+                    'resendInterval': 0,
+                    'retryInterval': 60,
+                    'tags': [],
+                    'type': 'http',
+                    'upsideDown': False,
+                    'url': 'http://127.0.0.1',
+                    'weight': 2000
                 }
             ]
         """
@@ -835,55 +841,61 @@ class UptimeKumaApi(object):
 
             >>> api.get_monitor(1)
             {
-                'id': 1,
-                'name': 'Google',
-                'url': 'https://google.com',
-                'method': 'GET',
-                'hostname': None,
-                'port': 53,
-                'maxretries': 0,
-                'weight': 2000,
+                'accepted_statuscodes': ['200-299'],
                 'active': True,
-                'type': 'http',
-                'interval': 60,
-                'retryInterval': 60,
-                'resendInterval': 0,
-                'keyword': None,
-                'expiryNotification': False,
-                'ignoreTls': False,
-                'upsideDown': False,
-                'maxredirects': 10,
-                'accepted_statuscodes': [
-                    '200-299'
-                ],
-                'dns_resolve_type': 'A',
-                'dns_resolve_server': '1.1.1.1',
-                'dns_last_result': None,
-                'pushToken': None,
-                'docker_container': None,
-                'docker_host': None,
-                'proxyId': None,
-                'notificationIDList': [],
-                'tags': [],
-                'maintenance': False,
-                'mqttUsername': None,
-                'mqttPassword': None,
-                'mqttTopic': None,
-                'mqttSuccessMessage': None,
-                'databaseConnectionString': None,
-                'databaseQuery': None,
+                'authDomain': None,
                 'authMethod': '',
                 'authWorkstation': None,
-                'authDomain': None,
-                'radiusUsername': None,
-                'radiusPassword': None,
+                'basic_auth_pass': None,
+                'basic_auth_user': None,
+                'body': None,
+                'databaseConnectionString': None,
+                'databaseQuery': None,
+                'dns_last_result': None,
+                'dns_resolve_server': '1.1.1.1',
+                'dns_resolve_type': 'A',
+                'docker_container': None,
+                'docker_host': None,
+                'expiryNotification': False,
+                'grpcBody': None,
+                'grpcEnableTls': False,
+                'grpcMetadata': None,
+                'grpcMethod': None,
+                'grpcProtobuf': None,
+                'grpcServiceName': None,
+                'grpcUrl': None,
+                'headers': None,
+                'hostname': None,
+                'id': 1,
+                'ignoreTls': False,
+                'includeSensitiveData': True,
+                'interval': 60,
+                'keyword': None,
+                'maintenance': False,
+                'maxredirects': 10,
+                'maxretries': 0,
+                'method': 'GET',
+                'mqttPassword': None,
+                'mqttSuccessMessage': None,
+                'mqttTopic': None,
+                'mqttUsername': None,
+                'name': 'monitor 1',
+                'notificationIDList': [1, 2],
+                'port': None,
+                'proxyId': None,
+                'pushToken': None,
                 'radiusCalledStationId': None,
                 'radiusCallingStationId': None,
+                'radiusPassword': None,
                 'radiusSecret': None,
-                'headers': None,
-                'body': None,
-                'basic_auth_user': None,
-                'basic_auth_pass': None
+                'radiusUsername': None,
+                'resendInterval': 0,
+                'retryInterval': 60,
+                'tags': [],
+                'type': 'http',
+                'upsideDown': False,
+                'url': 'http://127.0.0.1',
+                'weight': 2000
             }
         """
         r = self._call('getMonitor', id_)["monitor"]
@@ -2782,11 +2794,13 @@ class UptimeKumaApi(object):
             ...     timeRange=[
             ...         {
             ...             "hours": 2,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         },
             ...         {
             ...             "hours": 3,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         }
             ...     ],
             ...     weekdays=[],
@@ -2812,11 +2826,13 @@ class UptimeKumaApi(object):
             ...     timeRange=[
             ...         {
             ...             "hours": 2,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         },
             ...         {
             ...             "hours": 3,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         }
             ...     ],
             ...     weekdays=[],
@@ -2842,11 +2858,13 @@ class UptimeKumaApi(object):
             ...     timeRange=[
             ...         {
             ...             "hours": 2,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         },
             ...         {
             ...             "hours": 3,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         }
             ...     ],
             ...     weekdays=[],
@@ -2872,11 +2890,13 @@ class UptimeKumaApi(object):
             ...     timeRange=[
             ...         {
             ...             "hours": 2,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         },
             ...         {
             ...             "hours": 3,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         }
             ...     ],
             ...     weekdays=[
@@ -2907,11 +2927,13 @@ class UptimeKumaApi(object):
             ...     timeRange=[
             ...         {
             ...             "hours": 2,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         },
             ...         {
             ...             "hours": 3,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         }
             ...     ],
             ...     weekdays=[],
@@ -2958,11 +2980,13 @@ class UptimeKumaApi(object):
             ...     timeRange=[
             ...         {
             ...             "hours": 2,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         },
             ...         {
             ...             "hours": 3,
-            ...             "minutes": 0
+            ...             "minutes": 0,
+            ...             "seconds": 0
             ...         }
             ...     ],
             ...     weekdays=[],

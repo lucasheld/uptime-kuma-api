@@ -17,7 +17,7 @@ class TestMaintenance(UptimeKumaTestCase):
         expected_maintenance = {
             "title": "maintenance 1",
             "description": "test",
-            "strategy": "single",
+            "strategy": MaintenanceStrategy.SINGLE,
             "active": True,
             "intervalDay": 1,
             "dateRange": [
@@ -113,7 +113,7 @@ class TestMaintenance(UptimeKumaTestCase):
         expected_maintenance = {
             "title": "test",
             "description": "test",
-            "strategy": "manual",
+            "strategy": MaintenanceStrategy.MANUAL,
             "active": True,
             "intervalDay": 1,
             "dateRange": [
@@ -122,11 +122,13 @@ class TestMaintenance(UptimeKumaTestCase):
             "timeRange": [
                 {
                     "hours": 2,
-                    "minutes": 0
+                    "minutes": 0,
+                    "seconds": 0
                 },
                 {
                     "hours": 3,
-                    "minutes": 0
+                    "minutes": 0,
+                    "seconds": 0
                 }
             ],
             "weekdays": [],
@@ -138,7 +140,7 @@ class TestMaintenance(UptimeKumaTestCase):
         expected_maintenance = {
             "title": "test",
             "description": "test",
-            "strategy": "single",
+            "strategy": MaintenanceStrategy.SINGLE,
             "active": True,
             "intervalDay": 1,
             "dateRange": [
@@ -164,7 +166,7 @@ class TestMaintenance(UptimeKumaTestCase):
         expected_maintenance = {
             "title": "test",
             "description": "test",
-            "strategy": "recurring-interval",
+            "strategy": MaintenanceStrategy.RECURRING_INTERVAL,
             "active": True,
             "intervalDay": 1,
             "dateRange": [
@@ -190,7 +192,7 @@ class TestMaintenance(UptimeKumaTestCase):
         expected_maintenance = {
             "title": "test",
             "description": "test",
-            "strategy": "recurring-weekday",
+            "strategy": MaintenanceStrategy.RECURRING_WEEKDAY,
             "active": True,
             "intervalDay": 1,
             "dateRange": [
@@ -221,7 +223,7 @@ class TestMaintenance(UptimeKumaTestCase):
         expected_maintenance = {
             "title": "test",
             "description": "test",
-            "strategy": "recurring-day-of-month",
+            "strategy": MaintenanceStrategy.RECURRING_DAY_OF_MONTH,
             "active": True,
             "intervalDay": 1,
             "dateRange": [
