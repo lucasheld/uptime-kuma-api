@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 0.7.1
+
+#### Bugfix
+- remove unsupported type hints on old python versions
+
 ### Release 0.7.0
 
 #### Feature
