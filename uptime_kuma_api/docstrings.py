@@ -58,6 +58,7 @@ def monitor_docstring(mode) -> str:
         :param str, optional radiusCallingStationId: Calling Station Id. Identifier of the calling device., defaults to None
     """
 
+
 def notification_docstring(mode) -> str:
     return f"""
         :param str{", optional" if mode == "edit" else ""} name: Friendly Name        
@@ -206,7 +207,7 @@ def notification_docstring(mode) -> str:
         :param str, optional ntfypassword: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param str, optional ntfytopic: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param int, optional ntfyPriority: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param int, optional ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
+        :param str, optional ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param str, optional ntfyserverurl: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
         :param bool, optional smseagleEncoding: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. True to send messages in unicode.
         :param int, optional smseaglePriority: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Message priority (0-9, default = 0).
@@ -214,7 +215,11 @@ def notification_docstring(mode) -> str:
         :param str, optional smseagleToken: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. API Access token.
         :param str, optional smseagleRecipient: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient(s) (multiple must be separated with comma).
         :param str, optional smseagleUrl: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Your SMSEagle device URL.
+        :param str, optional webhookUrl: Notification option for ``type`` :attr:`~.NotificationType.ZOHOCLIQ`
+        :param str, optional kookGuildID: Notification option for ``type`` :attr:`~.NotificationType.KOOK`
+        :param str, optional kookBotToken: Notification option for ``type`` :attr:`~.NotificationType.KOOK`
     """
+
 
 def proxy_docstring(mode) -> str:
     return f"""
@@ -228,6 +233,7 @@ def proxy_docstring(mode) -> str:
         :param bool, optional default: Set As Default. This proxy will be enabled by default for new monitors. You can still disable the proxy separately for each monitor., , defaults to False
         :param bool, optional applyExisting: Apply on all existing monitors, defaults to False
     """
+
 
 def docker_host_docstring(mode) -> str:
     return f"""

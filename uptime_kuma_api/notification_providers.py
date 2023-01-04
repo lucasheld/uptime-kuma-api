@@ -136,6 +136,12 @@ class NotificationType(str, Enum):
     SMSEAGLE = "SMSEagle"
     """SMSEagle"""
 
+    ZOHOCLIQ = "ZohoCliq"
+    """ZohoCliq"""
+
+    KOOK = "Kook"
+    """Kook"""
+
 
 notification_provider_options = {
     NotificationType.ALERTA: dict(
@@ -376,7 +382,14 @@ notification_provider_options = {
         smseagleToken=dict(type="str"),
         smseagleRecipient=dict(type="str"),
         smseagleUrl=dict(type="str")
-    )
+    ),
+    NotificationType.ZOHOCLIQ: dict(
+        webhookUrl=dict(type="str")
+    ),
+    NotificationType.KOOK: dict(
+        kookGuildID=dict(type="str"),
+        kookBotToken=dict(type="str")
+    ),
 }
 
 notification_provider_conditions = dict(
