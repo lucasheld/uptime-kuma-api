@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 0.9.0
+
+#### Feature
+- add support for uptime kuma 1.19.5
+
 ### Release 0.8.0
 
 #### Feature
