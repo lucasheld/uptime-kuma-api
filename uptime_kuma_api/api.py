@@ -189,7 +189,7 @@ def _build_maintenance_data(
 ) -> dict:
     if not dateRange:
         dateRange = [
-            datetime.date.today().strftime("%Y-%m-%d 00:00")
+            datetime.date.today().strftime("%Y-%m-%d 00:00:00")
         ]
     if not timeRange:
         timeRange = [
@@ -337,6 +337,7 @@ def _check_arguments_maintenance(kwargs) -> None:
         )
     )
     _check_argument_conditions(conditions, kwargs)
+
 
 class UptimeKumaApi(object):
     """This class is used to communicate with Uptime Kuma.
@@ -2157,7 +2158,7 @@ class UptimeKumaApi(object):
         :param str, optional password: Password, defaults to None
         :param bool, optional checkUpdate: Show update if available, defaults to True
         :param bool, optional checkBeta: Also check beta release, defaults to False
-        :param int, optional keepDataPeriodDays: Keep monitor history data for X days., defaults to 180
+        :param int, optional keepDataPeriodDays: Keep monitor history data for X days. Set to 0 for infinite retention., defaults to 180
         :param str, optional serverTimezone: Server Timezone, defaults to ""
         :param str, optional entryPage: Entry Page, defaults to "dashboard"
         :param bool, optional searchEngineIndex: Search Engine Visibility, defaults to False

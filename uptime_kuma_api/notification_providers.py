@@ -142,6 +142,9 @@ class NotificationType(str, Enum):
     KOOK = "Kook"
     """Kook"""
 
+    SPLUNK = "Splunk"
+    """Splunk"""
+
 
 notification_provider_options = {
     NotificationType.ALERTA: dict(
@@ -236,6 +239,7 @@ notification_provider_options = {
         promosmsPhoneNumber=dict(type="str"),
         promosmsSMSType=dict(type="str"),
         promosmsSenderName=dict(type="str"),
+        promosmsAllowLongSMS=dict(type="bool"),
     ),
     NotificationType.PUSHBULLET: dict(
         pushbulletAccessToken=dict(type="str"),
@@ -390,6 +394,11 @@ notification_provider_options = {
         kookGuildID=dict(type="str"),
         kookBotToken=dict(type="str")
     ),
+    NotificationType.SPLUNK: dict(
+        splunkAutoResolve=dict(type="str"),
+        splunkSeverity=dict(type="str"),
+        splunkRestURL=dict(type="str")
+    )
 }
 
 notification_provider_conditions = dict(
