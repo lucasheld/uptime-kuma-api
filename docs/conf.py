@@ -13,7 +13,7 @@ import uptime_kuma_api
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = 'uptime-kuma-api'
-copyright = '2022, Lucas Held'
+copyright = '2023, Lucas Held'
 author = 'Lucas Held'
 
 version = uptime_kuma_api.__version__
