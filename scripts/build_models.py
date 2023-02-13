@@ -4,6 +4,9 @@ from pprint import pprint
 from utils import deduplicate_list
 
 
+ROOT = "uptime-kuma"
+
+
 def parse_json_keys(data):
     keys = []
     for line in data.split("\n"):
@@ -29,7 +32,7 @@ def parse_json_keys(data):
 
 
 def parse_heartbeat():
-    with open('uptime-kuma/server/model/heartbeat.js') as f:
+    with open(f'{ROOT}/server/model/heartbeat.js') as f:
         content = f.read()
     all_keys = []
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
@@ -45,7 +48,7 @@ def parse_heartbeat():
 
 
 def parse_incident():
-    with open('uptime-kuma/server/model/incident.js') as f:
+    with open(f'{ROOT}/server/model/incident.js') as f:
         content = f.read()
     match = re.search(r'toPublicJSON\(\) {\s+return.*{([^}]+)}', content)
     data = match.group(1)
@@ -55,7 +58,7 @@ def parse_incident():
 
 def parse_monitor():
     # todo: toPublicJSON ???
-    with open('uptime-kuma/server/model/monitor.js') as f:
+    with open(f'{ROOT}/server/model/monitor.js') as f:
         content = f.read()
     matches = re.findall(r'data = {([^}]+)}', content)
     all_keys = []
@@ -68,7 +71,7 @@ def parse_monitor():
 
 
 def parse_proxy():
-    with open('uptime-kuma/server/model/proxy.js') as f:
+    with open(f'{ROOT}/server/model/proxy.js') as f:
         content = f.read()
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
     data = match.group(1)
@@ -99,7 +102,7 @@ def parse_proxy():
 
 # # input (add, edit proxy)
 # def parse_proxy2():
-#     with open('uptime-kuma/server/proxy.js') as f:
+#     with open(f'{ROOT}/server/proxy.js') as f:
 #         content = f.read()
 #
 #     code = parse_function(r'async save\([^)]+\) ', content)
@@ -108,7 +111,7 @@ def parse_proxy():
 
 
 def parse_status_page():
-    with open('uptime-kuma/server/model/status_page.js') as f:
+    with open(f'{ROOT}/server/model/status_page.js') as f:
         content = f.read()
     all_keys = []
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
@@ -124,7 +127,7 @@ def parse_status_page():
 
 
 def parse_tag():
-    with open('uptime-kuma/server/model/tag.js') as f:
+    with open(f'{ROOT}/server/model/tag.js') as f:
         content = f.read()
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
     data = match.group(1)

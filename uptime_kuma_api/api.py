@@ -21,7 +21,7 @@ from . import NotificationType, notification_provider_options, notification_prov
 from . import ProxyProtocol
 from . import UptimeKumaException
 from .docstrings import append_docstring, monitor_docstring, notification_docstring, proxy_docstring, \
-    docker_host_docstring, maintenance_docstring
+    docker_host_docstring, maintenance_docstring, tag_docstring
 
 
 def int_to_bool(data, keys) -> None:
@@ -59,6 +59,12 @@ def _convert_monitor_input(kwargs) -> None:
             kwargs["databaseConnectionString"] = "Server=<hostname>,<port>;Database=<your database>;User Id=<your user id>;Password=<your password>;Encrypt=<true/false>;TrustServerCertificate=<Yes/No>;Connection Timeout=<int>"
         elif kwargs["type"] == MonitorType.POSTGRES:
             kwargs["databaseConnectionString"] = "postgres://username:password@host:port/database"
+        elif kwargs["type"] == MonitorType.MYSQL:
+            kwargs["databaseConnectionString"] = "mysql://username:password@host:port/database"
+        elif kwargs["type"] == MonitorType.MONGODB:
+            kwargs["databaseConnectionString"] = "mongodb://username:password@host:port/database"
+        elif kwargs["type"] == MonitorType.REDIS:
+            kwargs["databaseConnectionString"] = "redis://user:password@host:port"
 
     if kwargs["type"] == MonitorType.PUSH and not kwargs.get("pushToken"):
         kwargs["pushToken"] = gen_secret(10)
@@ -125,6 +131,7 @@ def _build_status_page_data(
     published: bool = True,
     showTags: bool = False,
     domainNameList: list = None,
+    googleAnalyticsId: str = None,
     customCSS: str = "",
     footerText: str = None,
     showPoweredBy: bool = True,
@@ -148,6 +155,7 @@ def _build_status_page_data(
         "published": published,
         "showTags": showTags,
         "domainNameList": domainNameList,
+        "googleAnalyticsId": googleAnalyticsId,
         "customCSS": customCSS,
         "footerText": footerText,
         "showPoweredBy": showPoweredBy
@@ -219,6 +227,18 @@ def _build_maintenance_data(
     return data
 
 
+def _build_tag_data(
+    name: str,
+    color: str
+) -> dict:
+    data = {
+        "new": True,
+        "name": name,
+        "color": color
+    }
+    return data
+
+
 def _check_missing_arguments(required_params, kwargs) -> None:
     missing_arguments = []
     for required_param in required_params:
@@ -264,11 +284,14 @@ def _check_arguments_monitor(kwargs) -> None:
         MonitorType.DOCKER: ["docker_container", "docker_host"],
         MonitorType.PUSH: [],
         MonitorType.STEAM: ["hostname", "port"],
+        MonitorType.GAMEDIG: ["game", "hostname", "port"],
         MonitorType.MQTT: ["hostname", "port", "mqttTopic"],
         MonitorType.SQLSERVER: [],
         MonitorType.POSTGRES: [],
         MonitorType.MYSQL: [],
-        MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"]
+        MonitorType.MONGODB: [],
+        MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"],
+        MonitorType.REDIS: []
     }
     type_ = kwargs["type"]
     required_args = required_args_by_type[type_]
@@ -337,6 +360,14 @@ def _check_arguments_maintenance(kwargs) -> None:
         )
     )
     _check_argument_conditions(conditions, kwargs)
+
+
+def _check_arguments_tag(kwargs) -> None:
+    required_args = [
+        "name",
+        "color"
+    ]
+    _check_missing_arguments(required_args, kwargs)
 
 
 class UptimeKumaApi(object):
@@ -608,6 +639,9 @@ class UptimeKumaApi(object):
             # DNS, PING, STEAM, MQTT
             hostname: str = None,
 
+            # PING
+            packetSize: int = 56,
+
             # DNS, STEAM, MQTT, RADIUS
             port: int = None,
 
@@ -621,8 +655,10 @@ class UptimeKumaApi(object):
             mqttTopic: str = None,
             mqttSuccessMessage: str = None,
 
-            # SQLSERVER, POSTGRES
+            # SQLSERVER, POSTGRES, MYSQL, MONGODB, REDIS
             databaseConnectionString: str = None,
+
+            # SQLSERVER, POSTGRES, MYSQL
             databaseQuery: str = None,
 
             # DOCKER
@@ -634,7 +670,10 @@ class UptimeKumaApi(object):
             radiusPassword: str = None,
             radiusSecret: str = None,
             radiusCalledStationId: str = None,
-            radiusCallingStationId: str = None
+            radiusCallingStationId: str = None,
+
+            # GAMEDIG
+            game: str = None
     ) -> dict:
         data = {
             "type": type,
@@ -699,6 +738,12 @@ class UptimeKumaApi(object):
             "hostname": hostname,
         })
 
+        # PING
+        if parse_version(self.version) >= parse_version("1.20"):
+            data.update({
+                "packetSize": packetSize,
+            })
+
         # PORT, DNS, STEAM, MQTT, RADIUS
         if not port:
             if type == MonitorType.DNS:
@@ -723,10 +768,12 @@ class UptimeKumaApi(object):
             "mqttSuccessMessage": mqttSuccessMessage,
         })
 
-        # SQLSERVER, POSTGRES
+        # SQLSERVER, POSTGRES, MYSQL, MONGODB, REDIS
         data.update({
             "databaseConnectionString": databaseConnectionString
         })
+
+        # SQLSERVER, POSTGRES, MYSQL
         if type in [MonitorType.SQLSERVER, MonitorType.POSTGRES, MonitorType.MYSQL]:
             data.update({
                 "databaseQuery": databaseQuery,
@@ -747,6 +794,12 @@ class UptimeKumaApi(object):
                 "radiusSecret": radiusSecret,
                 "radiusCalledStationId": radiusCalledStationId,
                 "radiusCallingStationId": radiusCallingStationId
+            })
+
+        # GAMEDIG
+        if type == MonitorType.GAMEDIG:
+            data.update({
+                "game": game
             })
 
         return data
@@ -781,6 +834,7 @@ class UptimeKumaApi(object):
                     'docker_container': None,
                     'docker_host': None,
                     'expiryNotification': False,
+                    'game': None,
                     'grpcBody': None,
                     'grpcEnableTls': False,
                     'grpcMetadata': None,
@@ -805,6 +859,7 @@ class UptimeKumaApi(object):
                     'mqttUsername': None,
                     'name': 'monitor 1',
                     'notificationIDList': [1, 2],
+                    'packetSize': 56,
                     'port': None,
                     'proxyId': None,
                     'pushToken': None,
@@ -858,6 +913,7 @@ class UptimeKumaApi(object):
                 'docker_container': None,
                 'docker_host': None,
                 'expiryNotification': False,
+                'game': None,
                 'grpcBody': None,
                 'grpcEnableTls': False,
                 'grpcMetadata': None,
@@ -882,6 +938,7 @@ class UptimeKumaApi(object):
                 'mqttUsername': None,
                 'name': 'monitor 1',
                 'notificationIDList': [1, 2],
+                'packetSize': 56,
                 'port': None,
                 'proxyId': None,
                 'pushToken': None,
@@ -1002,6 +1059,46 @@ class UptimeKumaApi(object):
         int_to_bool(r, ["important", "status"])
         return r
 
+    def get_game_list(self) -> list:
+        """
+        Get a list of games that are supported by the GameDig monitor type.
+
+        :return: The server response.
+        :rtype: list
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.get_game_list()
+            [
+                {
+                    'extra': {},
+                    'keys': ['7d2d'],
+                    'options': {
+                        'port': 26900,
+                        'port_query_offset': 1,
+                        'protocol': 'valve'
+                    },
+                    'pretty': '7 Days to Die (2013)'
+                },
+                {
+                    'extra': {},
+                    'keys': ['arma2'],
+                    'options': {
+                        'port': 2302,
+                        'port_query_offset': 1,
+                        'protocol': 'valve'
+                    },
+                    'pretty': 'ARMA 2 (2009)'
+                },
+                ...
+            ]
+        """
+        r = self._call('getGameList')
+        if not r:  # workaround, gamelist is not available on first call. TODO: remove when fixed
+            r = self._call('getGameList')
+        return r["gameList"]
+
     @append_docstring(monitor_docstring("add"))
     def add_monitor(self, **kwargs) -> dict:
         """
@@ -1041,7 +1138,9 @@ class UptimeKumaApi(object):
 
         Example::
 
-            >>> api.edit_monitor(1, interval=20)
+            >>> api.edit_monitor(1,
+            ...     interval=20
+            ... )
             {
                 'monitorID': 1,
                 'msg': 'Saved.'
@@ -1247,7 +1346,7 @@ class UptimeKumaApi(object):
 
         Example::
 
-            >>> api.edit_notification(
+            >>> api.edit_notification(1,
             ...     name="notification 1 edited",
             ...     isDefault=False,
             ...     applyExisting=False,
@@ -1472,6 +1571,7 @@ class UptimeKumaApi(object):
                     'domainNameList': [],
                     'footerText': None,
                     'icon': '/icon.svg',
+                    'googleAnalyticsId': '',
                     'id': 1,
                     'published': True,
                     'showPoweredBy': False,
@@ -1502,6 +1602,7 @@ class UptimeKumaApi(object):
                 'domainNameList': [],
                 'footerText': None,
                 'icon': '/icon.svg',
+                'googleAnalyticsId': '',
                 'id': 1,
                 'incident': {
                     'content': 'content 1',
@@ -1609,6 +1710,7 @@ class UptimeKumaApi(object):
         :param bool, optional published: Published, defaults to True
         :param bool, optional showTags: Show Tags, defaults to False
         :param list, optional domainNameList: Domain Names, defaults to None
+        :param str, optional googleAnalyticsId: Google Analytics ID, defaults to None
         :param str, optional customCSS: Custom CSS, defaults to ""
         :param str, optional footerText: Custom Footer, defaults to None
         :param bool, optional showPoweredBy: Show Powered By, defaults to True
@@ -1625,14 +1727,6 @@ class UptimeKumaApi(object):
             ...     slug="slug1",
             ...     title="status page 1",
             ...     description="description 1",
-            ...     theme="light",
-            ...     published=True,
-            ...     showTags=False,
-            ...     domainNameList=[],
-            ...     customCSS="",
-            ...     footerText=None,
-            ...     showPoweredBy=False,
-            ...     icon="/icon.svg",
             ...     publicGroupList=[
             ...         {
             ...             'name': 'Services',
@@ -2035,13 +2129,60 @@ class UptimeKumaApi(object):
                 return tag
         raise UptimeKumaException("tag does not exist")
 
-    # not working, monitor id required?
-    # def edit_tag(self, id_: int, name: str, color: str):
-    #     return self._call('editTag', {
-    #         "id": id_,
-    #         "name": name,
-    #         "color": color
-    #     })
+    @append_docstring(tag_docstring("add"))
+    def add_tag(self, **kwargs) -> dict:
+        """
+        Add a tag.
+
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.add_tag(
+            ...     name="tag 1",
+            ...     color="#ffffff"
+            ... )
+            {
+                'color': '#ffffff',
+                'id': 1,
+                'name': 'tag 1'
+            }
+        """
+        data = _build_tag_data(**kwargs)
+        _check_arguments_tag(data)
+        return self._call('addTag', data)["tag"]
+
+    @append_docstring(tag_docstring("edit"))
+    def edit_tag(self, id_: int, **kwargs) -> dict:
+        """
+        Edits an existing tag.
+
+        :param int id_: Id of the tag to edit.
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.edit_tag(1,
+            ...     name="tag 1 new",
+            ...     color="#000000"
+            ... )
+            {
+                'msg': 'Saved',
+                'tag': {
+                    'id': 1,
+                    'name': 'tag 1 new',
+                    'color': '#000000'
+                }
+            }
+        """
+        data = self.get_tag(id_)
+        data.update(kwargs)
+        _check_arguments_tag(data)
+        return self._call('editTag', data)
 
     def delete_tag(self, id_: int) -> dict:
         """
@@ -2060,34 +2201,6 @@ class UptimeKumaApi(object):
             }
         """
         return self._call('deleteTag', id_)
-
-    def add_tag(self, name: str, color: str) -> dict:
-        """
-        Add a tag.
-
-        :param str name: Tag name
-        :param str color: Tag color
-        :return: The server response.
-        :rtype: dict
-        :raises UptimeKumaException: If the server returns an error.
-
-        Example::
-
-            >>> api.add_tag(
-            ...     name="tag 1",
-            ...     color="#ffffff"
-            ... )
-            {
-                'color': '#ffffff',
-                'id': 1,
-                'name': 'tag 1'
-            }
-        """
-        return self._call('addTag', {
-            "name": name,
-            "color": color,
-            "new": True
-        })["tag"]
 
     # settings
 
@@ -2635,7 +2748,9 @@ class UptimeKumaApi(object):
 
         Example::
 
-            >>> api.edit_docker_host(1, name="name 2")
+            >>> api.edit_docker_host(1,
+            ...     name="name 2"
+            ... )
             {
                 'id': 1,
                 'msg': 'Saved'
@@ -2665,7 +2780,6 @@ class UptimeKumaApi(object):
         """
         with self.wait_for_event(Event.DOCKER_HOST_LIST):
             return self._call('deleteDockerHost', id_)
-
 
     def get_maintenances(self) -> list:
         """
@@ -2967,8 +3081,7 @@ class UptimeKumaApi(object):
 
         Example::
 
-            >>> api.edit_maintenance(
-            ...     1,
+            >>> api.edit_maintenance(1,
             ...     title="test",
             ...     description="test",
             ...     strategy=MaintenanceStrategy.RECURRING_INTERVAL,

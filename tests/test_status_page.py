@@ -1,5 +1,7 @@
 import unittest
 
+from packaging.version import parse as parse_version
+
 from uptime_kuma_api import UptimeKumaException, IncidentStyle
 from uptime_kuma_test_case import UptimeKumaTestCase
 
@@ -36,6 +38,10 @@ class TestStatusPage(UptimeKumaTestCase):
                 }
             ]
         }
+        if parse_version(self.api.version) >= parse_version("1.20"):
+            expected_status_page.update({
+                "googleAnalyticsId": ""
+            })
 
         # add status page
         r = self.api.add_status_page(slug, expected_status_page["title"])

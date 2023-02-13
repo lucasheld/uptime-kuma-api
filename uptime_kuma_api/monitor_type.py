@@ -31,6 +31,9 @@ class MonitorType(str, Enum):
     STEAM = "steam"
     """Steam Game Server"""
 
+    GAMEDIG = "gamedig"
+    """GameDig"""
+
     MQTT = "mqtt"
     """MQTT"""
 
@@ -43,5 +46,11 @@ class MonitorType(str, Enum):
     MYSQL = "mysql"
     """MySQL/MariaDB"""
 
+    MONGODB = "mongodb"
+    """MongoDB"""
+
     RADIUS = "radius"
     """Radius"""
+
+    REDIS = "redis"
+    """Redis"""

@@ -40,6 +40,7 @@ def monitor_docstring(mode) -> str:
         :param str, optional authWorkstation: Workstation, defaults to None
         :param str, optional keyword: Keyword. Search keyword in plain HTML or JSON response. The search is case-sensitive., defaults to None
         :param str, optional hostname: Hostname, defaults to None
+        :param int, optional packetSize: Packet Size, defaults to None
         :param int, optional port: Port, ``type`` :attr:`~.MonitorType.DNS` defaults to ``53`` and ``type`` :attr:`~.MonitorType.RADIUS` defaults to ``1812``
         :param str, optional dns_resolve_server: Resolver Server, defaults to "1.1.1.1"
         :param str, optional dns_resolve_type: Resource Record Type, defaults to "A"
@@ -56,6 +57,7 @@ def monitor_docstring(mode) -> str:
         :param str, optional radiusSecret: Radius Secret. Shared Secret between client and server., defaults to None
         :param str, optional radiusCalledStationId: Called Station Id. Identifier of the called device., defaults to None
         :param str, optional radiusCallingStationId: Calling Station Id. Identifier of the calling device., defaults to None
+        :param str, optional game: Game, defaults to None
     """
 
 
@@ -271,6 +273,7 @@ def docker_host_docstring(mode) -> str:
         :param str, optional dockerDaemon: Docker Daemon, defaults to None
     """
 
+
 def maintenance_docstring(mode) -> str:
     return f"""
         :param str{", optional" if mode == "edit" else ""} title: Title
@@ -282,4 +285,11 @@ def maintenance_docstring(mode) -> str:
         :param list, optional weekdays: List that contains the days of the week on which the maintenance is enabled (Sun = ``0``, Mon = ``1``, ..., Sat = ``6``). Required for ``strategy`` :attr:`~.MaintenanceStrategy.RECURRING_WEEKDAY`., defaults to ``[]``.
         :param list, optional daysOfMonth: List that contains the days of the month on which the maintenance is enabled (Day 1 = ``1``, Day 2 = ``2``, ..., Day 31 = ``31``) and the last day of the month (Last Day of Month = ``"lastDay1"``, 2nd Last Day of Month = ``"lastDay2"``, 3rd Last Day of Month = ``"lastDay3"``, 4th Last Day of Month = ``"lastDay4"``). Required for ``strategy`` :attr:`~.MaintenanceStrategy.RECURRING_DAY_OF_MONTH`., defaults to ``[]``.
         :param list, optional timeRange: Maintenance Time Window of a Day, defaults to ``[{{"hours": 2, "minutes": 0}}, {{"hours": 3, "minutes": 0}}]``.
+    """
+
+
+def tag_docstring(mode) -> str:
+    return f"""
+        :param str{", optional" if mode == "edit" else ""} name: Tag name
+        :param str{", optional" if mode == "edit" else ""} color: Tag color
     """

@@ -147,6 +147,10 @@ class TestMonitor(UptimeKumaTestCase):
             "name": "monitor 1",
             "hostname": "127.0.0.1"
         }
+        if parse_version(self.api.version) >= parse_version("1.20"):
+            expected_monitor.update({
+                "packetSize": 56
+            })
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_keyword(self):
@@ -215,6 +219,21 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
+    def test_monitor_type_gamedig(self):
+        if parse_version(self.api.version) < parse_version("1.20"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        game_list = self.api.get_game_list()
+        game = game_list[0]["keys"][0]
+        expected_monitor = {
+            "type": MonitorType.GAMEDIG,
+            "name": "monitor 1",
+            "hostname": "127.0.0.1",
+            "port": 8888,
+            "game": game
+        }
+        self.do_test_monitor_type(expected_monitor)
+
     def test_monitor_type_mqtt(self):
         expected_monitor = {
             "type": MonitorType.MQTT,
@@ -262,6 +281,17 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
+    def test_monitor_type_mongodb(self):
+        if parse_version(self.api.version) < parse_version("1.20"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.MONGODB,
+            "name": "monitor 1",
+            "databaseConnectionString": "mongodb://username:password@host:port/database"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
     def test_monitor_type_radius(self):
         if parse_version(self.api.version) < parse_version("1.18"):
             self.skipTest("Unsupported in this Uptime Kuma version")
@@ -274,6 +304,17 @@ class TestMonitor(UptimeKumaTestCase):
             "radiusSecret": "789",
             "radiusCalledStationId": "1",
             "radiusCallingStationId": "2"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_redis(self):
+        if parse_version(self.api.version) < parse_version("1.20"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.REDIS,
+            "name": "monitor 1",
+            "databaseConnectionString": "redis://user:password@host:port"
         }
         self.do_test_monitor_type(expected_monitor)
 
