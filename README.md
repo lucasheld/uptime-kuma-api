@@ -8,7 +8,7 @@ This package was developed to configure Uptime Kuma with Ansible. The Ansible co
 
 Python version 3.6+ is required.
 
-Supported Uptime Kuma versions: 1.17.0 - 1.20.0
+Supported Uptime Kuma versions: 1.17.0 - 1.20.1
 
 Installation
 ---
