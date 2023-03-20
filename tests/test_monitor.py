@@ -132,6 +132,18 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
+        if parse_version(self.api.version) >= parse_version("1.21"):
+            expected_monitor = {
+                "type": MonitorType.HTTP,
+                "name": "monitor 1",
+                "url": "http://127.0.0.1",
+                "authMethod": AuthMethod.MTLS,
+                "tlsCert": "cert",
+                "tlsKey": "key",
+                "tlsCa": "ca",
+            }
+            self.do_test_monitor_type(expected_monitor)
+
     def test_monitor_type_port(self):
         expected_monitor = {
             "type": MonitorType.PORT,

@@ -52,6 +52,9 @@ class NotificationType(str, Enum):
     PAGERDUTY = "PagerDuty"
     """PagerDuty"""
 
+    PAGERTREE = "PagerTree"
+    """PagerTree"""
+
     PROMOSMS = "promosms"
     """PromoSMS"""
 
@@ -207,6 +210,8 @@ notification_provider_options = {
         lineUserID=dict(type="str"),
     ),
     NotificationType.LUNASEA: dict(
+        lunaseaTarget=dict(type="str"),
+        lunaseaUserID=dict(type="str"),
         lunaseaDevice=dict(type="str"),
     ),
     NotificationType.MATRIX: dict(
@@ -232,6 +237,11 @@ notification_provider_options = {
         pagerdutyIntegrationUrl=dict(type="str"),
         pagerdutyPriority=dict(type="str"),
         pagerdutyIntegrationKey=dict(type="str"),
+    ),
+    NotificationType.PAGERTREE: dict(
+        pagertreeAutoResolve=dict(type="str"),
+        pagertreeIntegrationUrl=dict(type="str"),
+        pagertreeUrgency=dict(type="str"),
     ),
     NotificationType.PROMOSMS: dict(
         promosmsLogin=dict(type="str"),
@@ -310,8 +320,11 @@ notification_provider_options = {
         pushAPIKey=dict(type="str"),
     ),
     NotificationType.TELEGRAM: dict(
-        telegramBotToken=dict(type="str"),
         telegramChatID=dict(type="str"),
+        telegramSendSilently=dict(type="bool"),
+        telegramProtectContent=dict(type="bool"),
+        telegramMessageThreadID=dict(type="str"),
+        telegramBotToken=dict(type="str"),
     ),
     NotificationType.WEBHOOK: dict(
         webhookContentType=dict(type="str"),

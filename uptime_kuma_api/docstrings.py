@@ -18,6 +18,7 @@ def monitor_docstring(mode) -> str:
     return f"""
         :param MonitorType{", optional" if mode == "edit" else ""} type: Monitor Type
         :param str{", optional" if mode == "edit" else ""} name: Friendly Name
+        :param str, optional description: Description, defaults to None
         :param int, optional interval: Heartbeat Interval, defaults to 60
         :param int, optional retryInterval: Retry every X seconds, defaults to 60
         :param int, optional resendInterval: Resend every X times, defaults to 0
@@ -31,13 +32,17 @@ def monitor_docstring(mode) -> str:
         :param list, optional accepted_statuscodes: Accepted Status Codes. Select status codes which are considered as a successful response., defaults to None
         :param int, optional proxyId: Proxy, defaults to None
         :param str, optional method: Method, defaults to "GET"
+        :param str, optional httpBodyEncoding: Body Encoding, defaults to "json". Allowed values: "json", "xml".
         :param str, optional body: Body, defaults to None
         :param str, optional headers: Headers, defaults to None
         :param AuthMethod, optional authMethod: Method, defaults to :attr:`~.AuthMethod.NONE`
-        :param str, optional basic_auth_user: Username, defaults to None
-        :param str, optional basic_auth_pass: Password, defaults to None
-        :param str, optional authDomain: Domain, defaults to None
-        :param str, optional authWorkstation: Workstation, defaults to None
+        :param str, optional tlsCert: Cert for ``authMethod`` :attr:`~.AuthMethod.MTLS`, defaults to None.
+        :param str, optional tlsKey: Key for ``authMethod`` :attr:`~.AuthMethod.MTLS`, defaults to None.
+        :param str, optional tlsCa: Ca for ``authMethod`` :attr:`~.AuthMethod.MTLS`, defaults to None.
+        :param str, optional basic_auth_user: Username for ``authMethod`` :attr:`~.AuthMethod.HTTP_BASIC` and :attr:`~.AuthMethod.NTLM`, defaults to None
+        :param str, optional basic_auth_pass: Password for ``authMethod`` :attr:`~.AuthMethod.HTTP_BASIC` and :attr:`~.AuthMethod.NTLM`, defaults to None
+        :param str, optional authDomain: Domain for ``authMethod`` :attr:`~.AuthMethod.NTLM`, defaults to None
+        :param str, optional authWorkstation: Workstation for ``authMethod`` :attr:`~.AuthMethod.NTLM`, defaults to None
         :param str, optional keyword: Keyword. Search keyword in plain HTML or JSON response. The search is case-sensitive., defaults to None
         :param str, optional hostname: Hostname, defaults to None
         :param int, optional packetSize: Packet Size, defaults to None
@@ -103,6 +108,8 @@ def notification_docstring(mode) -> str:
         :param int, optional gotifyPriority: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`
         :param str, optional lineChannelAccessToken: Notification option for ``type`` :attr:`~.NotificationType.LINE`
         :param str, optional lineUserID: Notification option for ``type`` :attr:`~.NotificationType.LINE`
+        :param str, optional lunaseaTarget: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. Allowed values: "device", "user".
+        :param str, optional lunaseaUserID: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`
         :param str, optional lunaseaDevice: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`
         :param str, optional internalRoomId: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
         :param str, optional accessToken: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
@@ -120,6 +127,22 @@ def notification_docstring(mode) -> str:
         :param str, optional pagerdutyIntegrationUrl: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
         :param str, optional pagerdutyPriority: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
         :param str, optional pagerdutyIntegrationKey: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
+        :param str, optional pagertreeAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`
+        
+            Available values are:
+            
+            - ``0``: Do Nothing
+            - ``resolve``: Auto Resolve
+        :param str, optional pagertreeIntegrationUrl: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`
+        :param str, optional pagertreeUrgency: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`.
+        
+            Available values are:
+            
+            - ``silent``: Silent
+            - ``low``: Low
+            - ``medium``: Medium
+            - ``high``: High
+            - ``critical``: Critical
         :param str, optional promosmsLogin: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`
         :param str, optional promosmsPassword: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`
         :param str, optional promosmsPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`. Phone number (for Polish recipient You can skip area codes).
@@ -179,8 +202,11 @@ def notification_docstring(mode) -> str:
         :param str, optional smtpTo: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
         :param str, optional stackfieldwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.STACKFIELD`
         :param str, optional pushAPIKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHBYTECHULUS`
-        :param str, optional telegramBotToken: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
         :param str, optional telegramChatID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
+        :param bool, optional telegramSendSilently: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
+        :param bool, optional telegramProtectContent: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
+        :param str, optional telegramMessageThreadID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
+        :param str, optional telegramBotToken: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
         :param str, optional webhookContentType: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
         :param str, optional webhookAdditionalHeaders: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
         :param str, optional webhookURL: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`

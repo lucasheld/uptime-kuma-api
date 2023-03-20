@@ -12,3 +12,6 @@ class AuthMethod(str, Enum):
 
     NTLM = "ntlm"
     """NTLM Authentication."""
+
+    MTLS = "mtls"
+    """mTLS Authentication."""

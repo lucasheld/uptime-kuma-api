@@ -19,3 +19,4 @@ class Event(str, Enum):
     AUTO_LOGIN = "autoLogin"
     INIT_SERVER_TIMEZONE = "initServerTimezone"
     MAINTENANCE_LIST = "maintenanceList"
+    API_KEY_LIST = "apiKeyList"
