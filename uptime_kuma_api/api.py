@@ -475,7 +475,7 @@ class UptimeKumaApi(object):
                 return []
             time.sleep(0.01)
         time.sleep(0.05)  # wait for multiple messages
-        return deepcopy(self._event_data[event])
+        return deepcopy(self._event_data[event].copy())
 
     def _call(self, event, data=None) -> Any:
         r = self.sio.call(event, data)
