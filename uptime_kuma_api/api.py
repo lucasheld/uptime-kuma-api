@@ -494,67 +494,94 @@ class UptimeKumaApi(object):
         pass
 
     def _event_monitor_list(self, data) -> None:
+        int_to_bool(data, ["active"])
+
         self._event_data[Event.MONITOR_LIST] = data
 
     def _event_notification_list(self, data) -> None:
         self._event_data[Event.NOTIFICATION_LIST] = data
 
     def _event_proxy_list(self, data) -> None:
+        int_to_bool(data, ["auth", "active", "default", "applyExisting"])
+
         self._event_data[Event.PROXY_LIST] = data
 
     def _event_status_page_list(self, data) -> None:
         self._event_data[Event.STATUS_PAGE_LIST] = data
 
-    def _event_heartbeat_list(self, id_, data, bool_) -> None:
+    def _event_heartbeat_list(self, monitor_id, data, overwrite) -> None:
+        # TODO: breaking change!
+        # TODO: append still without limit?
+        monitor_id = int(monitor_id)
+        int_to_bool(data, ["important", "status"])
+
         if self._event_data[Event.HEARTBEAT_LIST] is None:
-            self._event_data[Event.HEARTBEAT_LIST] = []
-        self._event_data[Event.HEARTBEAT_LIST].append({
-            "id": id_,
-            "data": data,
-            "bool": bool_,
-        })
+            self._event_data[Event.HEARTBEAT_LIST] = {}
+        if monitor_id not in self._event_data[Event.HEARTBEAT_LIST] or overwrite:
+            self._event_data[Event.HEARTBEAT_LIST][monitor_id] = data
+        else:
+            self._event_data[Event.HEARTBEAT_LIST][monitor_id].append(data)
 
-    def _event_important_heartbeat_list(self, id_, data, bool_) -> None:
+    def _event_important_heartbeat_list(self, monitor_id, data, overwrite) -> None:
+        # TODO: breaking change!
+        # TODO: append still without limit?
+        monitor_id = int(monitor_id)
+        int_to_bool(data, ["important", "status"])
+
         if self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] is None:
-            self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] = []
-        self._event_data[Event.IMPORTANT_HEARTBEAT_LIST].append({
-            "id": id_,
-            "data": data,
-            "bool": bool_,
-        })
+            self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] = {}
+        if monitor_id not in self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] or overwrite:
+            self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id] = data
+        else:
+            self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id].append(data)
 
-    def _event_avg_ping(self, id_, data) -> None:
+    def _event_avg_ping(self, monitor_id, data) -> None:
+        # TODO: breaking change!
+        monitor_id = int(monitor_id)
+
         if self._event_data[Event.AVG_PING] is None:
-            self._event_data[Event.AVG_PING] = []
-        self._event_data[Event.AVG_PING].append({
-            "id": id_,
-            "data": data,
-        })
+            self._event_data[Event.AVG_PING] = {}
+        self._event_data[Event.AVG_PING][monitor_id] = data
 
-    def _event_uptime(self, monitor_id, duration, uptime) -> None:
+    def _event_uptime(self, monitor_id, type_, data) -> None:
+        # TODO: breaking change!
         if self._event_data[Event.UPTIME] is None:
-            self._event_data[Event.UPTIME] = []
-        self._event_data[Event.UPTIME].append({
-            "id": monitor_id,
-            "duration": duration,
-            "uptime": uptime,
-        })
+            self._event_data[Event.UPTIME] = {}
+        if monitor_id not in self._event_data[Event.UPTIME]:
+            self._event_data[Event.UPTIME][monitor_id] = {}
+        self._event_data[Event.UPTIME][monitor_id][type_] = data
 
     def _event_heartbeat(self, data) -> None:
+        # TODO: breaking change!
+        int_to_bool(data, ["important", "status"])
+
         if self._event_data[Event.HEARTBEAT] is None:
-            self._event_data[Event.HEARTBEAT] = []
-        self._event_data[Event.HEARTBEAT].append(data)
+            self._event_data[Event.HEARTBEAT] = {}
+        monitor_id = data["monitorID"]
+        if monitor_id not in self._event_data[Event.HEARTBEAT]:
+            self._event_data[Event.HEARTBEAT][monitor_id] = []
+        self._event_data[Event.HEARTBEAT][monitor_id].append(data)
+        if len(self._event_data[Event.HEARTBEAT][monitor_id]) >= 150:
+            self._event_data[Event.HEARTBEAT][monitor_id].pop(0)
+
+        # add heartbeat to important heartbeat list
+        if data["important"]:
+            if self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] is None:
+                self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] = {}
+            if monitor_id not in self._event_data[Event.IMPORTANT_HEARTBEAT_LIST]:
+                self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id] = []
+            self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id] = [data] + self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id]
 
     def _event_info(self, data) -> None:
         self._event_data[Event.INFO] = data
 
-    def _event_cert_info(self, id_, data) -> None:
+    def _event_cert_info(self, monitor_id, data) -> None:
+        # TODO: breaking change!
+        monitor_id = int(monitor_id)
+
         if self._event_data[Event.CERT_INFO] is None:
-            self._event_data[Event.CERT_INFO] = []
-        self._event_data[Event.CERT_INFO].append({
-            "id": id_,
-            "data": data,
-        })
+            self._event_data[Event.CERT_INFO] = {}
+        self._event_data[Event.CERT_INFO][monitor_id] = json.loads(data)
 
     def _event_docker_host_list(self, data) -> None:
         self._event_data[Event.DOCKER_HOST_LIST] = data
@@ -569,6 +596,8 @@ class UptimeKumaApi(object):
         self._event_data[Event.MAINTENANCE_LIST] = data
 
     def _event_api_key_list(self, data) -> None:
+        int_to_bool(data, ["active"])
+
         self._event_data[Event.API_KEY_LIST] = data
 
     # connection
@@ -907,7 +936,6 @@ class UptimeKumaApi(object):
         r = list(self._get_event_data(Event.MONITOR_LIST).values())
         for monitor in r:
             _convert_monitor_return(monitor)
-        int_to_bool(r, ["active"])
         return r
 
     def get_monitor(self, id_: int) -> dict:
@@ -1465,9 +1493,7 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        r = self._get_event_data(Event.PROXY_LIST)
-        int_to_bool(r, ["auth", "active", "default", "applyExisting"])
-        return r
+        return self._get_event_data(Event.PROXY_LIST)
 
     def get_proxy(self, id_: int) -> dict:
         """
@@ -1865,6 +1891,7 @@ class UptimeKumaApi(object):
     # heartbeat
 
     def get_heartbeats(self) -> list:
+        # TODO: breaking change!
         """
         Get heartbeats.
 
@@ -1906,12 +1933,10 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        r = self._get_event_data(Event.HEARTBEAT_LIST)
-        for i in r:
-            int_to_bool(i["data"], ["important", "status"])
-        return r
+        return self._get_event_data(Event.HEARTBEAT_LIST)
 
     def get_important_heartbeats(self) -> list:
+        # TODO: breaking change!
         """
         Get important heartbeats.
 
@@ -1939,12 +1964,10 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        r = self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
-        for i in r:
-            int_to_bool(i["data"], ["important", "status"])
-        return r
+        return self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
 
     def get_heartbeat(self) -> list:
+        # TODO: breaking change!
         """
         Get heartbeat.
 
@@ -1965,13 +1988,12 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        r = self._get_event_data(Event.HEARTBEAT)
-        int_to_bool(r, ["important", "status"])
-        return r
+        return self._get_event_data(Event.HEARTBEAT)
 
     # avg ping
 
     def avg_ping(self) -> list:
+        # TODO: breaking change!
         """
         Get average ping.
 
@@ -1993,6 +2015,7 @@ class UptimeKumaApi(object):
     # cert info
 
     def cert_info(self) -> list:
+        # TODO: breaking change!
         """
         Get certificate info.
 
@@ -2009,11 +2032,13 @@ class UptimeKumaApi(object):
                 }
             ]
         """
+        # TODO: endless call if only ping monitors used
         return self._get_event_data(Event.CERT_INFO)
 
     # uptime
 
     def uptime(self) -> list:
+        # TODO: breaking change!
         """
         Get monitor uptime.
 
@@ -3350,9 +3375,7 @@ class UptimeKumaApi(object):
 
         # TODO: replace with getAPIKeyList?
 
-        r = self._get_event_data(Event.API_KEY_LIST)
-        int_to_bool(r, ["active"])
-        return r
+        return self._get_event_data(Event.API_KEY_LIST)
 
     def get_api_key(self, id_: int) -> dict:
         """
