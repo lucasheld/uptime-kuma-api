@@ -148,6 +148,12 @@ class NotificationType(str, Enum):
     SPLUNK = "Splunk"
     """Splunk"""
 
+    OPSGENIE = "Opsgenie"
+    """Opsgenie"""
+
+    TWILIO = "twilio"
+    """twilio"""
+
 
 notification_provider_options = {
     NotificationType.ALERTA: dict(
@@ -411,6 +417,17 @@ notification_provider_options = {
         splunkAutoResolve=dict(type="str"),
         splunkSeverity=dict(type="str"),
         splunkRestURL=dict(type="str")
+    ),
+    NotificationType.OPSGENIE: dict(
+        opsgeniePriority=dict(type="int"),
+        opsgenieRegion=dict(type="str"),
+        opsgenieApiKey=dict(type="str")
+    ),
+    NotificationType.TWILIO: dict(
+        twilioAccountSID=dict(type="str"),
+        twilioAuthToken=dict(type="str"),
+        twilioToNumber=dict(type="str"),
+        twilioFromNumber=dict(type="str")
     )
 }
 
@@ -430,5 +447,9 @@ notification_provider_conditions = dict(
     smseaglePriority=dict(
         min=0,
         max=9
+    ),
+    opsgeniePriority=dict(
+        min=1,
+        max=5
     )
 )

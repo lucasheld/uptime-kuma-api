@@ -109,8 +109,8 @@ def notification_docstring(mode) -> str:
         :param str, optional lineChannelAccessToken: Notification option for ``type`` :attr:`~.NotificationType.LINE`
         :param str, optional lineUserID: Notification option for ``type`` :attr:`~.NotificationType.LINE`
         :param str, optional lunaseaTarget: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. Allowed values: "device", "user".
-        :param str, optional lunaseaUserID: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`
-        :param str, optional lunaseaDevice: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`
+        :param str, optional lunaseaUserID: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. User ID.
+        :param str, optional lunaseaDevice: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. Device ID.
         :param str, optional internalRoomId: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
         :param str, optional accessToken: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
         :param str, optional homeserverUrl: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
@@ -275,6 +275,16 @@ def notification_docstring(mode) -> str:
             - ``WARNING``
             - ``CRITICAL``
         :param str, optional splunkRestURL: Notification option for ``type`` :attr:`~.NotificationType.SPLUNK`. Splunk Rest URL.
+        :param int, optional opsgeniePriority: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. Priority. Available values are numbers between ``1`` and ``5``.
+        :param str, optional opsgenieRegion: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. Region. Available values are:
+            
+            - ``us``: US (Default)
+            - ``eu``: EU
+        :param str, optional opsgenieApiKey: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. API Key.
+        :param str, optional twilioAccountSID: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. Account SID.
+        :param str, optional twilioAuthToken: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. Auth Token.
+        :param str, optional twilioToNumber: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. To Number.
+        :param str, optional twilioFromNumber: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. From Number.
     """
 
 
