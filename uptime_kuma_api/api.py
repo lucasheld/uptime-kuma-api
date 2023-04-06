@@ -494,16 +494,12 @@ class UptimeKumaApi(object):
         pass
 
     def _event_monitor_list(self, data) -> None:
-        int_to_bool(data, ["active"])
-
         self._event_data[Event.MONITOR_LIST] = data
 
     def _event_notification_list(self, data) -> None:
         self._event_data[Event.NOTIFICATION_LIST] = data
 
     def _event_proxy_list(self, data) -> None:
-        int_to_bool(data, ["auth", "active", "default", "applyExisting"])
-
         self._event_data[Event.PROXY_LIST] = data
 
     def _event_status_page_list(self, data) -> None:
@@ -513,7 +509,6 @@ class UptimeKumaApi(object):
         # TODO: breaking change!
         # TODO: append still without limit?
         monitor_id = int(monitor_id)
-        int_to_bool(data, ["important", "status"])
 
         if self._event_data[Event.HEARTBEAT_LIST] is None:
             self._event_data[Event.HEARTBEAT_LIST] = {}
@@ -526,7 +521,6 @@ class UptimeKumaApi(object):
         # TODO: breaking change!
         # TODO: append still without limit?
         monitor_id = int(monitor_id)
-        int_to_bool(data, ["important", "status"])
 
         if self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] is None:
             self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] = {}
@@ -553,8 +547,6 @@ class UptimeKumaApi(object):
 
     def _event_heartbeat(self, data) -> None:
         # TODO: breaking change!
-        int_to_bool(data, ["important", "status"])
-
         if self._event_data[Event.HEARTBEAT] is None:
             self._event_data[Event.HEARTBEAT] = {}
         monitor_id = data["monitorID"]
@@ -596,8 +588,6 @@ class UptimeKumaApi(object):
         self._event_data[Event.MAINTENANCE_LIST] = data
 
     def _event_api_key_list(self, data) -> None:
-        int_to_bool(data, ["active"])
-
         self._event_data[Event.API_KEY_LIST] = data
 
     # connection
@@ -936,6 +926,7 @@ class UptimeKumaApi(object):
         r = list(self._get_event_data(Event.MONITOR_LIST).values())
         for monitor in r:
             _convert_monitor_return(monitor)
+        int_to_bool(r, ["active"])
         return r
 
     def get_monitor(self, id_: int) -> dict:
@@ -1493,7 +1484,9 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        return self._get_event_data(Event.PROXY_LIST)
+        r = self._get_event_data(Event.PROXY_LIST)
+        int_to_bool(r, ["auth", "active", "default", "applyExisting"])
+        return r
 
     def get_proxy(self, id_: int) -> dict:
         """
@@ -1933,7 +1926,10 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        return self._get_event_data(Event.HEARTBEAT_LIST)
+        r = self._get_event_data(Event.HEARTBEAT_LIST)
+        for i in r:
+            int_to_bool(r[i], ["important", "status"])
+        return r
 
     def get_important_heartbeats(self) -> list:
         # TODO: breaking change!
@@ -1964,7 +1960,10 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        return self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
+        r = self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
+        for i in r:
+            int_to_bool(r[i], ["important", "status"])
+        return r
 
     def get_heartbeat(self) -> list:
         # TODO: breaking change!
@@ -1988,7 +1987,9 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        return self._get_event_data(Event.HEARTBEAT)
+        r = self._get_event_data(Event.HEARTBEAT)
+        int_to_bool(r, ["important", "status"])
+        return r
 
     # avg ping
 
@@ -3375,7 +3376,9 @@ class UptimeKumaApi(object):
 
         # TODO: replace with getAPIKeyList?
 
-        return self._get_event_data(Event.API_KEY_LIST)
+        r = self._get_event_data(Event.API_KEY_LIST)
+        int_to_bool(r, ["active"])
+        return r
 
     def get_api_key(self, id_: int) -> dict:
         """
