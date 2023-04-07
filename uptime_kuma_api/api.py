@@ -451,8 +451,9 @@ class UptimeKumaApi(object):
 
     @contextmanager
     def wait_for_event(self, event: Event) -> None:
+        # 200 * 0.05 seconds = 10 seconds
         retries = 200
-        event_data_before = deepcopy(self._event_data)
+        sleep = 0.05
 
         try:
             yield
@@ -460,11 +461,11 @@ class UptimeKumaApi(object):
             raise
         else:
             counter = 0
-            while event_data_before[event] == self._event_data[event]:
-                time.sleep(0.01)
+            while self._event_data[event] is None:
+                time.sleep(sleep)
                 counter += 1
                 if counter >= retries:
-                    print("wait_for_event timeout")
+                    print(f"wait_for_event {event} timeout")
                     break
 
     def _get_event_data(self, event) -> Any:
