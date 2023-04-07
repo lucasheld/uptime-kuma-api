@@ -24,19 +24,14 @@ class TestMaintenance(UptimeKumaTestCase):
                 "2022-12-27 22:36:00",
                 "2022-12-29 22:36:00"
             ],
-            "timeRange": [
-                {
-                    "hours": 2,
-                    "minutes": 0
-                },
-                {
-                    "hours": 3,
-                    "minutes": 0
-                }
-            ],
             "weekdays": [],
             "daysOfMonth": []
         }
+
+        if parse_version(self.api.version) >= parse_version("1.21.2"):
+            expected_maintenance.update({
+                "timezone": "Europe/Berlin"
+            })
 
         # add maintenance
         r = self.api.add_maintenance(**expected_maintenance)
@@ -119,18 +114,6 @@ class TestMaintenance(UptimeKumaTestCase):
             "dateRange": [
                 "2022-12-27 00:00:00"
             ],
-            "timeRange": [
-                {
-                    "hours": 2,
-                    "minutes": 0,
-                    "seconds": 0
-                },
-                {
-                    "hours": 3,
-                    "minutes": 0,
-                    "seconds": 0
-                }
-            ],
             "weekdays": [],
             "daysOfMonth": []
         }
@@ -146,16 +129,6 @@ class TestMaintenance(UptimeKumaTestCase):
             "dateRange": [
                 "2022-12-27 22:36:00",
                 "2022-12-29 22:36:00"
-            ],
-            "timeRange": [
-                {
-                    "hours": 2,
-                    "minutes": 0
-                },
-                {
-                    "hours": 3,
-                    "minutes": 0
-                }
             ],
             "weekdays": [],
             "daysOfMonth": []
@@ -246,9 +219,30 @@ class TestMaintenance(UptimeKumaTestCase):
                 10,
                 20,
                 30,
-                "lastDay4",
-                "lastDay2"
+                "lastDay1"
             ]
+        }
+        self.do_test_maintenance_strategy(expected_maintenance)
+
+    def test_maintenance_strategy_cron(self):
+        if parse_version(self.api.version) < parse_version("1.21.2"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_maintenance = {
+            "title": "test",
+            "description": "test",
+            "strategy": MaintenanceStrategy.CRON,
+            "active": True,
+            "intervalDay": 1,
+            "dateRange": [
+                "2022-12-27 22:37:00",
+                "2022-12-31 22:37:00"
+            ],
+            "weekdays": [],
+            "daysOfMonth": [],
+            "cron": "50 5 * * *",
+            "durationMinutes": 120,
+            "timezone": "Europe/Berlin"
         }
         self.do_test_maintenance_strategy(expected_maintenance)
 

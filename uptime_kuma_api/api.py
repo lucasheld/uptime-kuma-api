@@ -184,49 +184,6 @@ def _build_docker_host_data(
     return data
 
 
-def _build_maintenance_data(
-    title: str,
-    strategy: MaintenanceStrategy,
-    active: bool = True,
-    description: str = "",
-    dateRange: list = None,
-    intervalDay: int = 1,
-    weekdays: list = None,
-    daysOfMonth: list = None,
-    timeRange: list = None
-) -> dict:
-    if not dateRange:
-        dateRange = [
-            datetime.date.today().strftime("%Y-%m-%d 00:00:00")
-        ]
-    if not timeRange:
-        timeRange = [
-            {
-                "hours": 2,
-                "minutes": 0,
-            }, {
-                "hours": 3,
-                "minutes": 0,
-            }
-        ]
-    if not weekdays:
-        weekdays = []
-    if not daysOfMonth:
-        daysOfMonth = []
-    data = {
-        "title": title,
-        "active": active,
-        "intervalDay": intervalDay,
-        "dateRange": dateRange,
-        "description": description,
-        "strategy": strategy,
-        "weekdays": weekdays,
-        "daysOfMonth": daysOfMonth,
-        "timeRange": timeRange
-    }
-    return data
-
-
 def _build_tag_data(
     name: str,
     color: str
@@ -611,7 +568,7 @@ class UptimeKumaApi(object):
             interval: int = 60,
             retryInterval: int = 60,
             resendInterval: int = 0,
-            maxretries: int = 0,
+            maxretries: int = 1,
             upsideDown: bool = False,
             notificationIDList: list = None,
             httpBodyEncoding: str = "json",
@@ -686,6 +643,10 @@ class UptimeKumaApi(object):
             # GAMEDIG
             game: str = None
     ) -> dict:
+        # https://github.com/louislam/uptime-kuma/compare/1.21.1...1.21.2#diff-f672603317047f3e6f27b0d7a44f6f244b7dbb5d0d0a85f1059a6b0bc2cb9aa0L910
+        if parse_version(self.version) < parse_version("1.21.2"):
+            maxretries = 0
+
         data = {
             "type": type,
             "name": name,
@@ -828,6 +789,58 @@ class UptimeKumaApi(object):
 
         return data
 
+    def _build_maintenance_data(
+            self,
+            title: str,
+            strategy: MaintenanceStrategy,
+            active: bool = True,
+            description: str = "",
+            dateRange: list = None,
+            intervalDay: int = 1,
+            weekdays: list = None,
+            daysOfMonth: list = None,
+            timeRange: list = None,
+            cron: str = "30 3 * * *",
+            durationMinutes: int = 60,
+            timezone: str = None
+    ) -> dict:
+        if not dateRange:
+            dateRange = [
+                datetime.date.today().strftime("%Y-%m-%d 00:00:00")
+            ]
+        if not timeRange:
+            timeRange = [
+                {
+                    "hours": 2,
+                    "minutes": 0,
+                }, {
+                    "hours": 3,
+                    "minutes": 0,
+                }
+            ]
+        if not weekdays:
+            weekdays = []
+        if not daysOfMonth:
+            daysOfMonth = []
+        data = {
+            "title": title,
+            "active": active,
+            "intervalDay": intervalDay,
+            "dateRange": dateRange,
+            "description": description,
+            "strategy": strategy,
+            "weekdays": weekdays,
+            "daysOfMonth": daysOfMonth,
+            "timeRange": timeRange
+        }
+        if parse_version(self.version) >= parse_version("1.21.2"):
+            data.update({
+                "cron": cron,
+                "durationMinutes": durationMinutes,
+                "timezone": timezone,
+            })
+        return data
+
     # monitor
 
     def get_monitors(self) -> list:
@@ -875,7 +888,7 @@ class UptimeKumaApi(object):
                     'keyword': None,
                     'maintenance': False,
                     'maxredirects': 10,
-                    'maxretries': 0,
+                    'maxretries': 1,
                     'method': 'GET',
                     'mqttPassword': None,
                     'mqttSuccessMessage': None,
@@ -957,7 +970,7 @@ class UptimeKumaApi(object):
                 'keyword': None,
                 'maintenance': False,
                 'maxredirects': 10,
-                'maxretries': 0,
+                'maxretries': 1,
                 'method': 'GET',
                 'mqttPassword': None,
                 'mqttSuccessMessage': None,
@@ -2838,29 +2851,27 @@ class UptimeKumaApi(object):
                     ],
                     "timeRange": [
                         {
-                            "hours": 2,
-                            "minutes": 0,
-                            "seconds": 0
+                            "hours": 0,
+                            "minutes": 0
                         },
                         {
-                            "hours": 3,
-                            "minutes": 0,
-                            "seconds": 0
+                            "hours": 0,
+                            "minutes": 0
                         }
                     ],
                     "weekdays": [],
                     "daysOfMonth": [],
                     "timeslotList": [
                         {
-                            "id": 1,
-                            "startDate": "2022-12-27 14:39:00",
-                            "endDate": "2022-12-30 14:39:00",
-                            "startDateServerTimezone": "2022-12-27 15:39",
-                            "endDateServerTimezone": "2022-12-30 15:39",
-                            "serverTimezoneOffset": "+01:00"
+                            "startDate": "2022-12-27 22:36:00",
+                            "endDate": "2022-12-29 22:36:00"
                         }
                     ],
-                    "status": "under-maintenance"
+                    "cron": "",
+                    "durationMinutes": null,
+                    "timezone": "Europe/Berlin",
+                    "timezoneOffset": "+02:00",
+                    "status": "ended"
                 }
             ]
         """
@@ -2891,29 +2902,28 @@ class UptimeKumaApi(object):
                 ],
                 "timeRange": [
                     {
-                        "hours": 2,
-                        "minutes": 0,
-                        "seconds": 0
+                        "hours": 0,
+                        "minutes": 0
                     },
                     {
-                        "hours": 3,
-                        "minutes": 0,
-                        "seconds": 0
+                        "hours": 0,
+                        "minutes": 0
                     }
                 ],
                 "weekdays": [],
                 "daysOfMonth": [],
                 "timeslotList": [
                     {
-                        "id": 1,
-                        "startDate": "2022-12-27 14:39:00",
-                        "endDate": "2022-12-30 14:39:00",
-                        "startDateServerTimezone": "2022-12-27 15:39",
-                        "endDateServerTimezone": "2022-12-30 15:39",
-                        "serverTimezoneOffset": "+01:00"
+                        "startDate": "2022-12-27 22:36:00",
+                        "endDate": "2022-12-29 22:36:00"
                     }
                 ],
-                "status": "under-maintenance"
+                "cron": null,
+                "duration": null,
+                "durationMinutes": 0,
+                "timezone": "Europe/Berlin",
+                "timezoneOffset": "+02:00",
+                "status": "ended"
             }
         """
         return self._call('getMaintenance', id_)["maintenance"]
@@ -2938,18 +2948,6 @@ class UptimeKumaApi(object):
             ...     dateRange=[
             ...         "2022-12-27 00:00:00"
             ...     ],
-            ...     timeRange=[
-            ...         {
-            ...             "hours": 2,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         },
-            ...         {
-            ...             "hours": 3,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         }
-            ...     ],
             ...     weekdays=[],
             ...     daysOfMonth=[]
             ... )
@@ -2970,20 +2968,9 @@ class UptimeKumaApi(object):
             ...         "2022-12-27 22:36:00",
             ...         "2022-12-29 22:36:00"
             ...     ],
-            ...     timeRange=[
-            ...         {
-            ...             "hours": 2,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         },
-            ...         {
-            ...             "hours": 3,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         }
-            ...     ],
             ...     weekdays=[],
-            ...     daysOfMonth=[]
+            ...     daysOfMonth=[],
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3015,7 +3002,8 @@ class UptimeKumaApi(object):
             ...         }
             ...     ],
             ...     weekdays=[],
-            ...     daysOfMonth=[]
+            ...     daysOfMonth=[],
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3052,7 +3040,8 @@ class UptimeKumaApi(object):
             ...         5,
             ...         0
             ...     ],
-            ...     daysOfMonth=[]
+            ...     daysOfMonth=[],
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3089,15 +3078,39 @@ class UptimeKumaApi(object):
             ...         10,
             ...         20,
             ...         30,
-            ...         "lastDay2"
-            ...     ]
+            ...         "lastDay1"
+            ...     ],
+            ...     timezone="Europe/Berlin"
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.CRON`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.CRON,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:39:00",
+            ...         "2022-12-31 22:39:00"
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[],
+            ...     cron="50 5 * * *",
+            ...     durationMinutes=120,
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
                 "maintenanceID": 1
             }
         """
-        data = _build_maintenance_data(**kwargs)
+        data = self._build_maintenance_data(**kwargs)
         _check_arguments_maintenance(data)
         return self._call('addMaintenance', data)
 
