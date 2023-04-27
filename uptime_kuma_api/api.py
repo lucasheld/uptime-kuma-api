@@ -357,18 +357,22 @@ class UptimeKumaApi(object):
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
     :param float wait_timeout: How many seconds the client should wait for the connection., defaults to 1
     :param dict headers: Headers that are passed to the socketio connection, defaults to None
+    :param bool ssl_verify: ``True`` to verify SSL certificates, or ``False`` to skip SSL certificate
+                            verification, allowing connections to servers with self signed certificates.
+                            Default is ``True``.
     :raises UptimeKumaException: When connection to server failed.
     """
     def __init__(
             self,
             url: str,
             wait_timeout: float = 1,
-            headers: dict = None
+            headers: dict = None,
+            ssl_verify: bool = True
     ) -> None:
         self.url = url
         self.wait_timeout = wait_timeout
         self.headers = headers
-        self.sio = socketio.Client()
+        self.sio = socketio.Client(ssl_verify=ssl_verify)
 
         self._event_data: dict = {
             Event.MONITOR_LIST: None,
