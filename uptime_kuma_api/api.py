@@ -360,6 +360,10 @@ class UptimeKumaApi(object):
     :param bool ssl_verify: ``True`` to verify SSL certificates, or ``False`` to skip SSL certificate
                             verification, allowing connections to servers with self signed certificates.
                             Default is ``True``.
+    :param float wait_events: How many seconds the client should wait for the next event of the same type.
+                              There is no way to determine when the last message of a certain type has arrived.
+                              Therefore, a timeout is required. If no further message has arrived within this time,
+                              it is assumed that it was the last message. Defaults is ``0.2``.
     :raises UptimeKumaException: When connection to server failed.
     """
     def __init__(
@@ -367,11 +371,13 @@ class UptimeKumaApi(object):
             url: str,
             wait_timeout: float = 1,
             headers: dict = None,
-            ssl_verify: bool = True
+            ssl_verify: bool = True,
+            wait_events: float = 0.2
     ) -> None:
         self.url = url
         self.wait_timeout = wait_timeout
         self.headers = headers
+        self.wait_events = wait_events
         self.sio = socketio.Client(ssl_verify=ssl_verify)
 
         self._event_data: dict = {
@@ -439,7 +445,7 @@ class UptimeKumaApi(object):
             if self._event_data[Event.MONITOR_LIST] == {} and event in monitor_events:
                 return []
             time.sleep(0.01)
-        time.sleep(0.05)  # wait for multiple messages
+        time.sleep(self.wait_events)  # wait for multiple messages
         return deepcopy(self._event_data[event])
 
     def _call(self, event, data=None) -> Any:
