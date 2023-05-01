@@ -6,7 +6,7 @@ uptime-kuma-api is a Python wrapper for the [Uptime Kuma](https://github.com/lou
 
 This package was developed to configure Uptime Kuma with Ansible. The Ansible collection can be found at https://github.com/lucasheld/ansible-uptime-kuma.
 
-Python version 3.6+ is required.
+Python version 3.7+ is required.
 
 Supported Uptime Kuma versions: 1.17.0 - 1.21.2
 
