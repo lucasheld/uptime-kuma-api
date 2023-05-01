@@ -18,3 +18,6 @@ class MaintenanceStrategy(str, Enum):
 
     RECURRING_DAY_OF_MONTH = "recurring-day-of-month"
     """Recurring - Day of Month"""
+
+    CRON = "cron"
+    """Cron Expression"""

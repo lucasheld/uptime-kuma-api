@@ -1,5 +1,19 @@
 ## Changelog
 
+### Release 0.13.0
+
+#### Feature
+- add support for uptime kuma 1.21.2
+- implement custom socketio headers
+
+#### Bugfix
+- do not wait for events that have already arrived
+
+### Release 0.12.0
+
+#### Feature
+- add support for uptime kuma 1.21.1
+
 ### Release 0.11.0
 
 #### Feature

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import datetime
 import json
 import random
@@ -11,21 +13,28 @@ import requests
 import socketio
 from packaging.version import parse as parse_version
 
-from . import AuthMethod
-from . import DockerType
-from . import Event
-from . import IncidentStyle
-from . import MaintenanceStrategy
-from . import MonitorType
-from . import NotificationType, notification_provider_options, notification_provider_conditions
-from . import ProxyProtocol
-from . import UptimeKumaException
-from .docstrings import append_docstring, monitor_docstring, notification_docstring, proxy_docstring, \
-    docker_host_docstring, maintenance_docstring, tag_docstring
+from . import (AuthMethod,
+               DockerType,
+               Event,
+               IncidentStyle,
+               MaintenanceStrategy,
+               MonitorType,
+               NotificationType,
+               ProxyProtocol,
+               UptimeKumaException,
+               notification_provider_conditions,
+               notification_provider_options)
 
+from .docstrings import (append_docstring,
+                         docker_host_docstring,
+                         maintenance_docstring,
+                         monitor_docstring,
+                         notification_docstring,
+                         proxy_docstring,
+                         tag_docstring)
 
 def int_to_bool(data, keys) -> None:
-    if type(data) == list:
+    if isinstance(data, list):
         for d in data:
             int_to_bool(d, keys)
     else:
@@ -40,7 +49,7 @@ def gen_secret(length: int) -> str:
 
 
 def _convert_monitor_return(monitor) -> None:
-    if type(monitor["notificationIDList"]) == dict:
+    if isinstance(monitor["notificationIDList"], dict):
         monitor["notificationIDList"] = [int(i) for i in monitor["notificationIDList"].keys()]
 
 
@@ -138,7 +147,7 @@ def _build_status_page_data(
 
     icon: str = "/icon.svg",
     publicGroupList: list = None
-) -> (str, dict, str, list):
+) -> tuple(str, dict, str, list):
     if theme not in ["light", "dark"]:
         raise ValueError
     if not domainNameList:
@@ -180,49 +189,6 @@ def _build_docker_host_data(
         "name": name,
         "dockerType": dockerType,
         "dockerDaemon": dockerDaemon
-    }
-    return data
-
-
-def _build_maintenance_data(
-    title: str,
-    strategy: MaintenanceStrategy,
-    active: bool = True,
-    description: str = "",
-    dateRange: list = None,
-    intervalDay: int = 1,
-    weekdays: list = None,
-    daysOfMonth: list = None,
-    timeRange: list = None
-) -> dict:
-    if not dateRange:
-        dateRange = [
-            datetime.date.today().strftime("%Y-%m-%d 00:00:00")
-        ]
-    if not timeRange:
-        timeRange = [
-            {
-                "hours": 2,
-                "minutes": 0,
-            }, {
-                "hours": 3,
-                "minutes": 0,
-            }
-        ]
-    if not weekdays:
-        weekdays = []
-    if not daysOfMonth:
-        daysOfMonth = []
-    data = {
-        "title": title,
-        "active": active,
-        "intervalDay": intervalDay,
-        "dateRange": dateRange,
-        "description": description,
-        "strategy": strategy,
-        "weekdays": weekdays,
-        "daysOfMonth": daysOfMonth,
-        "timeRange": timeRange
     }
     return data
 
@@ -380,6 +346,9 @@ class UptimeKumaApi(object):
         >>> from uptime_kuma_api import UptimeKumaApi
         >>> api = UptimeKumaApi('INSERT_URL')
         >>> api.login('INSERT_USERNAME', 'INSERT_PASSWORD')
+        {
+            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNjgyOTU4OTU4fQ.Xb81nuKXeNyE1D_XoQowYgsgZHka-edONdwHmIznJdk'
+        }
 
     Now you can call one of the existing methods of the instance. For example create a new monitor:
 
@@ -397,18 +366,45 @@ class UptimeKumaApi(object):
 
         >>> api.disconnect()
 
+    With a context manager, the disconnect method is called automatically:
+
+    .. code-block:: python
+
+        from uptime_kuma_api import UptimeKumaApi
+
+        with UptimeKumaApi('INSERT_URL') as api:
+            api.login('INSERT_USERNAME', 'INSERT_PASSWORD')
+            api.add_monitor(
+                type=MonitorType.HTTP,
+                name="Google",
+                url="https://google.com"
+            )
+
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
     :param float wait_timeout: How many seconds the client should wait for the connection., defaults to 1
+    :param dict headers: Headers that are passed to the socketio connection, defaults to None
+    :param bool ssl_verify: ``True`` to verify SSL certificates, or ``False`` to skip SSL certificate
+                            verification, allowing connections to servers with self signed certificates.
+                            Default is ``True``.
+    :param float wait_events: How many seconds the client should wait for the next event of the same type.
+                              There is no way to determine when the last message of a certain type has arrived.
+                              Therefore, a timeout is required. If no further message has arrived within this time,
+                              it is assumed that it was the last message. Defaults is ``0.2``.
     :raises UptimeKumaException: When connection to server failed.
     """
     def __init__(
             self,
             url: str,
-            wait_timeout: float = 1
+            wait_timeout: float = 1,
+            headers: dict = None,
+            ssl_verify: bool = True,
+            wait_events: float = 0.2
     ) -> None:
         self.url = url
         self.wait_timeout = wait_timeout
-        self.sio = socketio.Client()
+        self.headers = headers
+        self.wait_events = wait_events
+        self.sio = socketio.Client(ssl_verify=ssl_verify)
 
         self._event_data: dict = {
             Event.MONITOR_LIST: None,
@@ -449,10 +445,17 @@ class UptimeKumaApi(object):
 
         self.connect()
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
+
     @contextmanager
     def wait_for_event(self, event: Event) -> None:
+        # 200 * 0.05 seconds = 10 seconds
         retries = 200
-        event_data_before = deepcopy(self._event_data)
+        sleep = 0.05
 
         try:
             yield
@@ -460,11 +463,11 @@ class UptimeKumaApi(object):
             raise
         else:
             counter = 0
-            while event_data_before[event] == self._event_data[event]:
-                time.sleep(0.01)
+            while self._event_data[event] is None:
+                time.sleep(sleep)
                 counter += 1
                 if counter >= retries:
-                    print("wait_for_event timeout")
+                    print(f"wait_for_event {event} timeout")
                     break
 
     def _get_event_data(self, event) -> Any:
@@ -474,14 +477,14 @@ class UptimeKumaApi(object):
             if self._event_data[Event.MONITOR_LIST] == {} and event in monitor_events:
                 return []
             time.sleep(0.01)
-        time.sleep(0.05)  # wait for multiple messages
+        time.sleep(self.wait_events)  # wait for multiple messages
         return deepcopy(self._event_data[event].copy())
 
     def _call(self, event, data=None) -> Any:
         r = self.sio.call(event, data)
-        if type(r) == dict and "ok" in r:
+        if isinstance(r, dict) and "ok" in r:
             if not r["ok"]:
-                raise UptimeKumaException(r["msg"])
+                raise UptimeKumaException(r.get("msg"))
             r.pop("ok")
         return r
 
@@ -596,7 +599,7 @@ class UptimeKumaApi(object):
         """
         url = self.url.rstrip("/")
         try:
-            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.wait_timeout)
+            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.wait_timeout, headers=self.headers)
         except:
             raise UptimeKumaException("unable to connect")
 
@@ -613,7 +616,7 @@ class UptimeKumaApi(object):
     @property
     def version(self) -> str:
         info = self.info()
-        return info["version"]
+        return info.get("version")
 
     def _build_monitor_data(
             self,
@@ -623,7 +626,7 @@ class UptimeKumaApi(object):
             interval: int = 60,
             retryInterval: int = 60,
             resendInterval: int = 0,
-            maxretries: int = 0,
+            maxretries: int = 1,
             upsideDown: bool = False,
             notificationIDList: list = None,
             httpBodyEncoding: str = "json",
@@ -698,6 +701,10 @@ class UptimeKumaApi(object):
             # GAMEDIG
             game: str = None
     ) -> dict:
+        # https://github.com/louislam/uptime-kuma/compare/1.21.1...1.21.2#diff-f672603317047f3e6f27b0d7a44f6f244b7dbb5d0d0a85f1059a6b0bc2cb9aa0L910
+        if parse_version(self.version) < parse_version("1.21.2"):
+            maxretries = 0
+
         data = {
             "type": type,
             "name": name,
@@ -840,9 +847,61 @@ class UptimeKumaApi(object):
 
         return data
 
+    def _build_maintenance_data(
+            self,
+            title: str,
+            strategy: MaintenanceStrategy,
+            active: bool = True,
+            description: str = "",
+            dateRange: list = None,
+            intervalDay: int = 1,
+            weekdays: list = None,
+            daysOfMonth: list = None,
+            timeRange: list = None,
+            cron: str = "30 3 * * *",
+            durationMinutes: int = 60,
+            timezone: str = None
+    ) -> dict:
+        if not dateRange:
+            dateRange = [
+                datetime.date.today().strftime("%Y-%m-%d 00:00:00")
+            ]
+        if not timeRange:
+            timeRange = [
+                {
+                    "hours": 2,
+                    "minutes": 0,
+                }, {
+                    "hours": 3,
+                    "minutes": 0,
+                }
+            ]
+        if not weekdays:
+            weekdays = []
+        if not daysOfMonth:
+            daysOfMonth = []
+        data = {
+            "title": title,
+            "active": active,
+            "intervalDay": intervalDay,
+            "dateRange": dateRange,
+            "description": description,
+            "strategy": strategy,
+            "weekdays": weekdays,
+            "daysOfMonth": daysOfMonth,
+            "timeRange": timeRange
+        }
+        if parse_version(self.version) >= parse_version("1.21.2"):
+            data.update({
+                "cron": cron,
+                "durationMinutes": durationMinutes,
+                "timezone": timezone,
+            })
+        return data
+
     # monitor
 
-    def get_monitors(self) -> list:
+    def get_monitors(self) -> list[dict]:
         """
         Get all monitors.
 
@@ -887,7 +946,7 @@ class UptimeKumaApi(object):
                     'keyword': None,
                     'maintenance': False,
                     'maxredirects': 10,
-                    'maxretries': 0,
+                    'maxretries': 1,
                     'method': 'GET',
                     'mqttPassword': None,
                     'mqttSuccessMessage': None,
@@ -969,7 +1028,7 @@ class UptimeKumaApi(object):
                 'keyword': None,
                 'maintenance': False,
                 'maxredirects': 10,
-                'maxretries': 0,
+                'maxretries': 1,
                 'method': 'GET',
                 'mqttPassword': None,
                 'mqttSuccessMessage': None,
@@ -1055,7 +1114,7 @@ class UptimeKumaApi(object):
         with self.wait_for_event(Event.MONITOR_LIST):
             return self._call('deleteMonitor', id_)
 
-    def get_monitor_beats(self, id_: int, hours: int) -> list:
+    def get_monitor_beats(self, id_: int, hours: int) -> list[dict]:
         """
         Get monitor beats for a specific monitor in a time range.
 
@@ -1098,7 +1157,7 @@ class UptimeKumaApi(object):
         int_to_bool(r, ["important", "status"])
         return r
 
-    def get_game_list(self) -> list:
+    def get_game_list(self) -> list[dict]:
         """
         Get a list of games that are supported by the GameDig monitor type.
 
@@ -1139,7 +1198,7 @@ class UptimeKumaApi(object):
         # Exists in 1.20.0 - 1.21.0
         if not r:
             r = self._call('getGameList')
-        return r["gameList"]
+        return r.get("gameList")
 
     @append_docstring(monitor_docstring("add"))
     def add_monitor(self, **kwargs) -> dict:
@@ -1257,7 +1316,7 @@ class UptimeKumaApi(object):
 
     # notification
 
-    def get_notifications(self) -> list:
+    def get_notifications(self) -> list[dict]:
         """
         Get all notifications.
 
@@ -1452,7 +1511,7 @@ class UptimeKumaApi(object):
 
     # proxy
 
-    def get_proxies(self) -> list:
+    def get_proxies(self) -> list[dict]:
         """
         Get all proxies.
 
@@ -1510,7 +1569,7 @@ class UptimeKumaApi(object):
         """
         proxies = self.get_proxies()
         for proxy in proxies:
-            if proxy["id"] == id_:
+            if proxy.get("id") == id_:
                 return proxy
         raise UptimeKumaException("proxy does not exist")
 
@@ -1596,7 +1655,7 @@ class UptimeKumaApi(object):
 
     # status page
 
-    def get_status_pages(self) -> list:
+    def get_status_pages(self) -> list[dict]:
         """
         Get all status pages.
 
@@ -2252,7 +2311,7 @@ class UptimeKumaApi(object):
 
     # tags
 
-    def get_tags(self) -> list:
+    def get_tags(self) -> list[dict]:
         """
         Get all tags.
 
@@ -2807,7 +2866,7 @@ class UptimeKumaApi(object):
 
     # docker host
 
-    def get_docker_hosts(self) -> list:
+    def get_docker_hosts(self) -> list[dict]:
         """
         Get all docker hosts.
 
@@ -2952,7 +3011,7 @@ class UptimeKumaApi(object):
 
     # maintenance
 
-    def get_maintenances(self) -> list:
+    def get_maintenances(self) -> list[dict]:
         """
         Get all maintenances.
 
@@ -2977,29 +3036,27 @@ class UptimeKumaApi(object):
                     ],
                     "timeRange": [
                         {
-                            "hours": 2,
-                            "minutes": 0,
-                            "seconds": 0
+                            "hours": 0,
+                            "minutes": 0
                         },
                         {
-                            "hours": 3,
-                            "minutes": 0,
-                            "seconds": 0
+                            "hours": 0,
+                            "minutes": 0
                         }
                     ],
                     "weekdays": [],
                     "daysOfMonth": [],
                     "timeslotList": [
                         {
-                            "id": 1,
-                            "startDate": "2022-12-27 14:39:00",
-                            "endDate": "2022-12-30 14:39:00",
-                            "startDateServerTimezone": "2022-12-27 15:39",
-                            "endDateServerTimezone": "2022-12-30 15:39",
-                            "serverTimezoneOffset": "+01:00"
+                            "startDate": "2022-12-27 22:36:00",
+                            "endDate": "2022-12-29 22:36:00"
                         }
                     ],
-                    "status": "under-maintenance"
+                    "cron": "",
+                    "durationMinutes": null,
+                    "timezone": "Europe/Berlin",
+                    "timezoneOffset": "+02:00",
+                    "status": "ended"
                 }
             ]
         """
@@ -3030,29 +3087,28 @@ class UptimeKumaApi(object):
                 ],
                 "timeRange": [
                     {
-                        "hours": 2,
-                        "minutes": 0,
-                        "seconds": 0
+                        "hours": 0,
+                        "minutes": 0
                     },
                     {
-                        "hours": 3,
-                        "minutes": 0,
-                        "seconds": 0
+                        "hours": 0,
+                        "minutes": 0
                     }
                 ],
                 "weekdays": [],
                 "daysOfMonth": [],
                 "timeslotList": [
                     {
-                        "id": 1,
-                        "startDate": "2022-12-27 14:39:00",
-                        "endDate": "2022-12-30 14:39:00",
-                        "startDateServerTimezone": "2022-12-27 15:39",
-                        "endDateServerTimezone": "2022-12-30 15:39",
-                        "serverTimezoneOffset": "+01:00"
+                        "startDate": "2022-12-27 22:36:00",
+                        "endDate": "2022-12-29 22:36:00"
                     }
                 ],
-                "status": "under-maintenance"
+                "cron": null,
+                "duration": null,
+                "durationMinutes": 0,
+                "timezone": "Europe/Berlin",
+                "timezoneOffset": "+02:00",
+                "status": "ended"
             }
         """
         return self._call('getMaintenance', id_)["maintenance"]
@@ -3077,18 +3133,6 @@ class UptimeKumaApi(object):
             ...     dateRange=[
             ...         "2022-12-27 00:00:00"
             ...     ],
-            ...     timeRange=[
-            ...         {
-            ...             "hours": 2,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         },
-            ...         {
-            ...             "hours": 3,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         }
-            ...     ],
             ...     weekdays=[],
             ...     daysOfMonth=[]
             ... )
@@ -3109,20 +3153,9 @@ class UptimeKumaApi(object):
             ...         "2022-12-27 22:36:00",
             ...         "2022-12-29 22:36:00"
             ...     ],
-            ...     timeRange=[
-            ...         {
-            ...             "hours": 2,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         },
-            ...         {
-            ...             "hours": 3,
-            ...             "minutes": 0,
-            ...             "seconds": 0
-            ...         }
-            ...     ],
             ...     weekdays=[],
-            ...     daysOfMonth=[]
+            ...     daysOfMonth=[],
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3154,7 +3187,8 @@ class UptimeKumaApi(object):
             ...         }
             ...     ],
             ...     weekdays=[],
-            ...     daysOfMonth=[]
+            ...     daysOfMonth=[],
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3191,7 +3225,8 @@ class UptimeKumaApi(object):
             ...         5,
             ...         0
             ...     ],
-            ...     daysOfMonth=[]
+            ...     daysOfMonth=[],
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3228,15 +3263,39 @@ class UptimeKumaApi(object):
             ...         10,
             ...         20,
             ...         30,
-            ...         "lastDay2"
-            ...     ]
+            ...         "lastDay1"
+            ...     ],
+            ...     timezone="Europe/Berlin"
+            ... )
+            {
+                "msg": "Added Successfully.",
+                "maintenanceID": 1
+            }
+
+        Example (strategy: :attr:`~.MaintenanceStrategy.CRON`)::
+
+            >>> api.add_maintenance(
+            ...     title="test",
+            ...     description="test",
+            ...     strategy=MaintenanceStrategy.CRON,
+            ...     active=True,
+            ...     intervalDay=1,
+            ...     dateRange=[
+            ...         "2022-12-27 22:39:00",
+            ...         "2022-12-31 22:39:00"
+            ...     ],
+            ...     weekdays=[],
+            ...     daysOfMonth=[],
+            ...     cron="50 5 * * *",
+            ...     durationMinutes=120,
+            ...     timezone="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
                 "maintenanceID": 1
             }
         """
-        data = _build_maintenance_data(**kwargs)
+        data = self._build_maintenance_data(**kwargs)
         _check_arguments_maintenance(data)
         return self._call('addMaintenance', data)
 
@@ -3341,7 +3400,7 @@ class UptimeKumaApi(object):
         """
         return self._call('resumeMaintenance', id_)
 
-    def get_monitor_maintenance(self, id_: int) -> list:
+    def get_monitor_maintenance(self, id_: int) -> list[dict]:
         """
         Gets all monitors of a maintenance.
 
@@ -3399,7 +3458,7 @@ class UptimeKumaApi(object):
         """
         return self._call('addMonitorMaintenance', (id_, monitors))
 
-    def get_status_page_maintenance(self, id_: int) -> list:
+    def get_status_page_maintenance(self, id_: int) -> list[dict]:
         """
         Gets all status pages of a maintenance.
 
@@ -3455,7 +3514,7 @@ class UptimeKumaApi(object):
 
     # api key
 
-    def get_api_keys(self) -> list:
+    def get_api_keys(self) -> list[dict]:
         """
         Get all api keys.
 
