@@ -855,7 +855,7 @@ class UptimeKumaApi(object):
 
     # monitor
 
-    def get_monitors(self) -> List[dict]:
+    def get_monitors(self) -> list[dict]:
         """
         Get all monitors.
 
@@ -1068,7 +1068,7 @@ class UptimeKumaApi(object):
         with self.wait_for_event(Event.MONITOR_LIST):
             return self._call('deleteMonitor', id_)
 
-    def get_monitor_beats(self, id_: int, hours: int) -> List[dict]:
+    def get_monitor_beats(self, id_: int, hours: int) -> list[dict]:
         """
         Get monitor beats for a specific monitor in a time range.
 
@@ -1111,7 +1111,7 @@ class UptimeKumaApi(object):
         int_to_bool(r, ["important", "status"])
         return r
 
-    def get_game_list(self) -> List[dict]:
+    def get_game_list(self) -> list[dict]:
         """
         Get a list of games that are supported by the GameDig monitor type.
 
@@ -1270,7 +1270,7 @@ class UptimeKumaApi(object):
 
     # notification
 
-    def get_notifications(self) -> List[dict]:
+    def get_notifications(self) -> list[dict]:
         """
         Get all notifications.
 
@@ -1465,7 +1465,7 @@ class UptimeKumaApi(object):
 
     # proxy
 
-    def get_proxies(self) -> List[dict]:
+    def get_proxies(self) -> list[dict]:
         """
         Get all proxies.
 
@@ -1609,7 +1609,7 @@ class UptimeKumaApi(object):
 
     # status page
 
-    def get_status_pages(self) -> List[dict]:
+    def get_status_pages(self) -> list[dict]:
         """
         Get all status pages.
 
@@ -1890,7 +1890,7 @@ class UptimeKumaApi(object):
 
     # heartbeat
 
-    def get_heartbeats(self) -> List[dict]:
+    def get_heartbeats(self) -> list[dict]:
         """
         Get heartbeats.
 
@@ -1937,7 +1937,7 @@ class UptimeKumaApi(object):
             int_to_bool(i["data"], ["important", "status"])
         return r
 
-    def get_important_heartbeats(self) -> List[dict]:
+    def get_important_heartbeats(self) -> list[dict]:
         """
         Get important heartbeats.
 
@@ -1970,7 +1970,7 @@ class UptimeKumaApi(object):
             int_to_bool(i["data"], ["important", "status"])
         return r
 
-    def get_heartbeat(self) -> List[dict]:
+    def get_heartbeat(self) -> list[dict]:
         """
         Get heartbeat.
 
@@ -1997,7 +1997,7 @@ class UptimeKumaApi(object):
 
     # avg ping
 
-    def avg_ping(self) -> List[dict]:
+    def avg_ping(self) -> list[dict]:
         """
         Get average ping.
 
@@ -2018,7 +2018,7 @@ class UptimeKumaApi(object):
 
     # cert info
 
-    def cert_info(self) -> List[dict]:
+    def cert_info(self) -> list[dict]:
         """
         Get certificate info.
 
@@ -2039,7 +2039,7 @@ class UptimeKumaApi(object):
 
     # uptime
 
-    def uptime(self) -> List[dict]:
+    def uptime(self) -> list[dict]:
         """
         Get monitor uptime.
 
@@ -2138,7 +2138,7 @@ class UptimeKumaApi(object):
 
     # tags
 
-    def get_tags(self) -> List[dict]:
+    def get_tags(self) -> list[dict]:
         """
         Get all tags.
 
@@ -2693,7 +2693,7 @@ class UptimeKumaApi(object):
 
     # docker host
 
-    def get_docker_hosts(self) -> List[dict]:
+    def get_docker_hosts(self) -> list[dict]:
         """
         Get all docker hosts.
 
@@ -2838,7 +2838,7 @@ class UptimeKumaApi(object):
 
     # maintenance
 
-    def get_maintenances(self) -> List[dict]:
+    def get_maintenances(self) -> list[dict]:
         """
         Get all maintenances.
 
@@ -3227,7 +3227,7 @@ class UptimeKumaApi(object):
         """
         return self._call('resumeMaintenance', id_)
 
-    def get_monitor_maintenance(self, id_: int) -> List[dict]:
+    def get_monitor_maintenance(self, id_: int) -> list[dict]:
         """
         Gets all monitors of a maintenance.
 
@@ -3285,7 +3285,7 @@ class UptimeKumaApi(object):
         """
         return self._call('addMonitorMaintenance', (id_, monitors))
 
-    def get_status_page_maintenance(self, id_: int) -> List[dict]:
+    def get_status_page_maintenance(self, id_: int) -> list[dict]:
         """
         Gets all status pages of a maintenance.
 
@@ -3341,7 +3341,7 @@ class UptimeKumaApi(object):
 
     # api key
 
-    def get_api_keys(self) -> List[dict]:
+    def get_api_keys(self) -> list[dict]:
         """
         Get all api keys.
 
