@@ -337,6 +337,9 @@ class UptimeKumaApi(object):
         >>> from uptime_kuma_api import UptimeKumaApi
         >>> api = UptimeKumaApi('INSERT_URL')
         >>> api.login('INSERT_USERNAME', 'INSERT_PASSWORD')
+        {
+            'token': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNjgyOTU4OTU4fQ.Xb81nuKXeNyE1D_XoQowYgsgZHka-edONdwHmIznJdk'
+        }
 
     Now you can call one of the existing methods of the instance. For example create a new monitor:
 
@@ -353,6 +356,20 @@ class UptimeKumaApi(object):
     At the end, the connection to the API must be disconnected so that the program does not block.
 
         >>> api.disconnect()
+
+    With a context manager, the disconnect method is called automatically:
+
+    .. code-block:: python
+
+        from uptime_kuma_api import UptimeKumaApi
+
+        with UptimeKumaApi('INSERT_URL') as api:
+            api.login('INSERT_USERNAME', 'INSERT_PASSWORD')
+            api.add_monitor(
+                type=MonitorType.HTTP,
+                name="Google",
+                url="https://google.com"
+            )
 
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
     :param float wait_timeout: How many seconds the client should wait for the connection., defaults to 1
@@ -418,6 +435,12 @@ class UptimeKumaApi(object):
         self.sio.on(Event.API_KEY_LIST, self._event_api_key_list)
 
         self.connect()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.disconnect()
 
     @contextmanager
     def wait_for_event(self, event: Event) -> None:
