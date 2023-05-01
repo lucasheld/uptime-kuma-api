@@ -506,8 +506,6 @@ class UptimeKumaApi(object):
         self._event_data[Event.STATUS_PAGE_LIST] = data
 
     def _event_heartbeat_list(self, monitor_id, data, overwrite) -> None:
-        # TODO: breaking change!
-        # TODO: append still without limit?
         monitor_id = int(monitor_id)
 
         if self._event_data[Event.HEARTBEAT_LIST] is None:
@@ -518,8 +516,6 @@ class UptimeKumaApi(object):
             self._event_data[Event.HEARTBEAT_LIST][monitor_id].append(data)
 
     def _event_important_heartbeat_list(self, monitor_id, data, overwrite) -> None:
-        # TODO: breaking change!
-        # TODO: append still without limit?
         monitor_id = int(monitor_id)
 
         if self._event_data[Event.IMPORTANT_HEARTBEAT_LIST] is None:
@@ -530,7 +526,6 @@ class UptimeKumaApi(object):
             self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id].append(data)
 
     def _event_avg_ping(self, monitor_id, data) -> None:
-        # TODO: breaking change!
         monitor_id = int(monitor_id)
 
         if self._event_data[Event.AVG_PING] is None:
@@ -538,7 +533,6 @@ class UptimeKumaApi(object):
         self._event_data[Event.AVG_PING][monitor_id] = data
 
     def _event_uptime(self, monitor_id, type_, data) -> None:
-        # TODO: breaking change!
         if self._event_data[Event.UPTIME] is None:
             self._event_data[Event.UPTIME] = {}
         if monitor_id not in self._event_data[Event.UPTIME]:
@@ -546,7 +540,6 @@ class UptimeKumaApi(object):
         self._event_data[Event.UPTIME][monitor_id][type_] = data
 
     def _event_heartbeat(self, data) -> None:
-        # TODO: breaking change!
         if self._event_data[Event.HEARTBEAT] is None:
             self._event_data[Event.HEARTBEAT] = {}
         monitor_id = data["monitorID"]
@@ -568,7 +561,6 @@ class UptimeKumaApi(object):
         self._event_data[Event.INFO] = data
 
     def _event_cert_info(self, monitor_id, data) -> None:
-        # TODO: breaking change!
         monitor_id = int(monitor_id)
 
         if self._event_data[Event.CERT_INFO] is None:
@@ -1884,7 +1876,6 @@ class UptimeKumaApi(object):
     # heartbeat
 
     def get_heartbeats(self) -> list:
-        # TODO: breaking change!
         """
         Get heartbeats.
 
@@ -1932,7 +1923,6 @@ class UptimeKumaApi(object):
         return r
 
     def get_important_heartbeats(self) -> list:
-        # TODO: breaking change!
         """
         Get important heartbeats.
 
@@ -1966,7 +1956,6 @@ class UptimeKumaApi(object):
         return r
 
     def get_heartbeat(self) -> list:
-        # TODO: breaking change!
         """
         Get heartbeat.
 
@@ -1994,7 +1983,6 @@ class UptimeKumaApi(object):
     # avg ping
 
     def avg_ping(self) -> list:
-        # TODO: breaking change!
         """
         Get average ping.
 
@@ -2016,7 +2004,6 @@ class UptimeKumaApi(object):
     # cert info
 
     def cert_info(self) -> list:
-        # TODO: breaking change!
         """
         Get certificate info.
 
@@ -2039,7 +2026,6 @@ class UptimeKumaApi(object):
     # uptime
 
     def uptime(self) -> list:
-        # TODO: breaking change!
         """
         Get monitor uptime.
 
