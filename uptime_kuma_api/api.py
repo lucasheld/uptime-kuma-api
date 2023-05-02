@@ -3560,3 +3560,13 @@ class UptimeKumaApi(object):
         """
         with self.wait_for_event(Event.API_KEY_LIST):
             return self._call('deleteAPIKey', id_)
+
+    # helper methods
+
+    def get_monitor_status(self, monitor_id: int) -> MonitorStatus:
+        heartbeats = self.get_heartbeats()
+        for heartbeat in heartbeats:
+            if int(heartbeat["id"]) == monitor_id:
+                status = heartbeat["data"][-1]["status"]
+                return MonitorStatus(status)
+        raise UptimeKumaException("monitor does not exist")
