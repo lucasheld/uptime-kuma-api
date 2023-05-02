@@ -24,7 +24,7 @@ Documentation
 ---
 The API Reference is available on [Read the Docs](https://uptime-kuma-api.readthedocs.io).
 
-Examples
+Example
 ---
 Once you have installed the python package, you can use it to communicate with an Uptime Kuma instance.
 
@@ -48,4 +48,18 @@ At the end, the connection to the API must be disconnected so that the program d
 
 ```python
 >>> api.disconnect()
+```
+
+With a context manager, the disconnect method is called automatically:
+
+```python
+from uptime_kuma_api import UptimeKumaApi
+
+with UptimeKumaApi('INSERT_URL') as api:
+    api.login('INSERT_USERNAME', 'INSERT_PASSWORD')
+    api.add_monitor(
+        type=MonitorType.HTTP,
+        name="Google",
+        url="https://google.com"
+    )
 ```
