@@ -29,7 +29,7 @@ setup(
     author_email="lucasheld@hotmail.de",
     license=info["__license__"],
     packages=["uptime_kuma_api"],
-    python_requires=">=3.6, <4",
+    python_requires=">=3.7, <4",
     install_requires=[
         "python-socketio[client]>=5.0.0",
         "packaging"
@@ -43,7 +43,6 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
