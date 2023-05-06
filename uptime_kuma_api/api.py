@@ -13,7 +13,7 @@ import requests
 import socketio
 from packaging.version import parse as parse_version
 
-from . import (AuthMethod, 
+from . import (AuthMethod,
                DockerType,
                Event,
                IncidentStyle,
@@ -32,6 +32,7 @@ from .docstrings import (append_docstring,
                          notification_docstring,
                          proxy_docstring,
                          tag_docstring)
+
 
 def int_to_bool(data, keys) -> None:
     if isinstance(data, list):
@@ -147,7 +148,7 @@ def _build_status_page_data(
 
     icon: str = "/icon.svg",
     publicGroupList: list = None
-) -> tuple(str, dict, str, list):
+) -> tuple[str, dict, str, list]:
     if theme not in ["light", "dark"]:
         raise ValueError
     if not domainNameList:
