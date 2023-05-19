@@ -18,9 +18,11 @@ from . import (AuthMethod,
                Event,
                IncidentStyle,
                MaintenanceStrategy,
+               MonitorStatus,
                MonitorType,
                NotificationType,
                ProxyProtocol,
+               Timeout,
                UptimeKumaException,
                notification_provider_conditions,
                notification_provider_options)
@@ -33,6 +35,7 @@ from .docstrings import (append_docstring,
                          proxy_docstring,
                          tag_docstring)
 
+
 def int_to_bool(data, keys) -> None:
     if isinstance(data, list):
         for d in data:
@@ -41,6 +44,20 @@ def int_to_bool(data, keys) -> None:
         for key in keys:
             if key in data:
                 data[key] = True if data[key] == 1 else False
+
+
+def parse_value(data, func) -> None:
+    if isinstance(data, list):
+        for d in data:
+            parse_value(d, func)
+    else:
+        func(data)
+
+
+def parse_monitor_status(data) -> None:
+    def parse(x):
+        x["status"] = MonitorStatus(x["status"])
+    parse_value(data, parse)
 
 
 def gen_secret(length: int) -> str:
@@ -147,7 +164,7 @@ def _build_status_page_data(
 
     icon: str = "/icon.svg",
     publicGroupList: list = None
-) -> tuple(str, dict, str, list):
+) -> tuple[str, dict, str, list]:
     if theme not in ["light", "dark"]:
         raise ValueError
     if not domainNameList:
@@ -381,7 +398,8 @@ class UptimeKumaApi(object):
             )
 
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
-    :param float wait_timeout: How many seconds the client should wait for the connection., defaults to 1
+    :param float timeout: How many seconds the client should wait for the connection, an expected event or a server
+                          response. Default is ``10``.
     :param dict headers: Headers that are passed to the socketio connection, defaults to None
     :param bool ssl_verify: ``True`` to verify SSL certificates, or ``False`` to skip SSL certificate
                             verification, allowing connections to servers with self signed certificates.
@@ -395,13 +413,13 @@ class UptimeKumaApi(object):
     def __init__(
             self,
             url: str,
-            wait_timeout: float = 1,
+            timeout: float = 10,
             headers: dict = None,
             ssl_verify: bool = True,
             wait_events: float = 0.2
     ) -> None:
         self.url = url
-        self.wait_timeout = wait_timeout
+        self.timeout = timeout
         self.headers = headers
         self.wait_events = wait_events
         self.sio = socketio.Client(ssl_verify=ssl_verify)
@@ -453,26 +471,25 @@ class UptimeKumaApi(object):
 
     @contextmanager
     def wait_for_event(self, event: Event) -> None:
-        # 200 * 0.05 seconds = 10 seconds
-        retries = 200
-        sleep = 0.05
+        # waits for the first event of the given type to arrive
 
         try:
             yield
         except:
             raise
         else:
-            counter = 0
+            timestamp = time.time()
             while self._event_data[event] is None:
-                time.sleep(sleep)
-                counter += 1
-                if counter >= retries:
-                    print(f"wait_for_event {event} timeout")
-                    break
+                if time.time() - timestamp > self.timeout:
+                    raise Timeout(f"Timed out while waiting for event {event}")
+                time.sleep(0.01)
 
     def _get_event_data(self, event) -> Any:
         monitor_events = [Event.AVG_PING, Event.UPTIME, Event.HEARTBEAT_LIST, Event.IMPORTANT_HEARTBEAT_LIST, Event.CERT_INFO, Event.HEARTBEAT]
+        timestamp = time.time()
         while self._event_data[event] is None:
+            if time.time() - timestamp > self.timeout:
+                raise Timeout(f"Timed out while waiting for event {event}")
             # do not wait for events that are not sent
             if self._event_data[Event.MONITOR_LIST] == {} and event in monitor_events:
                 return []
@@ -481,7 +498,7 @@ class UptimeKumaApi(object):
         return deepcopy(self._event_data[event].copy())
 
     def _call(self, event, data=None) -> Any:
-        r = self.sio.call(event, data)
+        r = self.sio.call(event, data, timeout=self.timeout)
         if isinstance(r, dict) and "ok" in r:
             if not r["ok"]:
                 raise UptimeKumaException(r.get("msg"))
@@ -599,7 +616,7 @@ class UptimeKumaApi(object):
         """
         url = self.url.rstrip("/")
         try:
-            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.wait_timeout, headers=self.headers)
+            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.timeout, headers=self.headers)
         except:
             raise UptimeKumaException("unable to connect")
 
@@ -860,7 +877,7 @@ class UptimeKumaApi(object):
             timeRange: list = None,
             cron: str = "30 3 * * *",
             durationMinutes: int = 60,
-            timezone: str = None
+            timezoneOption: str = None
     ) -> dict:
         if not dateRange:
             dateRange = [
@@ -895,7 +912,7 @@ class UptimeKumaApi(object):
             data.update({
                 "cron": cron,
                 "durationMinutes": durationMinutes,
-                "timezone": timezone,
+                "timezoneOption": timezoneOption,
             })
         return data
 
@@ -1136,7 +1153,7 @@ class UptimeKumaApi(object):
                     'monitor_id': 1,
                     'msg': '200 - OK',
                     'ping': 201,
-                    'status': True,
+                    'status': <MonitorStatus.UP: 1>,
                     'time': '2022-12-15 12:38:42.661'
                 },
                 {
@@ -1147,14 +1164,15 @@ class UptimeKumaApi(object):
                     'monitor_id': 1,
                     'msg': '200 - OK',
                     'ping': 193,
-                    'status': True,
+                    'status': <MonitorStatus.UP: 1>,
                     'time': '2022-12-15 12:39:42.878'
                 },
                 ...
             ]
         """
         r = self._call('getMonitorBeats', (id_, hours))["data"]
-        int_to_bool(r, ["important", "status"])
+        int_to_bool(r, ["important"])
+        parse_monitor_status(r)
         return r
 
     def get_game_list(self) -> list[dict]:
@@ -1739,7 +1757,10 @@ class UptimeKumaApi(object):
             }
         """
         r1 = self._call('getStatusPage', slug)
-        r2 = requests.get(f"{self.url}/api/status-page/{slug}").json()
+        try:
+            r2 = requests.get(f"{self.url}/api/status-page/{slug}", timeout=self.timeout).json()
+        except requests.exceptions.Timeout as e:
+            raise Timeout(e)
 
         config = r1["config"]
         config.update(r2["config"])
@@ -1975,7 +1996,8 @@ class UptimeKumaApi(object):
         """
         r = self._get_event_data(Event.HEARTBEAT_LIST)
         for i in r:
-            int_to_bool(r[i], ["important", "status"])
+            int_to_bool(r[i], ["important"])
+            parse_monitor_status(r[i])
         return r
 
     def get_important_heartbeats(self) -> dict:
@@ -2004,7 +2026,8 @@ class UptimeKumaApi(object):
         """
         r = self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
         for i in r:
-            int_to_bool(r[i], ["important", "status"])
+            int_to_bool(r[i], ["important"])
+            parse_monitor_status(r[i])
         return r
 
     def get_heartbeat(self) -> dict:
@@ -2032,7 +2055,8 @@ class UptimeKumaApi(object):
             }
         """
         r = self._get_event_data(Event.HEARTBEAT)
-        int_to_bool(r, ["important", "status"])
+        int_to_bool(r, ["important"])
+        parse_monitor_status(r)
         return r
 
     # avg ping
@@ -3054,7 +3078,7 @@ class UptimeKumaApi(object):
                     ],
                     "cron": "",
                     "durationMinutes": null,
-                    "timezone": "Europe/Berlin",
+                    "timezoneOption": "Europe/Berlin",
                     "timezoneOffset": "+02:00",
                     "status": "ended"
                 }
@@ -3106,7 +3130,7 @@ class UptimeKumaApi(object):
                 "cron": null,
                 "duration": null,
                 "durationMinutes": 0,
-                "timezone": "Europe/Berlin",
+                "timezoneOption": "Europe/Berlin",
                 "timezoneOffset": "+02:00",
                 "status": "ended"
             }
@@ -3155,7 +3179,7 @@ class UptimeKumaApi(object):
             ...     ],
             ...     weekdays=[],
             ...     daysOfMonth=[],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3188,7 +3212,7 @@ class UptimeKumaApi(object):
             ...     ],
             ...     weekdays=[],
             ...     daysOfMonth=[],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3226,7 +3250,7 @@ class UptimeKumaApi(object):
             ...         0
             ...     ],
             ...     daysOfMonth=[],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3265,7 +3289,7 @@ class UptimeKumaApi(object):
             ...         30,
             ...         "lastDay1"
             ...     ],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3288,7 +3312,7 @@ class UptimeKumaApi(object):
             ...     daysOfMonth=[],
             ...     cron="50 5 * * *",
             ...     durationMinutes=120,
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3680,3 +3704,13 @@ class UptimeKumaApi(object):
         """
         with self.wait_for_event(Event.API_KEY_LIST):
             return self._call('deleteAPIKey', id_)
+
+    # helper methods
+
+    def get_monitor_status(self, monitor_id: int) -> MonitorStatus:
+        heartbeats = self.get_heartbeats()
+        for heartbeat in heartbeats:
+            if int(heartbeat["id"]) == monitor_id:
+                status = heartbeat["data"][-1]["status"]
+                return MonitorStatus(status)
+        raise UptimeKumaException("monitor does not exist")

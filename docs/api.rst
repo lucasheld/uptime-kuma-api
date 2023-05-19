@@ -39,3 +39,5 @@ Exceptions
 ----------
 
 .. autoexception:: UptimeKumaException
+
+.. autoexception:: Timeout
