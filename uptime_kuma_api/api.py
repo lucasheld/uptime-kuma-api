@@ -21,6 +21,7 @@ from . import (AuthMethod,
                MonitorType,
                NotificationType,
                ProxyProtocol,
+               Timeout,
                UptimeKumaException,
                notification_provider_conditions,
                notification_provider_options)
@@ -382,7 +383,8 @@ class UptimeKumaApi(object):
             )
 
     :param str url: The url to the Uptime Kuma instance. For example ``http://127.0.0.1:3001``
-    :param float wait_timeout: How many seconds the client should wait for the connection., defaults to 1
+    :param float timeout: How many seconds the client should wait for the connection, an expected event or a server
+                          response. Default is ``10``.
     :param dict headers: Headers that are passed to the socketio connection, defaults to None
     :param bool ssl_verify: ``True`` to verify SSL certificates, or ``False`` to skip SSL certificate
                             verification, allowing connections to servers with self signed certificates.
@@ -396,13 +398,13 @@ class UptimeKumaApi(object):
     def __init__(
             self,
             url: str,
-            wait_timeout: float = 1,
+            timeout: float = 10,
             headers: dict = None,
             ssl_verify: bool = True,
             wait_events: float = 0.2
     ) -> None:
         self.url = url
-        self.wait_timeout = wait_timeout
+        self.timeout = timeout
         self.headers = headers
         self.wait_events = wait_events
         self.sio = socketio.Client(ssl_verify=ssl_verify)
@@ -454,26 +456,25 @@ class UptimeKumaApi(object):
 
     @contextmanager
     def wait_for_event(self, event: Event) -> None:
-        # 200 * 0.05 seconds = 10 seconds
-        retries = 200
-        sleep = 0.05
+        # waits for the first event of the given type to arrive
 
         try:
             yield
         except:
             raise
         else:
-            counter = 0
+            timestamp = time.time()
             while self._event_data[event] is None:
-                time.sleep(sleep)
-                counter += 1
-                if counter >= retries:
-                    print(f"wait_for_event {event} timeout")
-                    break
+                if time.time() - timestamp > self.timeout:
+                    raise Timeout(f"Timed out while waiting for event {event}")
+                time.sleep(0.01)
 
     def _get_event_data(self, event) -> Any:
         monitor_events = [Event.AVG_PING, Event.UPTIME, Event.HEARTBEAT_LIST, Event.IMPORTANT_HEARTBEAT_LIST, Event.CERT_INFO, Event.HEARTBEAT]
+        timestamp = time.time()
         while self._event_data[event] is None:
+            if time.time() - timestamp > self.timeout:
+                raise Timeout(f"Timed out while waiting for event {event}")
             # do not wait for events that are not sent
             if self._event_data[Event.MONITOR_LIST] == {} and event in monitor_events:
                 return []
@@ -482,7 +483,7 @@ class UptimeKumaApi(object):
         return deepcopy(self._event_data[event])
 
     def _call(self, event, data=None) -> Any:
-        r = self.sio.call(event, data)
+        r = self.sio.call(event, data, timeout=self.timeout)
         if isinstance(r, dict) and "ok" in r:
             if not r["ok"]:
                 raise UptimeKumaException(r.get("msg"))
@@ -587,7 +588,7 @@ class UptimeKumaApi(object):
         """
         url = self.url.rstrip("/")
         try:
-            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.wait_timeout, headers=self.headers)
+            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.timeout, headers=self.headers)
         except:
             raise UptimeKumaException("unable to connect")
 
@@ -1727,7 +1728,10 @@ class UptimeKumaApi(object):
             }
         """
         r1 = self._call('getStatusPage', slug)
-        r2 = requests.get(f"{self.url}/api/status-page/{slug}").json()
+        try:
+            r2 = requests.get(f"{self.url}/api/status-page/{slug}", timeout=self.timeout).json()
+        except requests.exceptions.Timeout as e:
+            raise Timeout(e)
 
         config = r1["config"]
         config.update(r2["config"])

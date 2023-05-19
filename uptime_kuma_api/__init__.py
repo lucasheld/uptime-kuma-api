@@ -6,6 +6,6 @@ from .proxy_protocol import ProxyProtocol
 from .incident_style import IncidentStyle
 from .docker_type import DockerType
 from .maintenance_strategy import MaintenanceStrategy
-from .exceptions import UptimeKumaException
+from .exceptions import UptimeKumaException, Timeout
 from .event import Event
 from .api import UptimeKumaApi
