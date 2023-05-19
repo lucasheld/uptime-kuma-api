@@ -18,6 +18,7 @@ from . import (AuthMethod,
                Event,
                IncidentStyle,
                MaintenanceStrategy,
+               MonitorStatus,
                MonitorType,
                NotificationType,
                ProxyProtocol,
@@ -43,6 +44,20 @@ def int_to_bool(data, keys) -> None:
         for key in keys:
             if key in data:
                 data[key] = True if data[key] == 1 else False
+
+
+def parse_value(data, func) -> None:
+    if isinstance(data, list):
+        for d in data:
+            parse_value(d, func)
+    else:
+        func(data)
+
+
+def parse_monitor_status(data) -> None:
+    def parse(x):
+        x["status"] = MonitorStatus(x["status"])
+    parse_value(data, parse)
 
 
 def gen_secret(length: int) -> str:
@@ -1125,7 +1140,7 @@ class UptimeKumaApi(object):
                     'monitor_id': 1,
                     'msg': '200 - OK',
                     'ping': 201,
-                    'status': True,
+                    'status': <MonitorStatus.UP: 1>,
                     'time': '2022-12-15 12:38:42.661'
                 },
                 {
@@ -1136,14 +1151,15 @@ class UptimeKumaApi(object):
                     'monitor_id': 1,
                     'msg': '200 - OK',
                     'ping': 193,
-                    'status': True,
+                    'status': <MonitorStatus.UP: 1>,
                     'time': '2022-12-15 12:39:42.878'
                 },
                 ...
             ]
         """
         r = self._call('getMonitorBeats', (id_, hours))["data"]
-        int_to_bool(r, ["important", "status"])
+        int_to_bool(r, ["important"])
+        parse_monitor_status(r)
         return r
 
     def get_game_list(self) -> list[dict]:
@@ -1950,7 +1966,7 @@ class UptimeKumaApi(object):
                             'monitor_id': 1,
                             'msg': 'connect ECONNREFUSED 127.0.0.1:80',
                             'ping': None,
-                            'status': False,
+                            'status': <MonitorStatus.DOWN: 0>,
                             'time': '2022-12-15 16:51:41.782'
                         },
                         {
@@ -1961,7 +1977,7 @@ class UptimeKumaApi(object):
                             'monitor_id': 1,
                             'msg': 'connect ECONNREFUSED 127.0.0.1:80',
                             'ping': None,
-                            'status': False,
+                            'status': <MonitorStatus.DOWN: 0>,
                             'time': '2022-12-15 16:52:41.799'
                         },
                         ...
@@ -1972,7 +1988,8 @@ class UptimeKumaApi(object):
         """
         r = self._get_event_data(Event.HEARTBEAT_LIST)
         for i in r:
-            int_to_bool(i["data"], ["important", "status"])
+            int_to_bool(i["data"], ["important"])
+            parse_monitor_status(i["data"])
         return r
 
     def get_important_heartbeats(self) -> list[dict]:
@@ -1995,7 +2012,7 @@ class UptimeKumaApi(object):
                             'monitorID': 1,
                             'msg': 'connect ECONNREFUSED 127.0.0.1:80',
                             'ping': None,
-                            'status': False,
+                            'status': <MonitorStatus.DOWN: 0>,
                             'time': '2022-12-15 16:51:41.782'
                         }
                     ],
@@ -2005,7 +2022,8 @@ class UptimeKumaApi(object):
         """
         r = self._get_event_data(Event.IMPORTANT_HEARTBEAT_LIST)
         for i in r:
-            int_to_bool(i["data"], ["important", "status"])
+            int_to_bool(i["data"], ["important"])
+            parse_monitor_status(i["data"])
         return r
 
     def get_heartbeat(self) -> list[dict]:
@@ -2024,13 +2042,14 @@ class UptimeKumaApi(object):
                     'important': False,
                     'monitorID': 1,
                     'msg': 'connect ECONNREFUSED 127.0.0.1:80',
-                    'status': False,
+                    'status': <MonitorStatus.DOWN: 0>,
                     'time': '2022-12-15 17:17:42.099'
                 }
             ]
         """
         r = self._get_event_data(Event.HEARTBEAT)
-        int_to_bool(r, ["important", "status"])
+        int_to_bool(r, ["important"])
+        parse_monitor_status(r)
         return r
 
     # avg ping
@@ -3545,3 +3564,13 @@ class UptimeKumaApi(object):
         """
         with self.wait_for_event(Event.API_KEY_LIST):
             return self._call('deleteAPIKey', id_)
+
+    # helper methods
+
+    def get_monitor_status(self, monitor_id: int) -> MonitorStatus:
+        heartbeats = self.get_heartbeats()
+        for heartbeat in heartbeats:
+            if int(heartbeat["id"]) == monitor_id:
+                status = heartbeat["data"][-1]["status"]
+                return MonitorStatus(status)
+        raise UptimeKumaException("monitor does not exist")
