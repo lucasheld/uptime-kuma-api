@@ -848,7 +848,7 @@ class UptimeKumaApi(object):
             timeRange: list = None,
             cron: str = "30 3 * * *",
             durationMinutes: int = 60,
-            timezone: str = None
+            timezoneOption: str = None
     ) -> dict:
         if not dateRange:
             dateRange = [
@@ -883,7 +883,7 @@ class UptimeKumaApi(object):
             data.update({
                 "cron": cron,
                 "durationMinutes": durationMinutes,
-                "timezone": timezone,
+                "timezoneOption": timezoneOption,
             })
         return data
 
@@ -2915,7 +2915,7 @@ class UptimeKumaApi(object):
                     ],
                     "cron": "",
                     "durationMinutes": null,
-                    "timezone": "Europe/Berlin",
+                    "timezoneOption": "Europe/Berlin",
                     "timezoneOffset": "+02:00",
                     "status": "ended"
                 }
@@ -2967,7 +2967,7 @@ class UptimeKumaApi(object):
                 "cron": null,
                 "duration": null,
                 "durationMinutes": 0,
-                "timezone": "Europe/Berlin",
+                "timezoneOption": "Europe/Berlin",
                 "timezoneOffset": "+02:00",
                 "status": "ended"
             }
@@ -3016,7 +3016,7 @@ class UptimeKumaApi(object):
             ...     ],
             ...     weekdays=[],
             ...     daysOfMonth=[],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3049,7 +3049,7 @@ class UptimeKumaApi(object):
             ...     ],
             ...     weekdays=[],
             ...     daysOfMonth=[],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3087,7 +3087,7 @@ class UptimeKumaApi(object):
             ...         0
             ...     ],
             ...     daysOfMonth=[],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3126,7 +3126,7 @@ class UptimeKumaApi(object):
             ...         30,
             ...         "lastDay1"
             ...     ],
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",
@@ -3149,7 +3149,7 @@ class UptimeKumaApi(object):
             ...     daysOfMonth=[],
             ...     cron="50 5 * * *",
             ...     durationMinutes=120,
-            ...     timezone="Europe/Berlin"
+            ...     timezoneOption="Europe/Berlin"
             ... )
             {
                 "msg": "Added Successfully.",

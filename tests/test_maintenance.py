@@ -30,7 +30,7 @@ class TestMaintenance(UptimeKumaTestCase):
 
         if parse_version(self.api.version) >= parse_version("1.21.2"):
             expected_maintenance.update({
-                "timezone": "Europe/Berlin"
+                "timezoneOption": "Europe/Berlin"
             })
 
         # add maintenance
@@ -242,7 +242,7 @@ class TestMaintenance(UptimeKumaTestCase):
             "daysOfMonth": [],
             "cron": "50 5 * * *",
             "durationMinutes": 120,
-            "timezone": "Europe/Berlin"
+            "timezoneOption": "Europe/Berlin"
         }
         self.do_test_maintenance_strategy(expected_maintenance)
 
