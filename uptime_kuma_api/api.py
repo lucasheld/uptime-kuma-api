@@ -431,7 +431,6 @@ class UptimeKumaApi(object):
             Event.IMPORTANT_HEARTBEAT_LIST: None,
             Event.AVG_PING: None,
             Event.UPTIME: None,
-            Event.HEARTBEAT: None,
             Event.INFO: None,
             Event.CERT_INFO: None,
             Event.DOCKER_HOST_LIST: None,
@@ -560,14 +559,14 @@ class UptimeKumaApi(object):
         self._event_data[Event.UPTIME][monitor_id][type_] = data
 
     def _event_heartbeat(self, data) -> None:
-        if self._event_data[Event.HEARTBEAT] is None:
-            self._event_data[Event.HEARTBEAT] = {}
+        if self._event_data[Event.HEARTBEAT_LIST] is None:
+            self._event_data[Event.HEARTBEAT_LIST] = {}
         monitor_id = data["monitorID"]
-        if monitor_id not in self._event_data[Event.HEARTBEAT]:
-            self._event_data[Event.HEARTBEAT][monitor_id] = []
-        self._event_data[Event.HEARTBEAT][monitor_id].append(data)
-        if len(self._event_data[Event.HEARTBEAT][monitor_id]) >= 150:
-            self._event_data[Event.HEARTBEAT][monitor_id].pop(0)
+        if monitor_id not in self._event_data[Event.HEARTBEAT_LIST]:
+            self._event_data[Event.HEARTBEAT_LIST][monitor_id] = []
+        self._event_data[Event.HEARTBEAT_LIST][monitor_id].append(data)
+        if len(self._event_data[Event.HEARTBEAT_LIST][monitor_id]) >= 150:
+            self._event_data[Event.HEARTBEAT_LIST][monitor_id].pop(0)
 
         # add heartbeat to important heartbeat list
         if data["important"]:
@@ -2022,35 +2021,6 @@ class UptimeKumaApi(object):
         for i in r:
             int_to_bool(r[i], ["important"])
             parse_monitor_status(r[i])
-        return r
-
-    def get_heartbeat(self) -> dict:
-        """
-        Get the next heartbeat.
-
-        :return: The next heartbeat.
-        :rtype: dict
-
-        Example::
-
-            >>> api.get_heartbeat()
-            {
-                1: [
-                    {
-                        'duration': 60,
-                        'important': False,
-                        'monitorID': 1,
-                        'msg': '',
-                        'ping': 10.6,
-                        'status': 1,
-                        'time': '2023-05-01 17:28:20.557'
-                    }
-                ]
-            }
-        """
-        r = self._get_event_data(Event.HEARTBEAT)
-        int_to_bool(r, ["important"])
-        parse_monitor_status(r)
         return r
 
     # avg ping
