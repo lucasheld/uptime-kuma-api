@@ -37,7 +37,7 @@ class UptimeKumaTestCase(unittest.TestCase):
     def setUp(self):
         warnings.simplefilter("ignore", ResourceWarning)
 
-        self.api = UptimeKumaApi(self.url)
+        self.api = UptimeKumaApi(self.url, timeout=1, wait_events=0.01)
 
         global token
         if not token:
