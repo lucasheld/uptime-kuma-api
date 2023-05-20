@@ -1,5 +1,6 @@
 import unittest
 
+from uptime_kuma_api import UptimeKumaException
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
@@ -31,6 +32,10 @@ class TestMonitorTag(UptimeKumaTestCase):
         monitors = self.api.get_monitors()
         monitor = self.find_by_id(monitors, monitor_id)
         self.assertEqual(monitor["tags"], [])
+
+    def test_delete_not_existing_monitor_tag(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_monitor_tag(42, 42, 42)
 
 
 if __name__ == '__main__':

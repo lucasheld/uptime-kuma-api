@@ -260,6 +260,10 @@ class TestMaintenance(UptimeKumaTestCase):
         with self.assertRaises(UptimeKumaException):
             self.api.get_maintenance(maintenance_id)
 
+    def test_delete_not_existing_maintenance(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_maintenance(42)
+
 
 if __name__ == '__main__':
     unittest.main()

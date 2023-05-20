@@ -40,6 +40,10 @@ class TestTag(UptimeKumaTestCase):
         with self.assertRaises(UptimeKumaException):
             self.api.get_tag(tag_id)
 
+    def test_delete_not_existing_tag(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_tag(42)
+
 
 if __name__ == '__main__':
     unittest.main()

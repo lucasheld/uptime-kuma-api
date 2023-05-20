@@ -89,6 +89,10 @@ class TestStatusPage(UptimeKumaTestCase):
         status_page = self.find_by_id(status_pages, slug, "slug")
         self.assertIsNone(status_page)
 
+    def test_delete_not_existing_status_page(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_status_page("slug42")
+
 
 if __name__ == '__main__':
     unittest.main()

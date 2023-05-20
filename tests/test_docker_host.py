@@ -47,6 +47,10 @@ class TestDockerHost(UptimeKumaTestCase):
         with self.assertRaises(UptimeKumaException):
             self.api.get_docker_host(docker_host_id)
 
+    def test_delete_not_existing_docker_host(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_docker_host(42)
+
 
 if __name__ == '__main__':
     unittest.main()

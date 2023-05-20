@@ -50,6 +50,10 @@ class TestProxy(UptimeKumaTestCase):
         with self.assertRaises(UptimeKumaException):
             self.api.get_proxy(proxy_id)
 
+    def test_delete_not_existing_proxy(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_proxy(42)
+
 
 if __name__ == '__main__':
     unittest.main()
