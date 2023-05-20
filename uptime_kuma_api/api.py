@@ -3677,9 +3677,22 @@ class UptimeKumaApi(object):
     # helper methods
 
     def get_monitor_status(self, monitor_id: int) -> MonitorStatus:
+        """
+        Get the monitor status.
+
+        :param int monitor_id: Id of the monitor.
+        :return: The monitor status.
+        :rtype: MonitorStatus
+        :raises UptimeKumaException: If the monitor does not exist.
+
+        Example::
+
+            >>> api.get_monitor_status(1)
+            <MonitorStatus.PENDING: 2>
+        """
         heartbeats = self.get_heartbeats()
-        for heartbeat in heartbeats:
-            if int(heartbeat["id"]) == monitor_id:
-                status = heartbeat["data"][-1]["status"]
+        for heartbeat_monitor_id in heartbeats:
+            if heartbeat_monitor_id == monitor_id:
+                status = heartbeats[heartbeat_monitor_id][-1]["status"]
                 return MonitorStatus(status)
         raise UptimeKumaException("monitor does not exist")
