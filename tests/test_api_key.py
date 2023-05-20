@@ -1,17 +1,10 @@
 import unittest
-from packaging.version import parse as parse_version
 
-from uptime_kuma_api import DockerType, UptimeKumaException
+from uptime_kuma_api import UptimeKumaException
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestApiKey(UptimeKumaTestCase):
-    def setUp(self):
-        super(TestApiKey, self).setUp()
-        if parse_version(self.api.version) < parse_version("1.21"):
-            super(TestApiKey, self).tearDown()
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
     def test_api_key(self):
         # get empty list to make sure that future accesses will also work
         self.api.get_api_keys()

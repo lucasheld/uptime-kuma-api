@@ -1,5 +1,4 @@
 import unittest
-from packaging.version import parse as parse_version
 
 from uptime_kuma_api import UptimeKumaException, MonitorType, AuthMethod
 from uptime_kuma_test_case import UptimeKumaTestCase
@@ -21,12 +20,9 @@ class TestMonitor(UptimeKumaTestCase):
             "maxretries": 0,
             "notificationIDList": [notification_id_1, notification_id_2],
             "upsideDown": False,
-            "url": "http://127.0.0.1"
+            "url": "http://127.0.0.1",
+            "resendInterval": 0
         }
-        if parse_version(self.api.version) >= parse_version("1.18"):
-            expected_monitor.update({
-                "resendInterval": 0
-            })
 
         # add monitor
         r = self.api.add_monitor(**expected_monitor)
@@ -132,17 +128,16 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
-        if parse_version(self.api.version) >= parse_version("1.21"):
-            expected_monitor = {
-                "type": MonitorType.HTTP,
-                "name": "monitor 1",
-                "url": "http://127.0.0.1",
-                "authMethod": AuthMethod.MTLS,
-                "tlsCert": "cert",
-                "tlsKey": "key",
-                "tlsCa": "ca",
-            }
-            self.do_test_monitor_type(expected_monitor)
+        expected_monitor = {
+            "type": MonitorType.HTTP,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "authMethod": AuthMethod.MTLS,
+            "tlsCert": "cert",
+            "tlsKey": "key",
+            "tlsCa": "ca",
+        }
+        self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_port(self):
         expected_monitor = {
@@ -157,12 +152,9 @@ class TestMonitor(UptimeKumaTestCase):
         expected_monitor = {
             "type": MonitorType.PING,
             "name": "monitor 1",
-            "hostname": "127.0.0.1"
+            "hostname": "127.0.0.1",
+            "packetSize": 56
         }
-        if parse_version(self.api.version) >= parse_version("1.20"):
-            expected_monitor.update({
-                "packetSize": 56
-            })
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_keyword(self):
@@ -175,9 +167,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_grpc_keyword(self):
-        if parse_version(self.api.version) < parse_version("1.19"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_monitor = {
             "type": MonitorType.GRPC_KEYWORD,
             "name": "monitor 1",
@@ -200,9 +189,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_docker(self):
-        if parse_version(self.api.version) < parse_version("1.18"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         docker_host_id = self.add_docker_host()
         expected_monitor = {
             "type": MonitorType.DOCKER,
@@ -232,9 +218,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_gamedig(self):
-        if parse_version(self.api.version) < parse_version("1.20"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         game_list = self.api.get_game_list()
         game = game_list[0]["keys"][0]
         expected_monitor = {
@@ -270,9 +253,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_postgres(self):
-        if parse_version(self.api.version) < parse_version("1.18"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_monitor = {
             "type": MonitorType.POSTGRES,
             "name": "monitor 1",
@@ -282,9 +262,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_mysql(self):
-        if parse_version(self.api.version) < parse_version("1.19"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_monitor = {
             "type": MonitorType.MYSQL,
             "name": "monitor 1",
@@ -294,9 +271,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_mongodb(self):
-        if parse_version(self.api.version) < parse_version("1.20"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_monitor = {
             "type": MonitorType.MONGODB,
             "name": "monitor 1",
@@ -305,9 +279,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_radius(self):
-        if parse_version(self.api.version) < parse_version("1.18"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_monitor = {
             "type": MonitorType.RADIUS,
             "name": "monitor 1",
@@ -320,9 +291,6 @@ class TestMonitor(UptimeKumaTestCase):
         self.do_test_monitor_type(expected_monitor)
 
     def test_monitor_type_redis(self):
-        if parse_version(self.api.version) < parse_version("1.20"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_monitor = {
             "type": MonitorType.REDIS,
             "name": "monitor 1",

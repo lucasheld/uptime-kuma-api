@@ -1,7 +1,5 @@
 import unittest
 
-from packaging.version import parse as parse_version
-
 from uptime_kuma_api import UptimeKumaException
 from uptime_kuma_test_case import UptimeKumaTestCase
 
@@ -28,14 +26,13 @@ class TestTag(UptimeKumaTestCase):
         self.assertIsNotNone(tag)
         self.compare(tag, expected_tag)
 
-        if parse_version(self.api.version) >= parse_version("1.20"):
-            # edit tag
-            expected_tag["name"] = "tag 1 new"
-            expected_tag["color"] = "#000000"
-            r = self.api.edit_tag(tag_id, **expected_tag)
-            self.assertEqual(r["msg"], "Saved")
-            tag = self.api.get_tag(tag_id)
-            self.compare(tag, expected_tag)
+        # edit tag
+        expected_tag["name"] = "tag 1 new"
+        expected_tag["color"] = "#000000"
+        r = self.api.edit_tag(tag_id, **expected_tag)
+        self.assertEqual(r["msg"], "Saved")
+        tag = self.api.get_tag(tag_id)
+        self.compare(tag, expected_tag)
 
         # delete tag
         r = self.api.delete_tag(tag_id)

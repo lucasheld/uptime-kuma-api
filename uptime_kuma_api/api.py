@@ -11,7 +11,6 @@ from typing import Any
 
 import requests
 import socketio
-from packaging.version import parse as parse_version
 
 from . import (AuthMethod,
                DockerType,
@@ -718,10 +717,6 @@ class UptimeKumaApi(object):
             # GAMEDIG
             game: str = None
     ) -> dict:
-        # https://github.com/louislam/uptime-kuma/compare/1.21.1...1.21.2#diff-f672603317047f3e6f27b0d7a44f6f244b7dbb5d0d0a85f1059a6b0bc2cb9aa0L910
-        if parse_version(self.version) < parse_version("1.21.2"):
-            maxretries = 0
-
         data = {
             "type": type,
             "name": name,
@@ -730,18 +725,10 @@ class UptimeKumaApi(object):
             "maxretries": maxretries,
             "notificationIDList": notificationIDList,
             "upsideDown": upsideDown,
+            "resendInterval": resendInterval,
+            "description": description,
+            "httpBodyEncoding": httpBodyEncoding
         }
-
-        if parse_version(self.version) >= parse_version("1.18"):
-            data.update({
-                "resendInterval": resendInterval
-            })
-
-        if parse_version(self.version) >= parse_version("1.21"):
-            data.update({
-                "description": description,
-                "httpBodyEncoding": httpBodyEncoding
-            })
 
         if type in [MonitorType.KEYWORD, MonitorType.GRPC_KEYWORD]:
             data.update({
@@ -799,10 +786,9 @@ class UptimeKumaApi(object):
         })
 
         # PING
-        if parse_version(self.version) >= parse_version("1.20"):
-            data.update({
-                "packetSize": packetSize,
-            })
+        data.update({
+            "packetSize": packetSize,
+        })
 
         # PORT, DNS, STEAM, MQTT, RADIUS
         if not port:
@@ -906,14 +892,11 @@ class UptimeKumaApi(object):
             "strategy": strategy,
             "weekdays": weekdays,
             "daysOfMonth": daysOfMonth,
-            "timeRange": timeRange
+            "timeRange": timeRange,
+            "cron": cron,
+            "durationMinutes": durationMinutes,
+            "timezoneOption": timezoneOption
         }
-        if parse_version(self.version) >= parse_version("1.21.2"):
-            data.update({
-                "cron": cron,
-                "durationMinutes": durationMinutes,
-                "timezoneOption": timezoneOption,
-            })
         return data
 
     # monitor
@@ -1211,11 +1194,6 @@ class UptimeKumaApi(object):
             ]
         """
         r = self._call('getGameList')
-        # Workaround, gamelist is not available on first call.
-        # Fixed in https://github.com/louislam/uptime-kuma/commit/7b8ed01f272fc4c6b69ff6299185e936a5e63735
-        # Exists in 1.20.0 - 1.21.0
-        if not r:
-            r = self._call('getGameList')
         return r.get("gameList")
 
     @append_docstring(monitor_docstring("add"))
@@ -1769,11 +1747,8 @@ class UptimeKumaApi(object):
             **config,
             "incident": r2["incident"],
             "publicGroupList": r2["publicGroupList"],
+            "maintenanceList": r2["maintenanceList"]
         }
-        if parse_version(self.version) >= parse_version("1.19"):
-            data.update({
-                "maintenanceList": r2["maintenanceList"]
-            })
         return data
 
     def add_status_page(self, slug: str, title: str) -> dict:
@@ -1878,8 +1853,7 @@ class UptimeKumaApi(object):
         """
         status_page = self.get_status_page(slug)
         status_page.pop("incident")
-        if parse_version(self.version) >= parse_version("1.19"):
-            status_page.pop("maintenanceList")
+        status_page.pop("maintenanceList")
         status_page.update(kwargs)
         data = _build_status_page_data(**status_page)
         r = self._call('saveStatusPage', data)
@@ -2237,7 +2211,6 @@ class UptimeKumaApi(object):
                 }
             }
         """
-        # TODO: endless call if only ping monitors used
         return self._get_event_data(Event.CERT_INFO)
 
     # uptime
@@ -2576,12 +2549,9 @@ class UptimeKumaApi(object):
             "steamAPIKey": steamAPIKey,
             "dnsCache": dnsCache,
             "tlsExpiryNotifyDays": tlsExpiryNotifyDays,
-            "disableAuth": disableAuth
+            "disableAuth": disableAuth,
+            "trustProxy": trustProxy
         }
-        if parse_version(self.version) >= parse_version("1.18"):
-            data.update({
-                "trustProxy": trustProxy
-            })
         return self._call('setSettings', (data, password))
 
     def change_password(self, old_password: str, new_password: str) -> dict:

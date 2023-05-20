@@ -1,18 +1,10 @@
 import unittest
 
-from packaging.version import parse as parse_version
-
 from uptime_kuma_api import UptimeKumaException, MaintenanceStrategy
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestMaintenance(UptimeKumaTestCase):
-    def setUp(self):
-        super(TestMaintenance, self).setUp()
-        if parse_version(self.api.version) < parse_version("1.19"):
-            super(TestMaintenance, self).tearDown()
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
     def test_maintenance(self):
         expected_maintenance = {
             "title": "maintenance 1",
@@ -25,13 +17,9 @@ class TestMaintenance(UptimeKumaTestCase):
                 "2022-12-29 22:36:00"
             ],
             "weekdays": [],
-            "daysOfMonth": []
+            "daysOfMonth": [],
+            "timezoneOption": "Europe/Berlin"
         }
-
-        if parse_version(self.api.version) >= parse_version("1.21.2"):
-            expected_maintenance.update({
-                "timezoneOption": "Europe/Berlin"
-            })
 
         # add maintenance
         r = self.api.add_maintenance(**expected_maintenance)
@@ -225,9 +213,6 @@ class TestMaintenance(UptimeKumaTestCase):
         self.do_test_maintenance_strategy(expected_maintenance)
 
     def test_maintenance_strategy_cron(self):
-        if parse_version(self.api.version) < parse_version("1.21.2"):
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
         expected_maintenance = {
             "title": "test",
             "description": "test",

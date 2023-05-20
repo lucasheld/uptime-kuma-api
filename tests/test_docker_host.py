@@ -1,17 +1,10 @@
 import unittest
-from packaging.version import parse as parse_version
 
 from uptime_kuma_api import DockerType, UptimeKumaException
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
 class TestDockerHost(UptimeKumaTestCase):
-    def setUp(self):
-        super(TestDockerHost, self).setUp()
-        if parse_version(self.api.version) < parse_version("1.18"):
-            super(TestDockerHost, self).tearDown()
-            self.skipTest("Unsupported in this Uptime Kuma version")
-
     def test_docker_host(self):
         # get empty list to make sure that future accesses will also work
         self.api.get_docker_hosts()

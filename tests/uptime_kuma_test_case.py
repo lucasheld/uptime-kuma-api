@@ -1,8 +1,7 @@
 import unittest
 import warnings
-from packaging.version import parse as parse_version
 
-from uptime_kuma_api import UptimeKumaApi, MonitorType, DockerType, UptimeKumaException
+from uptime_kuma_api import UptimeKumaApi, MonitorType, DockerType
 
 token = None
 
@@ -74,23 +73,20 @@ class UptimeKumaTestCase(unittest.TestCase):
         for status_page in status_pages:
             self.api.delete_status_page(status_page["slug"])
 
-        if parse_version(self.api.version) >= parse_version("1.18"):
-            # delete docker hosts
-            docker_hosts = self.api.get_docker_hosts()
-            for docker_host in docker_hosts:
-                self.api.delete_docker_host(docker_host["id"])
+        # delete docker hosts
+        docker_hosts = self.api.get_docker_hosts()
+        for docker_host in docker_hosts:
+            self.api.delete_docker_host(docker_host["id"])
 
-        if parse_version(self.api.version) >= parse_version("1.19"):
-            # delete maintenances
-            maintenances = self.api.get_maintenances()
-            for maintenance in maintenances:
-                self.api.delete_maintenance(maintenance["id"])
+        # delete maintenances
+        maintenances = self.api.get_maintenances()
+        for maintenance in maintenances:
+            self.api.delete_maintenance(maintenance["id"])
 
-        if parse_version(self.api.version) >= parse_version("1.21"):
-            # delete api keys
-            api_keys = self.api.get_api_keys()
-            for api_key in api_keys:
-                self.api.delete_api_key(api_key["id"])
+        # delete api keys
+        api_keys = self.api.get_api_keys()
+        for api_key in api_keys:
+            self.api.delete_api_key(api_key["id"])
 
         # login again to receive initial messages
         self.api.disconnect()

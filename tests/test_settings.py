@@ -1,6 +1,5 @@
 import json
 import unittest
-from packaging.version import parse as parse_version
 
 from uptime_kuma_test_case import UptimeKumaTestCase
 
@@ -16,19 +15,11 @@ class TestSettings(UptimeKumaTestCase):
             "primaryBaseURL": "",
             "steamAPIKey": "",
             "tlsExpiryNotifyDays": [7, 14, 21],
-            "disableAuth": False
+            "disableAuth": False,
+            "trustProxy": False,
+            "serverTimezone": "Europe/Berlin",
+            "dnsCache": True
         }
-
-        if parse_version(self.api.version) >= parse_version("1.18"):
-            expected_settings.update({
-                "trustProxy": False
-            })
-
-        if parse_version(self.api.version) >= parse_version("1.19"):
-            expected_settings.update({
-                "serverTimezone": "Europe/Berlin",
-                "dnsCache": True,
-            })
 
         # set settings
         r = self.api.set_settings(self.password, **expected_settings)
