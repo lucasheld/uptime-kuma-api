@@ -73,68 +73,100 @@ def notification_docstring(mode) -> str:
         :param bool, optional isDefault: Default enabled. This notification will be enabled by default for new monitors. You can still disable the notification separately for each monitor., defaults to False
         :param bool, optional applyExisting: Apply on all existing monitors, defaults to False
         
-        :param str, optional alertaApiEndpoint: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`
-        :param str, optional alertaApiKey: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`
-        :param str, optional alertaEnvironment: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`
-        :param str, optional alertaAlertState: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`
-        :param str, optional alertaRecoverState: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`
-        :param str, optional phonenumber: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`
-        :param str, optional templateCode: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`
-        :param str, optional signName: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`
-        :param str, optional accessKeyId: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`
-        :param str, optional secretAccessKey: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`
-        :param str, optional appriseURL: Notification option for ``type`` :attr:`~.NotificationType.APPRISE`
-        :param str, optional title: Notification option for ``type`` :attr:`~.NotificationType.APPRISE`
-        :param str, optional clicksendsmsLogin: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`
-        :param str, optional clicksendsmsPassword: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`
-        :param str, optional clicksendsmsToNumber: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`
-        :param str, optional clicksendsmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`
-        :param str, optional webHookUrl: Notification option for ``type`` :attr:`~.NotificationType.DINGDING`
-        :param str, optional secretKey: Notification option for ``type`` :attr:`~.NotificationType.DINGDING`
-        :param str, optional discordUsername: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`
-        :param str, optional discordWebhookUrl: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`
-        :param str, optional discordPrefixMessage: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`
-        :param str, optional feishuWebHookUrl: Notification option for ``type`` :attr:`~.NotificationType.FEISHU`
-        :param str, optional googleChatWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.GOOGLECHAT`
-        :param str, optional gorushDeviceToken: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gorushPlatform: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gorushTitle: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gorushPriority: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gorushRetry: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gorushTopic: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gorushServerURL: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`
-        :param str, optional gotifyserverurl: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`
-        :param str, optional gotifyapplicationToken: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`
-        :param int, optional gotifyPriority: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`
-        :param str, optional lineChannelAccessToken: Notification option for ``type`` :attr:`~.NotificationType.LINE`
-        :param str, optional lineUserID: Notification option for ``type`` :attr:`~.NotificationType.LINE`
+        :param str, optional alertaApiEndpoint: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`.
+        :param str, optional alertaApiKey: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`.
+        :param str, optional alertaEnvironment: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`.
+        :param str, optional alertaAlertState: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`.
+        :param str, optional alertaRecoverState: Notification option for ``type`` :attr:`~.NotificationType.ALERTA`.
+        :param str, optional alertNowWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.ALERTNOW`.
+        :param str, optional phonenumber: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`.
+        :param str, optional templateCode: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`.
+        :param str, optional signName: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`.
+        :param str, optional accessKeyId: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`.
+        :param str, optional secretAccessKey: Notification option for ``type`` :attr:`~.NotificationType.ALIYUNSMS`.
+        :param str, optional appriseURL: Notification option for ``type`` :attr:`~.NotificationType.APPRISE`.
+        :param str title: Notification option for ``type`` :attr:`~.NotificationType.APPRISE`.
+        :param str, optional barkEndpoint: Notification option for ``type`` :attr:`~.NotificationType.BARK`.
+        :param str, optional barkGroup: Notification option for ``type`` :attr:`~.NotificationType.BARK`.
+        :param str, optional barkSound: Notification option for ``type`` :attr:`~.NotificationType.BARK`.
+        :param str, optional clicksendsmsLogin: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`.
+        :param str, optional clicksendsmsPassword: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`.
+        :param str, optional clicksendsmsToNumber: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`.
+        :param str clicksendsmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.CLICKSENDSMS`.
+        :param str, optional webHookUrl: Notification option for ``type`` :attr:`~.NotificationType.DINGDING`.
+        :param str, optional secretKey: Notification option for ``type`` :attr:`~.NotificationType.DINGDING`.
+        :param str discordUsername: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`.
+        :param str, optional discordWebhookUrl: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`.
+        :param str discordPrefixMessage: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`.
+        :param str, optional feishuWebHookUrl: Notification option for ``type`` :attr:`~.NotificationType.FEISHU`.
+        :param str, optional freemobileUser: Notification option for ``type`` :attr:`~.NotificationType.FREEMOBILE`.
+        :param str, optional freemobilePass: Notification option for ``type`` :attr:`~.NotificationType.FREEMOBILE`.
+        :param str, optional goAlertBaseURL: Notification option for ``type`` :attr:`~.NotificationType.GOALERT`.
+        :param str, optional goAlertToken: Notification option for ``type`` :attr:`~.NotificationType.GOALERT`.
+        :param str, optional googleChatWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.GOOGLECHAT`.
+        :param str, optional gorushDeviceToken: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param str gorushPlatform: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param str gorushTitle: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param str gorushPriority: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param int gorushRetry: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param str gorushTopic: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param str, optional gorushServerURL: Notification option for ``type`` :attr:`~.NotificationType.GORUSH`.
+        :param str, optional gotifyserverurl: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`.
+        :param str, optional gotifyapplicationToken: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`.
+        :param int, optional gotifyPriority: Notification option for ``type`` :attr:`~.NotificationType.GOTIFY`.
+        :param str notificationService: Notification option for ``type`` :attr:`~.NotificationType.HOMEASSISTANT`.
+        :param str, optional homeAssistantUrl: Notification option for ``type`` :attr:`~.NotificationType.HOMEASSISTANT`.
+        :param str, optional longLivedAccessToken: Notification option for ``type`` :attr:`~.NotificationType.HOMEASSISTANT`.
+        :param str, optional kookGuildID: Notification option for ``type`` :attr:`~.NotificationType.KOOK`.
+        :param str, optional kookBotToken: Notification option for ``type`` :attr:`~.NotificationType.KOOK`.
+        :param str, optional lineChannelAccessToken: Notification option for ``type`` :attr:`~.NotificationType.LINE`.
+        :param str, optional lineUserID: Notification option for ``type`` :attr:`~.NotificationType.LINE`.
+        :param str, optional lineNotifyAccessToken: Notification option for ``type`` :attr:`~.NotificationType.LINENOTIFY`.
         :param str, optional lunaseaTarget: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. Allowed values: "device", "user".
-        :param str, optional lunaseaUserID: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. User ID.
-        :param str, optional lunaseaDevice: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. Device ID.
-        :param str, optional internalRoomId: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
-        :param str, optional accessToken: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
-        :param str, optional homeserverUrl: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`
-        :param str, optional mattermostusername: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`
-        :param str, optional mattermostWebhookUrl: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`
-        :param str, optional mattermostchannel: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`
-        :param str, optional mattermosticonemo: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`
-        :param str, optional mattermosticonurl: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`
-        :param str, optional httpAddr: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`
-        :param str, optional accessToken: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`
-        :param str, optional msgType: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`
-        :param str, optional recieverId: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`
-        :param str, optional pagerdutyAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
-        :param str, optional pagerdutyIntegrationUrl: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
-        :param str, optional pagerdutyPriority: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
-        :param str, optional pagerdutyIntegrationKey: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`
-        :param str, optional pagertreeAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`
+        :param str lunaseaUserID: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. User ID.
+        :param str lunaseaDevice: Notification option for ``type`` :attr:`~.NotificationType.LUNASEA`. Device ID.
+        :param str, optional internalRoomId: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`.
+        :param str, optional accessToken: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`.
+        :param str, optional homeserverUrl: Notification option for ``type`` :attr:`~.NotificationType.MATRIX`.
+        :param str mattermostusername: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str, optional mattermostWebhookUrl: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str mattermostchannel: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str mattermosticonemo: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str mattermosticonurl: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str ntfyusername: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str ntfypassword: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str, optional ntfytopic: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param int, optional ntfyPriority: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str, optional ntfyserverurl: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str octopushVersion: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
+        :param str, optional octopushAPIKey: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
+        :param str, optional octopushLogin: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
+        :param str, optional octopushPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
+        :param str octopushSMSType: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
+        :param str octopushSenderName: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
+        :param str, optional httpAddr: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`.
+        :param str, optional accessToken: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`.
+        :param str msgType: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`.
+        :param str, optional recieverId: Notification option for ``type`` :attr:`~.NotificationType.ONEBOT`.
+        :param int opsgeniePriority: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. Priority. Available values are numbers between ``1`` and ``5``.
+        :param str, optional opsgenieRegion: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. Region. Available values are:
+            
+            - ``us``: US (Default)
+            - ``eu``: EU
+        :param str, optional opsgenieApiKey: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. API Key.
+        :param str pagerdutyAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`.
+        :param str pagerdutyIntegrationUrl: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`.
+        :param str pagerdutyPriority: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`.
+        :param str, optional pagerdutyIntegrationKey: Notification option for ``type`` :attr:`~.NotificationType.PAGERDUTY`.
+        :param str pagertreeAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`. 
         
             Available values are:
             
             - ``0``: Do Nothing
             - ``resolve``: Auto Resolve
-        :param str, optional pagertreeIntegrationUrl: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`
-        :param str, optional pagertreeUrgency: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`.
+        :param str pagertreeIntegrationUrl: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`.
+        :param str pagertreeUrgency: Notification option for ``type`` :attr:`~.NotificationType.PAGERTREE`. 
         
             Available values are:
             
@@ -143,112 +175,49 @@ def notification_docstring(mode) -> str:
             - ``medium``: Medium
             - ``high``: High
             - ``critical``: Critical
-        :param str, optional promosmsLogin: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`
-        :param str, optional promosmsPassword: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`
+        :param bool promosmsAllowLongSMS: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`. Allow long SMS.
+        :param str, optional promosmsLogin: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`.
+        :param str, optional promosmsPassword: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`.
         :param str, optional promosmsPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`. Phone number (for Polish recipient You can skip area codes).
-        :param str, optional promosmsSMSType: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`.
-        
+        :param str promosmsSMSType: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`. 
+            
             Available values are:
             
             - ``0``: SMS FLASH - Message will automatically show on recipient device. Limited only to Polish recipients.
             - ``1``: SMS ECO - cheap but slow and often overloaded. Limited only to Polish recipients.
             - ``3``: SMS FULL - Premium tier of SMS, You can use your Sender Name (You need to register name first). Reliable for alerts.
             - ``4``: SMS SPEED - Highest priority in system. Very quick and reliable but costly (about twice of SMS FULL price).
-        :param str, optional promosmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`
-        :param bool, optional promosmsAllowLongSMS: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`. Allow long SMS.
-        :param str, optional pushbulletAccessToken: Notification option for ``type`` :attr:`~.NotificationType.PUSHBULLET`
-        :param str, optional pushdeerKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHDEER`
-        :param str, optional pushoveruserkey: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`
-        :param str, optional pushoverapptoken: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`
-        :param str, optional pushoversounds: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`
-        :param str, optional pushoverpriority: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`
-        :param str, optional pushovertitle: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`
-        :param str, optional pushoverdevice: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`
-        :param str, optional pushyAPIKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHY`
-        :param str, optional pushyToken: Notification option for ``type`` :attr:`~.NotificationType.PUSHY`
-        :param str, optional rocketchannel: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`
-        :param str, optional rocketusername: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`
-        :param str, optional rocketiconemo: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`
-        :param str, optional rocketwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`
-        :param str, optional rocketbutton: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`
-        :param str, optional serwersmsUsername: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`
-        :param str, optional serwersmsPassword: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`
-        :param str, optional serwersmsPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`
-        :param str, optional serwersmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`
-        :param str, optional signalNumber: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`
-        :param str, optional signalRecipients: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`
-        :param str, optional signalURL: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`
-        :param str, optional slackbutton: Notification option for ``type`` :attr:`~.NotificationType.SLACK`
-        :param str, optional slackchannel: Notification option for ``type`` :attr:`~.NotificationType.SLACK`
-        :param str, optional slackusername: Notification option for ``type`` :attr:`~.NotificationType.SLACK`
-        :param str, optional slackiconemo: Notification option for ``type`` :attr:`~.NotificationType.SLACK`
-        :param str, optional slackwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.SLACK`
-        :param str, optional smtpHost: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param int, optional smtpPort: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpSecure: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpIgnoreTLSError: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpDkimDomain: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpDkimKeySelector: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpDkimPrivateKey: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpDkimHashAlgo: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpDkimheaderFieldNames: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpDkimskipFields: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpUsername: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpPassword: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional customSubject: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpFrom: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpCC: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpBCC: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional smtpTo: Notification option for ``type`` :attr:`~.NotificationType.SMTP`
-        :param str, optional stackfieldwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.STACKFIELD`
-        :param str, optional pushAPIKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHBYTECHULUS`
-        :param str, optional telegramChatID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
-        :param bool, optional telegramSendSilently: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
-        :param bool, optional telegramProtectContent: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
-        :param str, optional telegramMessageThreadID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
-        :param str, optional telegramBotToken: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`
-        :param str, optional webhookContentType: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
-        :param str, optional webhookAdditionalHeaders: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
-        :param str, optional webhookURL: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`
-        :param str, optional weComBotKey: Notification option for ``type`` :attr:`~.NotificationType.WECOM`
-        :param str, optional alertNowWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.ALERTNOW`
-        :param str, optional homeAssistantUrl: Notification option for ``type`` :attr:`~.NotificationType.HOMEASSISTANT`
-        :param str, optional longLivedAccessToken: Notification option for ``type`` :attr:`~.NotificationType.HOMEASSISTANT`
-        :param str, optional lineNotifyAccessToken: Notification option for ``type`` :attr:`~.NotificationType.LINENOTIFY`
-        :param str, optional barkEndpoint: Notification option for ``type`` :attr:`~.NotificationType.BARK`
-        :param str, optional barkGroup: Notification option for ``type`` :attr:`~.NotificationType.BARK`
-        :param str, optional barkSound: Notification option for ``type`` :attr:`~.NotificationType.BARK`
-        :param str, optional goAlertBaseURL: Notification option for ``type`` :attr:`~.NotificationType.GOALERT`
-        :param str, optional goAlertToken: Notification option for ``type`` :attr:`~.NotificationType.GOALERT`
-        :param str, optional octopushVersion: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushAPIKey: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushLogin: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushSMSType: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushSenderName: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushDMLogin: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushDMAPIKey: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushDMPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushDMSenderName: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional octopushDMSMSType: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`
-        :param str, optional serverChanSendKey: Notification option for ``type`` :attr:`~.NotificationType.SERVERCHAN`
-        :param str, optional smsmanagerApiKey: Notification option for ``type`` :attr:`~.NotificationType.SMSMANAGER`
-        :param str, optional numbers: Notification option for ``type`` :attr:`~.NotificationType.SMSMANAGER`
-        :param str, optional messageType: Notification option for ``type`` :attr:`~.NotificationType.SMSMANAGER`
-        :param str, optional squadcastWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.SQUADCAST`
-        :param str, optional webhookUrl: Notification option for ``type`` :attr:`~.NotificationType.TEAMS`
-        :param str, optional freemobileUser: Notification option for ``type`` :attr:`~.NotificationType.FREEMOBILE`
-        :param str, optional freemobilePass: Notification option for ``type`` :attr:`~.NotificationType.FREEMOBILE`
-        :param str, optional ntfyusername: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param str, optional ntfypassword: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param str, optional ntfytopic: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param int, optional ntfyPriority: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param str, optional ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param str, optional ntfyserverurl: Notification option for ``type`` :attr:`~.NotificationType.NTFY`
-        :param bool, optional smseagleEncoding: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. True to send messages in unicode.
-        :param int, optional smseaglePriority: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Message priority (0-9, default = 0).
-        :param str, optional smseagleRecipientType: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient type.
-        
+        :param str promosmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`.
+        :param str, optional pushbulletAccessToken: Notification option for ``type`` :attr:`~.NotificationType.PUSHBULLET`.
+        :param str, optional pushdeerKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHDEER`.
+        :param str, optional pushoveruserkey: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param str, optional pushoverapptoken: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param str pushoversounds: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param str pushoverpriority: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param str pushovertitle: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param str pushoverdevice: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param str, optional pushyAPIKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHY`.
+        :param str, optional pushyToken: Notification option for ``type`` :attr:`~.NotificationType.PUSHY`.
+        :param str rocketchannel: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`.
+        :param str rocketusername: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`.
+        :param str rocketiconemo: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`.
+        :param str, optional rocketwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`.
+        :param str, optional serverChanSendKey: Notification option for ``type`` :attr:`~.NotificationType.SERVERCHAN`.
+        :param str, optional serwersmsUsername: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`.
+        :param str, optional serwersmsPassword: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`.
+        :param str, optional serwersmsPhoneNumber: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`.
+        :param str serwersmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.SERWERSMS`.
+        :param str, optional signalNumber: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`.
+        :param str, optional signalRecipients: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`.
+        :param str, optional signalURL: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`.
+        :param str slackchannel: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
+        :param str slackusername: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
+        :param str slackiconemo: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
+        :param str, optional slackwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
+        :param bool smseagleEncoding: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. True to send messages in unicode.
+        :param int smseaglePriority: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Message priority (0-9, default = 0).
+        :param str smseagleRecipientType: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient type.
+            
             Available values are:
             
             - ``smseagle-to``: Phone number(s)
@@ -257,17 +226,34 @@ def notification_docstring(mode) -> str:
         :param str, optional smseagleToken: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. API Access token.
         :param str, optional smseagleRecipient: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient(s) (multiple must be separated with comma).
         :param str, optional smseagleUrl: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Your SMSEagle device URL.
-        :param str, optional webhookUrl: Notification option for ``type`` :attr:`~.NotificationType.ZOHOCLIQ`
-        :param str, optional kookGuildID: Notification option for ``type`` :attr:`~.NotificationType.KOOK`
-        :param str, optional kookBotToken: Notification option for ``type`` :attr:`~.NotificationType.KOOK`
-        :param str, optional splunkAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.SPLUNK`. Auto resolve or acknowledged.
+        :param str smsmanagerApiKey: Notification option for ``type`` :attr:`~.NotificationType.SMSMANAGER`.
+        :param str numbers: Notification option for ``type`` :attr:`~.NotificationType.SMSMANAGER`.
+        :param str messageType: Notification option for ``type`` :attr:`~.NotificationType.SMSMANAGER`.
+        :param str, optional smtpHost: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param int, optional smtpPort: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpSecure: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param bool smtpIgnoreTLSError: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpDkimDomain: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpDkimKeySelector: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpDkimPrivateKey: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpDkimHashAlgo: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpDkimheaderFieldNames: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpDkimskipFields: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpUsername: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpPassword: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str customSubject: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str, optional smtpFrom: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpCC: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpBCC: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str smtpTo: Notification option for ``type`` :attr:`~.NotificationType.SMTP`.
+        :param str splunkAutoResolve: Notification option for ``type`` :attr:`~.NotificationType.SPLUNK`. Auto resolve or acknowledged.
         
             Available values are:
             
             - ``0``: do nothing
             - ``ACKNOWLEDGEMENT``: auto acknowledged
             - ``RECOVERY``: auto resolve
-        :param str, optional splunkSeverity: Notification option for ``type`` :attr:`~.NotificationType.SPLUNK`. Severity.
+        :param str splunkSeverity: Notification option for ``type`` :attr:`~.NotificationType.SPLUNK`. Severity.
         
             Available values are:
             
@@ -275,16 +261,24 @@ def notification_docstring(mode) -> str:
             - ``WARNING``
             - ``CRITICAL``
         :param str, optional splunkRestURL: Notification option for ``type`` :attr:`~.NotificationType.SPLUNK`. Splunk Rest URL.
-        :param int, optional opsgeniePriority: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. Priority. Available values are numbers between ``1`` and ``5``.
-        :param str, optional opsgenieRegion: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. Region. Available values are:
-            
-            - ``us``: US (Default)
-            - ``eu``: EU
-        :param str, optional opsgenieApiKey: Notification option for ``type`` :attr:`~.NotificationType.OPSGENIE`. API Key.
+        :param str, optional squadcastWebhookURL: Notification option for ``type`` :attr:`~.NotificationType.SQUADCAST`.
+        :param str, optional stackfieldwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.STACKFIELD`.
+        :param str, optional webhookUrl: Notification option for ``type`` :attr:`~.NotificationType.TEAMS`.
+        :param str, optional pushAPIKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHBYTECHULUS`.
+        :param str, optional telegramChatID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
+        :param bool telegramSendSilently: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
+        :param bool telegramProtectContent: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
+        :param str telegramMessageThreadID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
+        :param str, optional telegramBotToken: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
         :param str, optional twilioAccountSID: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. Account SID.
         :param str, optional twilioAuthToken: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. Auth Token.
         :param str, optional twilioToNumber: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. To Number.
         :param str, optional twilioFromNumber: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. From Number.
+        :param str, optional webhookContentType: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
+        :param str webhookAdditionalHeaders: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
+        :param str, optional webhookURL: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
+        :param str, optional weComBotKey: Notification option for ``type`` :attr:`~.NotificationType.WECOM`.
+        :param str, optional webhookUrl: Notification option for ``type`` :attr:`~.NotificationType.ZOHOCLIQ`.
     """
 
 
