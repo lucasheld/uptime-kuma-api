@@ -2,30 +2,30 @@ from enum import Enum
 
 
 class NotificationType(str, Enum):
-{%- for notification_provider in notification_providers %}
-    {%- set name = notification_provider["name"] %}
-    {{ name.upper().replace(".", "_") }} = "{{ name }}"
-{%- endfor %}
-
+    """Enumerate notification types."""
+{% for provider in notification_providers %}
+    {{ provider.upper().replace(".", "_") }} = "{{ provider }}"
+    """{{ notification_providers[provider]["title"] }}"""
+{% endfor %}
 
 notification_provider_options = {
-{%- for notification_provider in notification_providers %}
-    {%- set name = notification_provider["name"] %}
-    NotificationType.{{ name.upper().replace(".", "_") }}: [
-        {%- for input in notification_provider["inputs"] %}
-        "{{ input }}",
+{%- for provider in notification_providers %}
+    NotificationType.{{ provider.upper().replace(".", "_") }}: dict(
+        {%- for input_name in notification_providers[provider]["inputs"] %}
+        {%- set input = notification_providers[provider]["inputs"][input_name] %}
+        {{ input_name }}=dict(type="{{ input["type"] }}", required={{ input["required"] }}),
         {%- endfor %}
-    ],
+    ),
 {%- endfor %}
 }
 
-notification_provider_conditions = {
+notification_provider_conditions = dict(
     {%- for provider in notification_provider_conditions %}
-    "{{ provider }}": {
+    {{ provider }}=dict(
         {%- for key, value in notification_provider_conditions[provider].items() %}
-        "{{ key }}": {{ value }},
+        {{ key }}={{ value }},
         {%- endfor %}
-    },
+    ),
     {%- endfor %}
-}
+)
 
