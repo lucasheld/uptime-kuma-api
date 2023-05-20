@@ -7,11 +7,17 @@ class NotificationType(str, Enum):
     ALERTA = "alerta"
     """Alerta"""
 
+    ALERTNOW = "AlertNow"
+    """AlertNow"""
+
     ALIYUNSMS = "AliyunSMS"
     """AliyunSMS"""
 
     APPRISE = "apprise"
     """Apprise (Support 50+ Notification services)"""
+
+    BARK = "Bark"
+    """Bark"""
 
     CLICKSENDSMS = "clicksendsms"
     """ClickSend SMS"""
@@ -25,8 +31,14 @@ class NotificationType(str, Enum):
     FEISHU = "Feishu"
     """Feishu"""
 
+    FREEMOBILE = "FreeMobile"
+    """FreeMobile (mobile.free.fr)"""
+
+    GOALERT = "GoAlert"
+    """GoAlert"""
+
     GOOGLECHAT = "GoogleChat"
-    """Google Chat (Google Workspace only)"""
+    """Google Chat (Google Workspace)"""
 
     GORUSH = "gorush"
     """Gorush"""
@@ -34,8 +46,17 @@ class NotificationType(str, Enum):
     GOTIFY = "gotify"
     """Gotify"""
 
+    HOMEASSISTANT = "HomeAssistant"
+    """Home Assistant"""
+
+    KOOK = "Kook"
+    """Kook"""
+
     LINE = "line"
-    """Line Messenger"""
+    """LINE Messenger"""
+
+    LINENOTIFY = "LineNotify"
+    """LINE Notify"""
 
     LUNASEA = "lunasea"
     """LunaSea"""
@@ -46,8 +67,17 @@ class NotificationType(str, Enum):
     MATTERMOST = "mattermost"
     """Mattermost"""
 
+    NTFY = "ntfy"
+    """Ntfy"""
+
+    OCTOPUSH = "octopush"
+    """Octopush"""
+
     ONEBOT = "OneBot"
     """OneBot"""
+
+    OPSGENIE = "Opsgenie"
+    """Opsgenie"""
 
     PAGERDUTY = "PagerDuty"
     """PagerDuty"""
@@ -73,6 +103,9 @@ class NotificationType(str, Enum):
     ROCKET_CHAT = "rocket.chat"
     """Rocket.Chat"""
 
+    SERVERCHAN = "ServerChan"
+    """ServerChan"""
+
     SERWERSMS = "serwersms"
     """SerwerSMS.pl"""
 
@@ -82,11 +115,26 @@ class NotificationType(str, Enum):
     SLACK = "slack"
     """Slack"""
 
+    SMSEAGLE = "SMSEagle"
+    """SMSEagle"""
+
+    SMSMANAGER = "SMSManager"
+    """SmsManager (smsmanager.cz)"""
+
     SMTP = "smtp"
     """Email (SMTP)"""
 
+    SPLUNK = "Splunk"
+    """Splunk"""
+
+    SQUADCAST = "squadcast"
+    """SquadCast"""
+
     STACKFIELD = "stackfield"
     """Stackfield"""
+
+    TEAMS = "teams"
+    """Microsoft Teams"""
 
     PUSHBYTECHULUS = "PushByTechulus"
     """Push by Techulus"""
@@ -94,362 +142,306 @@ class NotificationType(str, Enum):
     TELEGRAM = "telegram"
     """Telegram"""
 
+    TWILIO = "twilio"
+    """Twilio"""
+
     WEBHOOK = "webhook"
     """Webhook"""
 
     WECOM = "WeCom"
     """WeCom"""
 
-    ALERTNOW = "AlertNow"
-    """AlertNow"""
-
-    HOMEASSISTANT = "HomeAssistant"
-    """Home Assistant"""
-
-    LINENOTIFY = "LineNotify"
-    """LineNotify"""
-
-    BARK = "Bark"
-    """Bark"""
-
-    GOALERT = "GoAlert"
-    """GoAlert"""
-
-    OCTOPUSH = "octopush"
-    """Octopush"""
-
-    SERVERCHAN = "ServerChan"
-    """ServerChan"""
-
-    SMSMANAGER = "SMSManager"
-    """SMSManager"""
-
-    SQUADCAST = "squadcast"
-    """Squadcast"""
-
-    TEAMS = "teams"
-    """Microsoft Teams"""
-
-    FREEMOBILE = "FreeMobile"
-    """FreeMobile"""
-
-    NTFY = "ntfy"
-    """ntfy"""
-
-    SMSEAGLE = "SMSEagle"
-    """SMSEagle"""
-
     ZOHOCLIQ = "ZohoCliq"
     """ZohoCliq"""
-
-    KOOK = "Kook"
-    """Kook"""
-
-    SPLUNK = "Splunk"
-    """Splunk"""
-
-    OPSGENIE = "Opsgenie"
-    """Opsgenie"""
-
-    TWILIO = "twilio"
-    """twilio"""
 
 
 notification_provider_options = {
     NotificationType.ALERTA: dict(
-        alertaApiEndpoint=dict(
-            type="str"
-        ),
-        alertaApiKey=dict(type="str"),
-        alertaEnvironment=dict(type="str"),
-        alertaAlertState=dict(type="str"),
-        alertaRecoverState=dict(type="str"),
-    ),
-    NotificationType.ALIYUNSMS: dict(
-        phonenumber=dict(type="str"),
-        templateCode=dict(type="str"),
-        signName=dict(type="str"),
-        accessKeyId=dict(type="str"),
-        secretAccessKey=dict(type="str"),
-    ),
-    NotificationType.APPRISE: dict(
-        appriseURL=dict(type="str"),
-        title=dict(type="str"),
-    ),
-    NotificationType.CLICKSENDSMS: dict(
-        clicksendsmsLogin=dict(type="str"),
-        clicksendsmsPassword=dict(type="str"),
-        clicksendsmsToNumber=dict(type="str"),
-        clicksendsmsSenderName=dict(type="str"),
-    ),
-    NotificationType.DINGDING: dict(
-        webHookUrl=dict(type="str"),
-        secretKey=dict(type="str"),
-    ),
-    NotificationType.DISCORD: dict(
-        discordUsername=dict(type="str"),
-        discordWebhookUrl=dict(type="str"),
-        discordPrefixMessage=dict(type="str"),
-    ),
-    NotificationType.FEISHU: dict(
-        feishuWebHookUrl=dict(type="str"),
-    ),
-    NotificationType.GOOGLECHAT: dict(
-        googleChatWebhookURL=dict(type="str"),
-    ),
-    NotificationType.GORUSH: dict(
-        gorushDeviceToken=dict(type="str"),
-        gorushPlatform=dict(type="str"),
-        gorushTitle=dict(type="str"),
-        gorushPriority=dict(type="str"),
-        gorushRetry=dict(type="str"),
-        gorushTopic=dict(type="str"),
-        gorushServerURL=dict(type="str"),
-    ),
-    NotificationType.GOTIFY: dict(
-        gotifyserverurl=dict(type="str"),
-        gotifyapplicationToken=dict(type="str"),
-        gotifyPriority=dict(type="int"),
-    ),
-    NotificationType.LINE: dict(
-        lineChannelAccessToken=dict(type="str"),
-        lineUserID=dict(type="str"),
-    ),
-    NotificationType.LUNASEA: dict(
-        lunaseaTarget=dict(type="str"),
-        lunaseaUserID=dict(type="str"),
-        lunaseaDevice=dict(type="str"),
-    ),
-    NotificationType.MATRIX: dict(
-        internalRoomId=dict(type="str"),
-        accessToken=dict(type="str"),
-        homeserverUrl=dict(type="str"),
-    ),
-    NotificationType.MATTERMOST: dict(
-        mattermostusername=dict(type="str"),
-        mattermostWebhookUrl=dict(type="str"),
-        mattermostchannel=dict(type="str"),
-        mattermosticonemo=dict(type="str"),
-        mattermosticonurl=dict(type="str"),
-    ),
-    NotificationType.ONEBOT: dict(
-        httpAddr=dict(type="str"),
-        accessToken=dict(type="str"),
-        msgType=dict(type="str"),
-        recieverId=dict(type="str"),
-    ),
-    NotificationType.PAGERDUTY: dict(
-        pagerdutyAutoResolve=dict(type="str"),
-        pagerdutyIntegrationUrl=dict(type="str"),
-        pagerdutyPriority=dict(type="str"),
-        pagerdutyIntegrationKey=dict(type="str"),
-    ),
-    NotificationType.PAGERTREE: dict(
-        pagertreeAutoResolve=dict(type="str"),
-        pagertreeIntegrationUrl=dict(type="str"),
-        pagertreeUrgency=dict(type="str"),
-    ),
-    NotificationType.PROMOSMS: dict(
-        promosmsLogin=dict(type="str"),
-        promosmsPassword=dict(type="str"),
-        promosmsPhoneNumber=dict(type="str"),
-        promosmsSMSType=dict(type="str"),
-        promosmsSenderName=dict(type="str"),
-        promosmsAllowLongSMS=dict(type="bool"),
-    ),
-    NotificationType.PUSHBULLET: dict(
-        pushbulletAccessToken=dict(type="str"),
-    ),
-    NotificationType.PUSHDEER: dict(
-        pushdeerKey=dict(type="str"),
-    ),
-    NotificationType.PUSHOVER: dict(
-        pushoveruserkey=dict(type="str"),
-        pushoverapptoken=dict(type="str"),
-        pushoversounds=dict(type="str"),
-        pushoverpriority=dict(type="str"),
-        pushovertitle=dict(type="str"),
-        pushoverdevice=dict(type="str"),
-    ),
-    NotificationType.PUSHY: dict(
-        pushyAPIKey=dict(type="str"),
-        pushyToken=dict(type="str"),
-    ),
-    NotificationType.ROCKET_CHAT: dict(
-        rocketchannel=dict(type="str"),
-        rocketusername=dict(type="str"),
-        rocketiconemo=dict(type="str"),
-        rocketwebhookURL=dict(type="str"),
-        rocketbutton=dict(type="str"),
-    ),
-    NotificationType.SERWERSMS: dict(
-        serwersmsUsername=dict(type="str"),
-        serwersmsPassword=dict(type="str"),
-        serwersmsPhoneNumber=dict(type="str"),
-        serwersmsSenderName=dict(type="str"),
-    ),
-    NotificationType.SIGNAL: dict(
-        signalNumber=dict(type="str"),
-        signalRecipients=dict(type="str"),
-        signalURL=dict(type="str"),
-    ),
-    NotificationType.SLACK: dict(
-        slackbutton=dict(type="str"),
-        slackchannel=dict(type="str"),
-        slackusername=dict(type="str"),
-        slackiconemo=dict(type="str"),
-        slackwebhookURL=dict(type="str"),
-    ),
-    NotificationType.SMTP: dict(
-        smtpHost=dict(type="str"),
-        smtpPort=dict(type="int"),
-        smtpSecure=dict(type="str"),
-        smtpIgnoreTLSError=dict(type="str"),
-        smtpDkimDomain=dict(type="str"),
-        smtpDkimKeySelector=dict(type="str"),
-        smtpDkimPrivateKey=dict(type="str"),
-        smtpDkimHashAlgo=dict(type="str"),
-        smtpDkimheaderFieldNames=dict(type="str"),
-        smtpDkimskipFields=dict(type="str"),
-        smtpUsername=dict(type="str"),
-        smtpPassword=dict(type="str"),
-        customSubject=dict(type="str"),
-        smtpFrom=dict(type="str"),
-        smtpCC=dict(type="str"),
-        smtpBCC=dict(type="str"),
-        smtpTo=dict(type="str"),
-    ),
-    NotificationType.STACKFIELD: dict(
-        stackfieldwebhookURL=dict(type="str"),
-    ),
-    NotificationType.PUSHBYTECHULUS: dict(
-        pushAPIKey=dict(type="str"),
-    ),
-    NotificationType.TELEGRAM: dict(
-        telegramChatID=dict(type="str"),
-        telegramSendSilently=dict(type="bool"),
-        telegramProtectContent=dict(type="bool"),
-        telegramMessageThreadID=dict(type="str"),
-        telegramBotToken=dict(type="str"),
-    ),
-    NotificationType.WEBHOOK: dict(
-        webhookContentType=dict(type="str"),
-        webhookAdditionalHeaders=dict(type="str"),
-        webhookURL=dict(type="str"),
-    ),
-    NotificationType.WECOM: dict(
-        weComBotKey=dict(type="str"),
+        alertaApiEndpoint=dict(type="str", required=True),
+        alertaApiKey=dict(type="str", required=True),
+        alertaEnvironment=dict(type="str", required=True),
+        alertaAlertState=dict(type="str", required=True),
+        alertaRecoverState=dict(type="str", required=True),
     ),
     NotificationType.ALERTNOW: dict(
-        alertNowWebhookURL=dict(type="str"),
+        alertNowWebhookURL=dict(type="str", required=True),
     ),
-    NotificationType.HOMEASSISTANT: dict(
-        homeAssistantUrl=dict(type="str"),
-        longLivedAccessToken=dict(type="str"),
+    NotificationType.ALIYUNSMS: dict(
+        phonenumber=dict(type="str", required=True),
+        templateCode=dict(type="str", required=True),
+        signName=dict(type="str", required=True),
+        accessKeyId=dict(type="str", required=True),
+        secretAccessKey=dict(type="str", required=True),
     ),
-    NotificationType.LINENOTIFY: dict(
-        lineNotifyAccessToken=dict(type="str"),
+    NotificationType.APPRISE: dict(
+        appriseURL=dict(type="str", required=True),
+        title=dict(type="str", required=False),
     ),
     NotificationType.BARK: dict(
-        barkEndpoint=dict(type="str"),
-        barkGroup=dict(type="str"),
-        barkSound=dict(type="str"),
+        barkEndpoint=dict(type="str", required=True),
+        barkGroup=dict(type="str", required=True),
+        barkSound=dict(type="str", required=True),
     ),
-    NotificationType.GOALERT: dict(
-        goAlertBaseURL=dict(type="str"),
-        goAlertToken=dict(type="str"),
+    NotificationType.CLICKSENDSMS: dict(
+        clicksendsmsLogin=dict(type="str", required=True),
+        clicksendsmsPassword=dict(type="str", required=True),
+        clicksendsmsToNumber=dict(type="str", required=True),
+        clicksendsmsSenderName=dict(type="str", required=False),
     ),
-    NotificationType.OCTOPUSH: dict(
-        octopushVersion=dict(type="str"),
-        octopushAPIKey=dict(type="str"),
-        octopushLogin=dict(type="str"),
-        octopushPhoneNumber=dict(type="str"),
-        octopushSMSType=dict(type="str"),
-        octopushSenderName=dict(type="str"),
-        octopushDMLogin=dict(type="str"),
-        octopushDMAPIKey=dict(type="str"),
-        octopushDMPhoneNumber=dict(type="str"),
-        octopushDMSenderName=dict(type="str"),
-        octopushDMSMSType=dict(type="str"),
+    NotificationType.DINGDING: dict(
+        webHookUrl=dict(type="str", required=True),
+        secretKey=dict(type="str", required=True),
     ),
-    NotificationType.SERVERCHAN: dict(
-        serverChanSendKey=dict(type="str"),
+    NotificationType.DISCORD: dict(
+        discordUsername=dict(type="str", required=False),
+        discordWebhookUrl=dict(type="str", required=True),
+        discordPrefixMessage=dict(type="str", required=False),
     ),
-    NotificationType.SMSMANAGER: dict(
-        smsmanagerApiKey=dict(type="str"),
-        numbers=dict(type="str"),
-        messageType=dict(type="str"),
-    ),
-    NotificationType.SQUADCAST: dict(
-        squadcastWebhookURL=dict(type="str"),
-    ),
-    NotificationType.TEAMS: dict(
-        webhookUrl=dict(type="str"),
+    NotificationType.FEISHU: dict(
+        feishuWebHookUrl=dict(type="str", required=True),
     ),
     NotificationType.FREEMOBILE: dict(
-        freemobileUser=dict(type="str"),
-        freemobilePass=dict(type="str"),
+        freemobileUser=dict(type="str", required=True),
+        freemobilePass=dict(type="str", required=True),
     ),
-    NotificationType.NTFY: dict(
-        ntfyusername=dict(type="str"),
-        ntfypassword=dict(type="str"),
-        ntfytopic=dict(type="str"),
-        ntfyPriority=dict(type="int"),
-        ntfyIcon=dict(type="str"),
-        ntfyserverurl=dict(type="str"),
+    NotificationType.GOALERT: dict(
+        goAlertBaseURL=dict(type="str", required=True),
+        goAlertToken=dict(type="str", required=True),
     ),
-    NotificationType.SMSEAGLE: dict(
-        smseagleEncoding=dict(type="bool"),
-        smseaglePriority=dict(type="int"),
-        smseagleRecipientType=dict(type="str"),
-        smseagleToken=dict(type="str"),
-        smseagleRecipient=dict(type="str"),
-        smseagleUrl=dict(type="str")
+    NotificationType.GOOGLECHAT: dict(
+        googleChatWebhookURL=dict(type="str", required=True),
     ),
-    NotificationType.ZOHOCLIQ: dict(
-        webhookUrl=dict(type="str")
+    NotificationType.GORUSH: dict(
+        gorushDeviceToken=dict(type="str", required=True),
+        gorushPlatform=dict(type="str", required=False),
+        gorushTitle=dict(type="str", required=False),
+        gorushPriority=dict(type="str", required=False),
+        gorushRetry=dict(type="int", required=False),
+        gorushTopic=dict(type="str", required=False),
+        gorushServerURL=dict(type="str", required=True),
+    ),
+    NotificationType.GOTIFY: dict(
+        gotifyserverurl=dict(type="str", required=True),
+        gotifyapplicationToken=dict(type="str", required=True),
+        gotifyPriority=dict(type="int", required=True),
+    ),
+    NotificationType.HOMEASSISTANT: dict(
+        notificationService=dict(type="str", required=False),
+        homeAssistantUrl=dict(type="str", required=True),
+        longLivedAccessToken=dict(type="str", required=True),
     ),
     NotificationType.KOOK: dict(
-        kookGuildID=dict(type="str"),
-        kookBotToken=dict(type="str")
+        kookGuildID=dict(type="str", required=True),
+        kookBotToken=dict(type="str", required=True),
     ),
-    NotificationType.SPLUNK: dict(
-        splunkAutoResolve=dict(type="str"),
-        splunkSeverity=dict(type="str"),
-        splunkRestURL=dict(type="str")
+    NotificationType.LINE: dict(
+        lineChannelAccessToken=dict(type="str", required=True),
+        lineUserID=dict(type="str", required=True),
+    ),
+    NotificationType.LINENOTIFY: dict(
+        lineNotifyAccessToken=dict(type="str", required=True),
+    ),
+    NotificationType.LUNASEA: dict(
+        lunaseaTarget=dict(type="str", required=True),
+        lunaseaUserID=dict(type="str", required=False),
+        lunaseaDevice=dict(type="str", required=False),
+    ),
+    NotificationType.MATRIX: dict(
+        internalRoomId=dict(type="str", required=True),
+        accessToken=dict(type="str", required=True),
+        homeserverUrl=dict(type="str", required=True),
+    ),
+    NotificationType.MATTERMOST: dict(
+        mattermostusername=dict(type="str", required=False),
+        mattermostWebhookUrl=dict(type="str", required=True),
+        mattermostchannel=dict(type="str", required=False),
+        mattermosticonemo=dict(type="str", required=False),
+        mattermosticonurl=dict(type="str", required=False),
+    ),
+    NotificationType.NTFY: dict(
+        ntfyusername=dict(type="str", required=False),
+        ntfypassword=dict(type="str", required=False),
+        ntfytopic=dict(type="str", required=True),
+        ntfyPriority=dict(type="int", required=True),
+        ntfyIcon=dict(type="str", required=False),
+        ntfyserverurl=dict(type="str", required=True),
+    ),
+    NotificationType.OCTOPUSH: dict(
+        octopushVersion=dict(type="str", required=False),
+        octopushAPIKey=dict(type="str", required=True),
+        octopushLogin=dict(type="str", required=True),
+        octopushPhoneNumber=dict(type="str", required=True),
+        octopushSMSType=dict(type="str", required=False),
+        octopushSenderName=dict(type="str", required=False),
+    ),
+    NotificationType.ONEBOT: dict(
+        httpAddr=dict(type="str", required=True),
+        accessToken=dict(type="str", required=True),
+        msgType=dict(type="str", required=False),
+        recieverId=dict(type="str", required=True),
     ),
     NotificationType.OPSGENIE: dict(
-        opsgeniePriority=dict(type="int"),
-        opsgenieRegion=dict(type="str"),
-        opsgenieApiKey=dict(type="str")
+        opsgeniePriority=dict(type="int", required=False),
+        opsgenieRegion=dict(type="str", required=True),
+        opsgenieApiKey=dict(type="str", required=True),
+    ),
+    NotificationType.PAGERDUTY: dict(
+        pagerdutyAutoResolve=dict(type="str", required=False),
+        pagerdutyIntegrationUrl=dict(type="str", required=False),
+        pagerdutyPriority=dict(type="str", required=False),
+        pagerdutyIntegrationKey=dict(type="str", required=True),
+    ),
+    NotificationType.PAGERTREE: dict(
+        pagertreeAutoResolve=dict(type="str", required=False),
+        pagertreeIntegrationUrl=dict(type="str", required=False),
+        pagertreeUrgency=dict(type="str", required=False),
+    ),
+    NotificationType.PROMOSMS: dict(
+        promosmsAllowLongSMS=dict(type="bool", required=False),
+        promosmsLogin=dict(type="str", required=True),
+        promosmsPassword=dict(type="str", required=True),
+        promosmsPhoneNumber=dict(type="str", required=True),
+        promosmsSMSType=dict(type="str", required=False),
+        promosmsSenderName=dict(type="str", required=False),
+    ),
+    NotificationType.PUSHBULLET: dict(
+        pushbulletAccessToken=dict(type="str", required=True),
+    ),
+    NotificationType.PUSHDEER: dict(
+        pushdeerKey=dict(type="str", required=True),
+    ),
+    NotificationType.PUSHOVER: dict(
+        pushoveruserkey=dict(type="str", required=True),
+        pushoverapptoken=dict(type="str", required=True),
+        pushoversounds=dict(type="str", required=False),
+        pushoverpriority=dict(type="str", required=False),
+        pushovertitle=dict(type="str", required=False),
+        pushoverdevice=dict(type="str", required=False),
+    ),
+    NotificationType.PUSHY: dict(
+        pushyAPIKey=dict(type="str", required=True),
+        pushyToken=dict(type="str", required=True),
+    ),
+    NotificationType.ROCKET_CHAT: dict(
+        rocketchannel=dict(type="str", required=False),
+        rocketusername=dict(type="str", required=False),
+        rocketiconemo=dict(type="str", required=False),
+        rocketwebhookURL=dict(type="str", required=True),
+    ),
+    NotificationType.SERVERCHAN: dict(
+        serverChanSendKey=dict(type="str", required=True),
+    ),
+    NotificationType.SERWERSMS: dict(
+        serwersmsUsername=dict(type="str", required=True),
+        serwersmsPassword=dict(type="str", required=True),
+        serwersmsPhoneNumber=dict(type="str", required=True),
+        serwersmsSenderName=dict(type="str", required=False),
+    ),
+    NotificationType.SIGNAL: dict(
+        signalNumber=dict(type="str", required=True),
+        signalRecipients=dict(type="str", required=True),
+        signalURL=dict(type="str", required=True),
+    ),
+    NotificationType.SLACK: dict(
+        slackchannel=dict(type="str", required=False),
+        slackusername=dict(type="str", required=False),
+        slackiconemo=dict(type="str", required=False),
+        slackwebhookURL=dict(type="str", required=True),
+    ),
+    NotificationType.SMSEAGLE: dict(
+        smseagleEncoding=dict(type="bool", required=False),
+        smseaglePriority=dict(type="int", required=False),
+        smseagleRecipientType=dict(type="str", required=False),
+        smseagleToken=dict(type="str", required=True),
+        smseagleRecipient=dict(type="str", required=True),
+        smseagleUrl=dict(type="str", required=True),
+    ),
+    NotificationType.SMSMANAGER: dict(
+        smsmanagerApiKey=dict(type="str", required=False),
+        numbers=dict(type="str", required=False),
+        messageType=dict(type="str", required=False),
+    ),
+    NotificationType.SMTP: dict(
+        smtpHost=dict(type="str", required=True),
+        smtpPort=dict(type="int", required=True),
+        smtpSecure=dict(type="str", required=False),
+        smtpIgnoreTLSError=dict(type="bool", required=False),
+        smtpDkimDomain=dict(type="str", required=False),
+        smtpDkimKeySelector=dict(type="str", required=False),
+        smtpDkimPrivateKey=dict(type="str", required=False),
+        smtpDkimHashAlgo=dict(type="str", required=False),
+        smtpDkimheaderFieldNames=dict(type="str", required=False),
+        smtpDkimskipFields=dict(type="str", required=False),
+        smtpUsername=dict(type="str", required=False),
+        smtpPassword=dict(type="str", required=False),
+        customSubject=dict(type="str", required=False),
+        smtpFrom=dict(type="str", required=True),
+        smtpCC=dict(type="str", required=False),
+        smtpBCC=dict(type="str", required=False),
+        smtpTo=dict(type="str", required=False),
+    ),
+    NotificationType.SPLUNK: dict(
+        splunkAutoResolve=dict(type="str", required=False),
+        splunkSeverity=dict(type="str", required=False),
+        splunkRestURL=dict(type="str", required=True),
+    ),
+    NotificationType.SQUADCAST: dict(
+        squadcastWebhookURL=dict(type="str", required=True),
+    ),
+    NotificationType.STACKFIELD: dict(
+        stackfieldwebhookURL=dict(type="str", required=True),
+    ),
+    NotificationType.TEAMS: dict(
+        webhookUrl=dict(type="str", required=True),
+    ),
+    NotificationType.PUSHBYTECHULUS: dict(
+        pushAPIKey=dict(type="str", required=True),
+    ),
+    NotificationType.TELEGRAM: dict(
+        telegramChatID=dict(type="str", required=True),
+        telegramSendSilently=dict(type="bool", required=False),
+        telegramProtectContent=dict(type="bool", required=False),
+        telegramMessageThreadID=dict(type="str", required=False),
+        telegramBotToken=dict(type="str", required=True),
     ),
     NotificationType.TWILIO: dict(
-        twilioAccountSID=dict(type="str"),
-        twilioAuthToken=dict(type="str"),
-        twilioToNumber=dict(type="str"),
-        twilioFromNumber=dict(type="str")
-    )
+        twilioAccountSID=dict(type="str", required=True),
+        twilioAuthToken=dict(type="str", required=True),
+        twilioToNumber=dict(type="str", required=True),
+        twilioFromNumber=dict(type="str", required=True),
+    ),
+    NotificationType.WEBHOOK: dict(
+        webhookContentType=dict(type="str", required=True),
+        webhookAdditionalHeaders=dict(type="str", required=False),
+        webhookURL=dict(type="str", required=True),
+    ),
+    NotificationType.WECOM: dict(
+        weComBotKey=dict(type="str", required=True),
+    ),
+    NotificationType.ZOHOCLIQ: dict(
+        webhookUrl=dict(type="str", required=True),
+    ),
 }
 
 notification_provider_conditions = dict(
     gotifyPriority=dict(
         min=0,
-        max=10
-    ),
-    smtpPort=dict(
-        min=0,
-        max=65535
+        max=10,
     ),
     ntfyPriority=dict(
         min=1,
-        max=5
-    ),
-    smseaglePriority=dict(
-        min=0,
-        max=9
+        max=5,
     ),
     opsgeniePriority=dict(
         min=1,
-        max=5
-    )
+        max=5,
+    ),
+    smseaglePriority=dict(
+        min=0,
+        max=9,
+    ),
+    smtpPort=dict(
+        min=0,
+        max=65535,
+    ),
 )
