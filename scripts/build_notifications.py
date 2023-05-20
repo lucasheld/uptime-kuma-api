@@ -118,6 +118,7 @@ def build_notification_providers(root):
             attrs = input_.attrs
             v_model = attrs.get("v-model")
             param_name = re.match(r'\$parent.notification.(.*)$', v_model).group(1)
+
             type_ = attrs.get("type")
             if type_ == "number":
                 type_ = "int"
@@ -125,14 +126,17 @@ def build_notification_providers(root):
                 type_ = "bool"
             else:
                 type_ = "str"
-            required = attrs.get("required")
-            if required in ['', 'true']:
+
+            required_true_values = ['', 'true']
+            if attrs.get("required") in required_true_values or attrs.get(":required") in required_true_values:
                 required = True
             else:
                 required = False
+
             min_ = attrs.get("min")
             if min_:
                 conditions["min"] = int(min_)
+
             max_ = attrs.get("max")
             if max_:
                 conditions["max"] = int(max_)
