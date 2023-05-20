@@ -1,2 +1,0 @@
-Jinja2==3.1.2
-BeautifulSoup4==4.11.1
