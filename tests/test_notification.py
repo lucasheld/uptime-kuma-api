@@ -13,8 +13,9 @@ class TestNotification(UptimeKumaTestCase):
             "name": "notification 1",
             "isDefault": True,
             "applyExisting": True,
-            "type": NotificationType.PUSHBYTECHULUS,
-            "pushAPIKey": "123456789"
+            "type": NotificationType.TELEGRAM,
+            "telegramChatID": "123456789",
+            "telegramBotToken": "987654321"
         }
 
         # test notification
