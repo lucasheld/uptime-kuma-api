@@ -50,6 +50,10 @@ class TestApiKey(UptimeKumaTestCase):
         with self.assertRaises(UptimeKumaException):
             self.api.get_api_key(api_key_id)
 
+    def test_delete_not_existing_api_key(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_api_key(42)
+
 
 if __name__ == '__main__':
     unittest.main()

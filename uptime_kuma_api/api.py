@@ -1111,6 +1111,8 @@ class UptimeKumaApi(object):
             }
         """
         with self.wait_for_event(Event.MONITOR_LIST):
+            if id_ not in [i["id"] for i in self.get_monitors()]:
+                raise UptimeKumaException("monitor does not exist")
             return self._call('deleteMonitor', id_)
 
     def get_monitor_beats(self, id_: int, hours: int) -> list[dict]:
@@ -1304,10 +1306,22 @@ class UptimeKumaApi(object):
                 'msg': 'Deleted Successfully.'
             }
         """
-        r = self._call('deleteMonitorTag', (tag_id, monitor_id, value))
-        # the monitor list event does not send the updated tags
-        self._event_data[Event.MONITOR_LIST][str(monitor_id)] = self.get_monitor(monitor_id)
-        return r
+        with self.wait_for_event(Event.MONITOR_LIST):
+            tags = [
+                {
+                    "monitor_id": y["monitor_id"],
+                    "tag_id": y["tag_id"],
+                    "value": y["value"]
+                } for x in [
+                    i.get("tags") for i in self.get_monitors()
+                ] for y in x
+            ]
+            if {"monitor_id": monitor_id, "tag_id": tag_id, "value": value} not in tags:
+                raise UptimeKumaException("monitor tag does not exist")
+            r = self._call('deleteMonitorTag', (tag_id, monitor_id, value))
+            # the monitor list event does not send the updated tags
+            self._event_data[Event.MONITOR_LIST][str(monitor_id)] = self.get_monitor(monitor_id)
+            return r
 
     # notification
 
@@ -1487,6 +1501,8 @@ class UptimeKumaApi(object):
             }
         """
         with self.wait_for_event(Event.NOTIFICATION_LIST):
+            if id_ not in [i["id"] for i in self.get_notifications()]:
+                raise UptimeKumaException("notification does not exist")
             return self._call('deleteNotification', id_)
 
     def check_apprise(self) -> bool:
@@ -1646,6 +1662,8 @@ class UptimeKumaApi(object):
             }
         """
         with self.wait_for_event(Event.PROXY_LIST):
+            if id_ not in [i["id"] for i in self.get_proxies()]:
+                raise UptimeKumaException("proxy does not exist")
             return self._call('deleteProxy', id_)
 
     # status page
@@ -1783,16 +1801,19 @@ class UptimeKumaApi(object):
             >>> api.delete_status_page("slug1")
             {}
         """
-        r = self._call('deleteStatusPage', slug)
+        with self.wait_for_event(Event.STATUS_PAGE_LIST):
+            if slug not in [i["slug"] for i in self.get_status_pages()]:
+                raise UptimeKumaException("status page does not exist")
+            r = self._call('deleteStatusPage', slug)
 
-        # uptime kuma does not send the status page list event when a status page is deleted
-        for status_page in self._event_data[Event.STATUS_PAGE_LIST].values():
-            if status_page["slug"] == slug:
-                status_page_id = status_page["id"]
-                del self._event_data[Event.STATUS_PAGE_LIST][str(status_page_id)]
-                break
+            # uptime kuma does not send the status page list event when a status page is deleted
+            for status_page in self._event_data[Event.STATUS_PAGE_LIST].values():
+                if status_page["slug"] == slug:
+                    status_page_id = status_page["id"]
+                    del self._event_data[Event.STATUS_PAGE_LIST][str(status_page_id)]
+                    break
 
-        return r
+            return r
 
     def save_status_page(self, slug: str, **kwargs) -> dict:
         """
@@ -2424,6 +2445,8 @@ class UptimeKumaApi(object):
                 'msg': 'Deleted Successfully.'
             }
         """
+        if id_ not in [i["id"] for i in self.get_tags()]:
+            raise UptimeKumaException("tag does not exist")
         return self._call('deleteTag', id_)
 
     # settings
@@ -3000,6 +3023,8 @@ class UptimeKumaApi(object):
             }
         """
         with self.wait_for_event(Event.DOCKER_HOST_LIST):
+            if id_ not in [i["id"] for i in self.get_docker_hosts()]:
+                raise UptimeKumaException("docker host does not exist")
             return self._call('deleteDockerHost', id_)
 
     # maintenance
@@ -3355,7 +3380,10 @@ class UptimeKumaApi(object):
                 "msg": "Deleted Successfully."
             }
         """
-        return self._call('deleteMaintenance', id_)
+        with self.wait_for_event(Event.MAINTENANCE_LIST):
+            if id_ not in [i["id"] for i in self.get_maintenances()]:
+                raise UptimeKumaException("maintenance does not exist")
+            return self._call('deleteMaintenance', id_)
 
     def pause_maintenance(self, id_: int) -> dict:
         """
@@ -3672,6 +3700,8 @@ class UptimeKumaApi(object):
             }
         """
         with self.wait_for_event(Event.API_KEY_LIST):
+            if id_ not in [i["id"] for i in self.get_api_keys()]:
+                raise UptimeKumaException("api key does not exist")
             return self._call('deleteAPIKey', id_)
 
     # helper methods

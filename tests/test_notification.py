@@ -55,6 +55,10 @@ class TestNotification(UptimeKumaTestCase):
         with self.assertRaises(UptimeKumaException):
             self.api.delete_notification(notification_id)
 
+    def test_delete_not_existing_notification(self):
+        with self.assertRaises(UptimeKumaException):
+            self.api.delete_notification(42)
+
 
 if __name__ == '__main__':
     unittest.main()
