@@ -33,7 +33,9 @@ class TestNotification(UptimeKumaTestCase):
 
         # get notifications
         notifications = self.api.get_notifications()
+        self.assertTrue(type(notifications[0]["type"]) == NotificationType)
         notification = self.find_by_id(notifications, notification_id)
+        self.assertTrue(type(notification["type"]) == NotificationType)
         self.assertIsNotNone(notification)
         self.compare(notification, expected_notification)
 

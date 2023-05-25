@@ -28,10 +28,12 @@ class TestMaintenance(UptimeKumaTestCase):
 
         # get maintenance
         maintenance = self.api.get_maintenance(maintenance_id)
+        self.assertTrue(type(maintenance["strategy"]) == MaintenanceStrategy)
         self.compare(maintenance, expected_maintenance)
 
         # get maintenances
         maintenances = self.api.get_maintenances()
+        self.assertTrue(type(maintenances[0]["strategy"]) == MaintenanceStrategy)
         maintenance = self.find_by_id(maintenances, maintenance_id)
         self.assertIsNotNone(maintenance)
         self.compare(maintenance, expected_maintenance)

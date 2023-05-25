@@ -71,9 +71,11 @@ class TestStatusPage(UptimeKumaTestCase):
             "style": IncidentStyle.DANGER
         }
         incident = self.api.post_incident(slug, **incident_expected)
+        self.assertTrue(type(incident["style"]) == IncidentStyle)
         self.compare(incident, incident_expected)
         status_page = self.api.get_status_page(slug)
         self.compare(status_page["incident"], incident)
+        self.assertTrue(type(status_page["incident"]["style"]) == IncidentStyle)
 
         # unpin incident
         self.api.unpin_incident(slug)

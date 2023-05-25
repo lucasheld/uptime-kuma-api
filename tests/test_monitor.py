@@ -1,6 +1,6 @@
 import unittest
 
-from uptime_kuma_api import UptimeKumaException, MonitorType, AuthMethod
+from uptime_kuma_api import UptimeKumaException, MonitorType, AuthMethod, MonitorStatus
 from uptime_kuma_test_case import UptimeKumaTestCase
 
 
@@ -35,7 +35,11 @@ class TestMonitor(UptimeKumaTestCase):
 
         # get monitors
         monitors = self.api.get_monitors()
+        self.assertTrue(type(monitors[0]["type"]) == MonitorType)
+        self.assertTrue(type(monitors[0]["authMethod"]) == AuthMethod)
         monitor = self.find_by_id(monitors, monitor_id)
+        self.assertTrue(type(monitor["type"]) == MonitorType)
+        self.assertTrue(type(monitor["authMethod"]) == AuthMethod)
         self.assertIsNotNone(monitor)
         self.compare(monitor, expected_monitor)
 
@@ -58,7 +62,8 @@ class TestMonitor(UptimeKumaTestCase):
         self.assertEqual(r["msg"], "Resumed Successfully.")
 
         # get monitor beats
-        self.api.get_monitor_beats(monitor_id, 6)
+        r = self.api.get_monitor_beats(monitor_id, 6)
+        self.assertTrue(type(r[0]["status"]) == MonitorStatus)
 
         # delete monitor
         r = self.api.delete_monitor(monitor_id)

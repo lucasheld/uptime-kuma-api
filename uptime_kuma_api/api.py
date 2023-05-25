@@ -49,18 +49,53 @@ def int_to_bool(data, keys) -> None:
                 data[key] = True if data[key] == 1 else False
 
 
-def parse_value(data, func) -> None:
+def parse_value(data, key, type_) -> None:
+    if not data:
+        return
     if isinstance(data, list):
         for d in data:
-            parse_value(d, func)
+            parse_value(d, key, type_)
     else:
-        func(data)
+        if key in data:
+            data[key] = type_(data[key])
 
 
+# monitor
 def parse_monitor_status(data) -> None:
-    def parse(x):
-        x["status"] = MonitorStatus(x["status"])
-    parse_value(data, parse)
+    parse_value(data, "status", MonitorStatus)
+
+
+def parse_monitor_type(data) -> None:
+    parse_value(data, "type", MonitorType)
+
+
+def parse_auth_method(data) -> None:
+    parse_value(data, "authMethod", AuthMethod)
+
+
+# notification
+def parse_notification_type(data) -> None:
+    parse_value(data, "type", NotificationType)
+
+
+# docker host
+def parse_docker_type(data) -> None:
+    parse_value(data, "dockerType", DockerType)
+
+
+# status page
+def parse_incident_style(data) -> None:
+    parse_value(data, "style", IncidentStyle)
+
+
+# maintenance
+def parse_maintenance_strategy(data) -> None:
+    parse_value(data, "strategy", MaintenanceStrategy)
+
+
+# proxy
+def parse_proxy_protocol(data) -> None:
+    parse_value(data, "protocol", ProxyProtocol)
 
 
 def gen_secret(length: int) -> str:
@@ -918,7 +953,7 @@ class UptimeKumaApi(object):
                     'accepted_statuscodes': ['200-299'],
                     'active': True,
                     'authDomain': None,
-                    'authMethod': '',
+                    'authMethod': <AuthMethod.NONE: ''>,
                     'authWorkstation': None,
                     'basic_auth_pass': None,
                     'basic_auth_user': None,
@@ -968,7 +1003,7 @@ class UptimeKumaApi(object):
                     'resendInterval': 0,
                     'retryInterval': 60,
                     'tags': [],
-                    'type': 'http',
+                    'type': <MonitorType.HTTP: 'http'>
                     'upsideDown': False,
                     'url': 'http://127.0.0.1',
                     'weight': 2000
@@ -982,6 +1017,8 @@ class UptimeKumaApi(object):
         for monitor in r:
             _convert_monitor_return(monitor)
         int_to_bool(r, ["active"])
+        parse_monitor_type(r)
+        parse_auth_method(r)
         return r
 
     def get_monitor(self, id_: int) -> dict:
@@ -1000,7 +1037,7 @@ class UptimeKumaApi(object):
                 'accepted_statuscodes': ['200-299'],
                 'active': True,
                 'authDomain': None,
-                'authMethod': '',
+                'authMethod': <AuthMethod.NONE: ''>,
                 'authWorkstation': None,
                 'basic_auth_pass': None,
                 'basic_auth_user': None,
@@ -1050,7 +1087,7 @@ class UptimeKumaApi(object):
                 'resendInterval': 0,
                 'retryInterval': 60,
                 'tags': [],
-                'type': 'http',
+                'type': <MonitorType.HTTP: 'http'>
                 'upsideDown': False,
                 'url': 'http://127.0.0.1',
                 'weight': 2000
@@ -1059,6 +1096,8 @@ class UptimeKumaApi(object):
         r = self._call('getMonitor', id_)["monitor"]
         _convert_monitor_return(r)
         int_to_bool(r, ["active"])
+        parse_monitor_type(r)
+        parse_auth_method(r)
         return r
 
     def pause_monitor(self, id_: int) -> dict:
@@ -1346,7 +1385,7 @@ class UptimeKumaApi(object):
                     'isDefault': True,
                     'name': 'notification 1',
                     'pushAPIKey': '123456789',
-                    'type': 'PushByTechulus',
+                    'type': <NotificationType.PUSHBYTECHULUS: 'PushByTechulus'>
                     'userId': 1
                 }
             ]
@@ -1359,6 +1398,7 @@ class UptimeKumaApi(object):
             del notification["config"]
             notification.update(config)
             r.append(notification)
+        parse_notification_type(r)
         return r
 
     def get_notification(self, id_: int) -> dict:
@@ -1380,7 +1420,7 @@ class UptimeKumaApi(object):
                 'isDefault': True,
                 'name': 'notification 1',
                 'pushAPIKey': '123456789',
-                'type': 'PushByTechulus',
+                'type': <NotificationType.PUSHBYTECHULUS: 'PushByTechulus'>
                 'userId': 1
             }
         """
@@ -1545,7 +1585,7 @@ class UptimeKumaApi(object):
                     'id': 1,
                     'password': 'password',
                     'port': 8080,
-                    'protocol': 'http',
+                    'protocol': <ProxyProtocol.HTTP: 'http'>,
                     'userId': 1,
                     'username': 'username'
                 }
@@ -1553,6 +1593,7 @@ class UptimeKumaApi(object):
         """
         r = self._get_event_data(Event.PROXY_LIST)
         int_to_bool(r, ["auth", "active", "default", "applyExisting"])
+        parse_proxy_protocol(r)
         return r
 
     def get_proxy(self, id_: int) -> dict:
@@ -1727,7 +1768,7 @@ class UptimeKumaApi(object):
                     'id': 1,
                     'lastUpdatedDate': None,
                     'pin': 1,
-                    'style': 'danger',
+                    'style': <IncidentStyle.DANGER: 'danger'>,
                     'title': 'title 1'
                 },
                 'maintenanceList': [],
@@ -1769,6 +1810,7 @@ class UptimeKumaApi(object):
             "publicGroupList": r2["publicGroupList"],
             "maintenanceList": r2["maintenanceList"]
         }
+        parse_incident_style(data["incident"])
         return data
 
     def add_status_page(self, slug: str, title: str) -> dict:
@@ -1921,7 +1963,7 @@ class UptimeKumaApi(object):
                 'createdDate': '2022-12-15 16:51:43',
                 'id': 1,
                 'pin': True,
-                'style': 'danger',
+                'style': <IncidentStyle.DANGER: 'danger'>,
                 'title': 'title 1'
             }
         """
@@ -1932,6 +1974,7 @@ class UptimeKumaApi(object):
         }
         r = self._call('postIncident', (slug, incident))["incident"]
         self.save_status_page(slug)
+        parse_incident_style(r)
         return r
 
     def unpin_incident(self, slug: str) -> dict:
@@ -1974,7 +2017,7 @@ class UptimeKumaApi(object):
                         'monitor_id': 1,
                         'msg': '',
                         'ping': 10.5,
-                        'status': True,
+                        'status': <MonitorStatus.UP: 1>,
                         'time': '2023-05-01 17:22:20.289'
                     },
                     {
@@ -1985,7 +2028,7 @@ class UptimeKumaApi(object):
                         'monitor_id': 1,
                         'msg': '',
                         'ping': 10.7,
-                        'status': True,
+                        'status': <MonitorStatus.UP: 1>,
                         'time': '2023-05-01 17:23:20.349'
                     }
                 ]
@@ -2015,7 +2058,7 @@ class UptimeKumaApi(object):
                         'monitorID': 1,
                         'msg': '',
                         'ping': 10.5,
-                        'status': True,
+                        'status': <MonitorStatus.UP: 1>,
                         'time': '2023-05-01 17:22:20.289'
                     }
                 ]
@@ -2869,7 +2912,7 @@ class UptimeKumaApi(object):
             [
                 {
                     'dockerDaemon': '/var/run/docker.sock',
-                    'dockerType': 'socket',
+                    'dockerType': <DockerType.SOCKET: 'socket'>,
                     'id': 1,
                     'name': 'name 1',
                     'userID': 1
@@ -2877,6 +2920,7 @@ class UptimeKumaApi(object):
             ]
         """
         r = self._get_event_data(Event.DOCKER_HOST_LIST)
+        parse_docker_type(r)
         return r
 
     def get_docker_host(self, id_: int) -> dict:
@@ -3019,7 +3063,7 @@ class UptimeKumaApi(object):
                     "id": 1,
                     "title": "title",
                     "description": "description",
-                    "strategy": "single",
+                    "strategy": <MaintenanceStrategy.SINGLE: 'single'>,
                     "intervalDay": 1,
                     "active": true,
                     "dateRange": [
@@ -3052,7 +3096,9 @@ class UptimeKumaApi(object):
                 }
             ]
         """
-        return list(self._get_event_data(Event.MAINTENANCE_LIST).values())
+        r = list(self._get_event_data(Event.MAINTENANCE_LIST).values())
+        parse_maintenance_strategy(r)
+        return r
 
     def get_maintenance(self, id_: int) -> dict:
         """
@@ -3070,7 +3116,7 @@ class UptimeKumaApi(object):
                 "id": 1,
                 "title": "title",
                 "description": "description",
-                "strategy": "single",
+                "strategy": <MaintenanceStrategy.SINGLE: 'single'>,
                 "intervalDay": 1,
                 "active": true,
                 "dateRange": [
@@ -3103,7 +3149,9 @@ class UptimeKumaApi(object):
                 "status": "ended"
             }
         """
-        return self._call('getMaintenance', id_)["maintenance"]
+        r = self._call('getMaintenance', id_)["maintenance"]
+        parse_maintenance_strategy(r)
+        return r
 
     @append_docstring(maintenance_docstring("add"))
     def add_maintenance(self, **kwargs) -> dict:
