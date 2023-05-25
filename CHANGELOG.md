@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 1.0.1
+
+#### Bugfixes
+- fix ValueError if monitor authMethod is None
+
 ### Release 1.0.0
 
 #### Features
