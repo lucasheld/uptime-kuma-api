@@ -49,15 +49,18 @@ def int_to_bool(data, keys) -> None:
                 data[key] = True if data[key] == 1 else False
 
 
-def parse_value(data, key, type_) -> None:
+def parse_value(data, key, type_, default=None) -> None:
     if not data:
         return
     if isinstance(data, list):
         for d in data:
-            parse_value(d, key, type_)
+            parse_value(d, key, type_, default)
     else:
         if key in data:
-            data[key] = type_(data[key])
+            if data[key] is not None:
+                data[key] = type_(data[key])
+            elif default is not None:
+                data[key] = default
 
 
 # monitor
@@ -70,7 +73,7 @@ def parse_monitor_type(data) -> None:
 
 
 def parse_auth_method(data) -> None:
-    parse_value(data, "authMethod", AuthMethod)
+    parse_value(data, "authMethod", AuthMethod, AuthMethod.NONE)
 
 
 # notification
