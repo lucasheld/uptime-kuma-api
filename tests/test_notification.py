@@ -19,7 +19,7 @@ class TestNotification(UptimeKumaTestCase):
         }
 
         # test notification
-        with self.assertRaisesRegex(UptimeKumaException, r'Invalid API key'):
+        with self.assertRaisesRegex(UptimeKumaException, r'Not Found'):
             self.api.test_notification(**expected_notification)
 
         # add notification
@@ -43,7 +43,8 @@ class TestNotification(UptimeKumaTestCase):
         expected_notification["applyExisting"] = False
         expected_notification["type"] = NotificationType.PUSHDEER
         expected_notification["pushdeerKey"] = "987654321"
-        del expected_notification["pushAPIKey"]
+        del expected_notification["telegramChatID"]
+        del expected_notification["telegramBotToken"]
         r = self.api.edit_notification(notification_id, **expected_notification)
         self.assertEqual(r["msg"], "Saved")
         notification = self.api.get_notification(notification_id)
