@@ -1,5 +1,39 @@
 ## Changelog
 
+### Release 1.0.0
+
+#### Features
+- add `ssl_verify` parameter
+- add `wait_events` parameter
+- implement context manager for UptimeKumaApi class
+- drop Python 3.6 support
+- implement `get_monitor_status` helper method
+- implement timeouts for all methods (`timeout` parameter)
+- add support for uptime kuma 1.21.3
+- drop support for Uptime Kuma versions < 1.21.3
+- check for required notification arguments
+- raise exception when deleting an element that does not exist
+- replace raw return values with enum values
+
+#### Bugfixes
+- adjust monitor `status` type to allow all used values
+- fix memory leak
+
+#### BREAKING CHANGES
+- Python 3.7+ required
+- maintenance parameter `timezone` renamed to `timezoneOption`
+- Removed the `wait_timeout` parameter. Use the new `timeout` parameter instead. The `timeout` parameter specifies how many seconds the client should wait for the connection, an expected event or a server response.
+- changed return values of methods `get_heartbeats`, `get_important_heartbeats`, `avg_ping`, `uptime`, `get_heartbeat`, `cert_info`
+- Uptime Kuma versions < 1.21.3 are not supported in uptime-kuma-api 1.0.0+
+- Removed the `get_heartbeat` method. This method was never intended to retrieve information. Use `get_heartbeats` or `get_important_heartbeats` instead.
+- Types of return values changed to enum values:
+  - monitor: `type` (str -> MonitorType), `status` (bool -> MonitorStatus), `authMethod` (str -> AuthMethod)
+  - notification: `type` (str -> NotificationType)
+  - docker host: `dockerType` (str -> DockerType)
+  - status page: `style` (str -> IncidentStyle)
+  - maintenance: `strategy` (str -> MaintenanceStrategy)
+  - proxy: `protocol` (str -> ProxyProtocol)
+
 ### Release 0.13.0
 
 #### Feature
