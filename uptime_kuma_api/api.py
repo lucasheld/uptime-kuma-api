@@ -12,27 +12,31 @@ from typing import Any
 import requests
 import socketio
 
-from . import (AuthMethod,
-               DockerType,
-               Event,
-               IncidentStyle,
-               MaintenanceStrategy,
-               MonitorStatus,
-               MonitorType,
-               NotificationType,
-               ProxyProtocol,
-               Timeout,
-               UptimeKumaException,
-               notification_provider_conditions,
-               notification_provider_options)
+from . import (
+    AuthMethod,
+    DockerType,
+    Event,
+    IncidentStyle,
+    MaintenanceStrategy,
+    MonitorStatus,
+    MonitorType,
+    NotificationType,
+    ProxyProtocol,
+    Timeout,
+    UptimeKumaException,
+    notification_provider_conditions,
+    notification_provider_options
+)
 
-from .docstrings import (append_docstring,
-                         docker_host_docstring,
-                         maintenance_docstring,
-                         monitor_docstring,
-                         notification_docstring,
-                         proxy_docstring,
-                         tag_docstring)
+from .docstrings import (
+    append_docstring,
+    docker_host_docstring,
+    maintenance_docstring,
+    monitor_docstring,
+    notification_docstring,
+    proxy_docstring,
+    tag_docstring
+)
 
 
 def int_to_bool(data, keys) -> None:
