@@ -23,7 +23,7 @@
 - Python 3.7+ required
 - maintenance parameter `timezone` renamed to `timezoneOption`
 - Removed the `wait_timeout` parameter. Use the new `timeout` parameter instead. The `timeout` parameter specifies how many seconds the client should wait for the connection, an expected event or a server response.
-- changed return values of methods `get_heartbeats`, `get_important_heartbeats`, `avg_ping`, `uptime`, `get_heartbeat`, `cert_info`
+- changed return values of methods `get_heartbeats`, `get_important_heartbeats`, `avg_ping`, `uptime`, `cert_info`
 - Uptime Kuma versions < 1.21.3 are not supported in uptime-kuma-api 1.0.0+
 - Removed the `get_heartbeat` method. This method was never intended to retrieve information. Use `get_heartbeats` or `get_important_heartbeats` instead.
 - Types of return values changed to enum values:
