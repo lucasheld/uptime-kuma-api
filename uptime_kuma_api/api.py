@@ -315,7 +315,8 @@ def _check_arguments_monitor(kwargs) -> None:
         MonitorType.MYSQL: [],
         MonitorType.MONGODB: [],
         MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"],
-        MonitorType.REDIS: []
+        MonitorType.REDIS: [],
+        MonitorType.GROUP: []
     }
     type_ = kwargs["type"]
     required_args = required_args_by_type[type_]
