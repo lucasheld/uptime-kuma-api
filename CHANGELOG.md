@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 1.1.0
+
+#### Feature
+- add support for uptime kuma 1.22.0 and 1.22.1
+
 ### Release 1.0.1
 
 #### Bugfixes
