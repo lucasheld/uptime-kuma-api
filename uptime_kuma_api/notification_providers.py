@@ -259,12 +259,14 @@ notification_provider_options = {
         mattermosticonurl=dict(type="str", required=False),
     ),
     NotificationType.NTFY: dict(
+        ntfyAuthenticationMethod=dict(type="str", required=False),
         ntfyusername=dict(type="str", required=False),
         ntfypassword=dict(type="str", required=False),
+        ntfyaccesstoken=dict(type="str", required=False),
         ntfytopic=dict(type="str", required=True),
         ntfyPriority=dict(type="int", required=True),
-        ntfyIcon=dict(type="str", required=False),
         ntfyserverurl=dict(type="str", required=True),
+        ntfyIcon=dict(type="str", required=False),
     ),
     NotificationType.OCTOPUSH: dict(
         octopushVersion=dict(type="str", required=False),
@@ -317,6 +319,7 @@ notification_provider_options = {
         pushoverpriority=dict(type="str", required=False),
         pushovertitle=dict(type="str", required=False),
         pushoverdevice=dict(type="str", required=False),
+        pushoverttl=dict(type="int", required=False),
     ),
     NotificationType.PUSHY: dict(
         pushyAPIKey=dict(type="str", required=True),
@@ -435,6 +438,9 @@ notification_provider_conditions = dict(
     opsgeniePriority=dict(
         min=1,
         max=5,
+    ),
+    pushoverttl=dict(
+        min=0,
     ),
     smseaglePriority=dict(
         min=0,

@@ -89,6 +89,12 @@ data = {
     "twilioToNumber": "To Number.",
 
     "twilioFromNumber": "From Number.",
+
+    "pushoverttl": "Message TTL (Seconds).",
+
+    "ntfyaccesstoken": "Access Token.",
+
+    "ntfyAuthenticationMethod": "Authentication Method.",
 }
 
 for provider in notification_provider_options:

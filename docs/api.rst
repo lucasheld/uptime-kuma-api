@@ -19,6 +19,9 @@ Enums
 .. autoclass:: MonitorType
     :members:
 
+.. autoclass:: MonitorStatus
+    :members:
+
 .. autoclass:: NotificationType
     :members:
 

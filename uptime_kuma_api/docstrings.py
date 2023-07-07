@@ -18,6 +18,7 @@ def monitor_docstring(mode) -> str:
     return f"""
         :param MonitorType{", optional" if mode == "edit" else ""} type: Monitor Type
         :param str{", optional" if mode == "edit" else ""} name: Friendly Name
+        :param str, optional parent: Id of the monitor group, defaults to None
         :param str, optional description: Description, defaults to None
         :param int, optional interval: Heartbeat Interval, defaults to 60
         :param int, optional retryInterval: Retry every X seconds, defaults to 60
@@ -133,12 +134,14 @@ def notification_docstring(mode) -> str:
         :param str mattermostchannel: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
         :param str mattermosticonemo: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
         :param str mattermosticonurl: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str ntfyAuthenticationMethod: Notification option for ``type`` :attr:`~.NotificationType.NTFY`. Authentication Method.
         :param str ntfyusername: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
         :param str ntfypassword: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str ntfyaccesstoken: Notification option for ``type`` :attr:`~.NotificationType.NTFY`. Access Token.
         :param str, optional ntfytopic: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
         :param int, optional ntfyPriority: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
-        :param str ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
         :param str, optional ntfyserverurl: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
+        :param str ntfyIcon: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
         :param str octopushVersion: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
         :param str, optional octopushAPIKey: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
         :param str, optional octopushLogin: Notification option for ``type`` :attr:`~.NotificationType.OCTOPUSH`.
@@ -196,6 +199,7 @@ def notification_docstring(mode) -> str:
         :param str pushoverpriority: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
         :param str pushovertitle: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
         :param str pushoverdevice: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
+        :param int pushoverttl: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`. Message TTL (Seconds).
         :param str, optional pushyAPIKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHY`.
         :param str, optional pushyToken: Notification option for ``type`` :attr:`~.NotificationType.PUSHY`.
         :param str rocketchannel: Notification option for ``type`` :attr:`~.NotificationType.ROCKET_CHAT`.

@@ -11,6 +11,7 @@ from typing import Any
 
 import requests
 import socketio
+from packaging.version import parse as parse_version
 
 from . import (
     AuthMethod,
@@ -58,7 +59,11 @@ def parse_value(data, key, type_, default=None) -> None:
     else:
         if key in data:
             if data[key] is not None:
-                data[key] = type_(data[key])
+                try:
+                    data[key] = type_(data[key])
+                except ValueError:
+                    # todo: add warning to logs
+                    pass
             elif default is not None:
                 data[key] = default
 
@@ -128,10 +133,10 @@ def _convert_monitor_input(kwargs) -> None:
             kwargs["databaseConnectionString"] = "postgres://username:password@host:port/database"
         elif kwargs["type"] == MonitorType.MYSQL:
             kwargs["databaseConnectionString"] = "mysql://username:password@host:port/database"
-        elif kwargs["type"] == MonitorType.MONGODB:
-            kwargs["databaseConnectionString"] = "mongodb://username:password@host:port/database"
         elif kwargs["type"] == MonitorType.REDIS:
             kwargs["databaseConnectionString"] = "redis://user:password@host:port"
+        elif kwargs["type"] == MonitorType.MONGODB:
+            kwargs["databaseConnectionString"] = "mongodb://username:password@host:port/database"
 
     if kwargs["type"] == MonitorType.PUSH and not kwargs.get("pushToken"):
         kwargs["pushToken"] = gen_secret(10)
@@ -185,49 +190,6 @@ def _build_proxy_data(
         "applyExisting": applyExisting
     }
     return data
-
-
-def _build_status_page_data(
-    slug: str,
-
-    # config
-    id: int,
-    title: str,
-    description: str = None,
-    theme: str = "light",
-    published: bool = True,
-    showTags: bool = False,
-    domainNameList: list = None,
-    googleAnalyticsId: str = None,
-    customCSS: str = "",
-    footerText: str = None,
-    showPoweredBy: bool = True,
-
-    icon: str = "/icon.svg",
-    publicGroupList: list = None
-) -> tuple[str, dict, str, list]:
-    if theme not in ["light", "dark"]:
-        raise ValueError
-    if not domainNameList:
-        domainNameList = []
-    if not publicGroupList:
-        publicGroupList = []
-    config = {
-        "id": id,
-        "slug": slug,
-        "title": title,
-        "description": description,
-        "icon": icon,
-        "theme": theme,
-        "published": published,
-        "showTags": showTags,
-        "domainNameList": domainNameList,
-        "googleAnalyticsId": googleAnalyticsId,
-        "customCSS": customCSS,
-        "footerText": footerText,
-        "showPoweredBy": showPoweredBy
-    }
-    return slug, config, icon, publicGroupList
 
 
 def _convert_docker_host_input(kwargs) -> None:
@@ -315,7 +277,8 @@ def _check_arguments_monitor(kwargs) -> None:
         MonitorType.MYSQL: [],
         MonitorType.MONGODB: [],
         MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"],
-        MonitorType.REDIS: []
+        MonitorType.REDIS: [],
+        MonitorType.GROUP: []
     }
     type_ = kwargs["type"]
     required_args = required_args_by_type[type_]
@@ -678,6 +641,7 @@ class UptimeKumaApi(object):
             self,
             type: MonitorType,
             name: str,
+            parent: int = None,
             description: str = None,
             interval: int = 60,
             retryInterval: int = 60,
@@ -769,6 +733,11 @@ class UptimeKumaApi(object):
             "description": description,
             "httpBodyEncoding": httpBodyEncoding
         }
+
+        if parse_version(self.version) >= parse_version("1.22"):
+            data.update({
+                "parent": parent
+            })
 
         if type in [MonitorType.KEYWORD, MonitorType.GRPC_KEYWORD]:
             data.update({
@@ -939,6 +908,54 @@ class UptimeKumaApi(object):
         }
         return data
 
+    def _build_status_page_data(
+            self,
+            slug: str,
+
+            # config
+            id: int,
+            title: str,
+            description: str = None,
+            theme: str = None,
+            published: bool = True,
+            showTags: bool = False,
+            domainNameList: list = None,
+            googleAnalyticsId: str = None,
+            customCSS: str = "",
+            footerText: str = None,
+            showPoweredBy: bool = True,
+
+            icon: str = "/icon.svg",
+            publicGroupList: list = None
+    ) -> tuple[str, dict, str, list]:
+        if not theme:
+            if parse_version(self.version) >= parse_version("1.22"):
+                theme = "auto"
+            else:
+                theme = "light"
+        if theme not in ["auto", "light", "dark"]:
+            raise ValueError
+        if not domainNameList:
+            domainNameList = []
+        if not publicGroupList:
+            publicGroupList = []
+        config = {
+            "id": id,
+            "slug": slug,
+            "title": title,
+            "description": description,
+            "icon": icon,
+            "theme": theme,
+            "published": published,
+            "showTags": showTags,
+            "domainNameList": domainNameList,
+            "googleAnalyticsId": googleAnalyticsId,
+            "customCSS": customCSS,
+            "footerText": footerText,
+            "showPoweredBy": showPoweredBy
+        }
+        return slug, config, icon, publicGroupList
+
     # monitor
 
     def get_monitors(self) -> list[dict]:
@@ -961,14 +978,17 @@ class UptimeKumaApi(object):
                     'basic_auth_pass': None,
                     'basic_auth_user': None,
                     'body': None,
+                    'childrenIDs': [],
                     'databaseConnectionString': None,
                     'databaseQuery': None,
+                    'description': None,
                     'dns_last_result': None,
                     'dns_resolve_server': '1.1.1.1',
                     'dns_resolve_type': 'A',
                     'docker_container': None,
                     'docker_host': None,
                     'expiryNotification': False,
+                    'forceInactive': False,
                     'game': None,
                     'grpcBody': None,
                     'grpcEnableTls': False,
@@ -979,6 +999,7 @@ class UptimeKumaApi(object):
                     'grpcUrl': None,
                     'headers': None,
                     'hostname': None,
+                    'httpBodyEncoding': 'json',
                     'id': 1,
                     'ignoreTls': False,
                     'includeSensitiveData': True,
@@ -986,7 +1007,7 @@ class UptimeKumaApi(object):
                     'keyword': None,
                     'maintenance': False,
                     'maxredirects': 10,
-                    'maxretries': 1,
+                    'maxretries': 0,
                     'method': 'GET',
                     'mqttPassword': None,
                     'mqttSuccessMessage': None,
@@ -995,6 +1016,8 @@ class UptimeKumaApi(object):
                     'name': 'monitor 1',
                     'notificationIDList': [1, 2],
                     'packetSize': 56,
+                    'parent': None,
+                    'pathName': 'monitor 1',
                     'port': None,
                     'proxyId': None,
                     'pushToken': None,
@@ -1006,7 +1029,10 @@ class UptimeKumaApi(object):
                     'resendInterval': 0,
                     'retryInterval': 60,
                     'tags': [],
-                    'type': <MonitorType.HTTP: 'http'>
+                    'tlsCa': None,
+                    'tlsCert': None,
+                    'tlsKey': None,
+                    'type': <MonitorType.HTTP: 'http'>,
                     'upsideDown': False,
                     'url': 'http://127.0.0.1',
                     'weight': 2000
@@ -1045,14 +1071,17 @@ class UptimeKumaApi(object):
                 'basic_auth_pass': None,
                 'basic_auth_user': None,
                 'body': None,
+                'childrenIDs': [],
                 'databaseConnectionString': None,
                 'databaseQuery': None,
+                'description': None,
                 'dns_last_result': None,
                 'dns_resolve_server': '1.1.1.1',
                 'dns_resolve_type': 'A',
                 'docker_container': None,
                 'docker_host': None,
                 'expiryNotification': False,
+                'forceInactive': False,
                 'game': None,
                 'grpcBody': None,
                 'grpcEnableTls': False,
@@ -1063,6 +1092,7 @@ class UptimeKumaApi(object):
                 'grpcUrl': None,
                 'headers': None,
                 'hostname': None,
+                'httpBodyEncoding': 'json',
                 'id': 1,
                 'ignoreTls': False,
                 'includeSensitiveData': True,
@@ -1070,7 +1100,7 @@ class UptimeKumaApi(object):
                 'keyword': None,
                 'maintenance': False,
                 'maxredirects': 10,
-                'maxretries': 1,
+                'maxretries': 0,
                 'method': 'GET',
                 'mqttPassword': None,
                 'mqttSuccessMessage': None,
@@ -1079,6 +1109,8 @@ class UptimeKumaApi(object):
                 'name': 'monitor 1',
                 'notificationIDList': [1, 2],
                 'packetSize': 56,
+                'parent': None,
+                'pathName': 'monitor 1',
                 'port': None,
                 'proxyId': None,
                 'pushToken': None,
@@ -1090,7 +1122,10 @@ class UptimeKumaApi(object):
                 'resendInterval': 0,
                 'retryInterval': 60,
                 'tags': [],
-                'type': <MonitorType.HTTP: 'http'>
+                'tlsCa': None,
+                'tlsCert': None,
+                'tlsKey': None,
+                'type': <MonitorType.HTTP: 'http'>,
                 'upsideDown': False,
                 'url': 'http://127.0.0.1',
                 'weight': 2000
@@ -1781,7 +1816,6 @@ class UptimeKumaApi(object):
                         'monitorList': [
                             {
                                 'id': 1,
-                                'maintenance': False,
                                 'name': 'monitor 1',
                                 'sendUrl': 0
                             }
@@ -1871,7 +1905,7 @@ class UptimeKumaApi(object):
         :param int id: Id of the status page to save
         :param str title: Title
         :param str, optional description: Description, defaults to None
-        :param str, optional theme: Switch Theme, defaults to "light"
+        :param str, optional theme: Switch Theme, defaults to "auto"
         :param bool, optional published: Published, defaults to True
         :param bool, optional showTags: Show Tags, defaults to False
         :param list, optional domainNameList: Domain Names, defaults to None
@@ -1923,7 +1957,7 @@ class UptimeKumaApi(object):
         status_page.pop("incident")
         status_page.pop("maintenanceList")
         status_page.update(kwargs)
-        data = _build_status_page_data(**status_page)
+        data = self._build_status_page_data(**status_page)
         r = self._call('saveStatusPage', data)
 
         # uptime kuma does not send the status page list event when a status page is saved
@@ -3460,12 +3494,10 @@ class UptimeKumaApi(object):
             >>> api.get_monitor_maintenance(1)
             [
                 {
-                    "id": 1,
-                    "name": "monitor 1"
+                    "id": 1
                 },
                 {
-                    "id": 2,
-                    "name": "monitor 2"
+                    "id": 2
                 }
             ]
         """

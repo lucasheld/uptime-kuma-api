@@ -54,3 +54,6 @@ class MonitorType(str, Enum):
 
     REDIS = "redis"
     """Redis"""
+
+    GROUP = "group"
+    """Group"""

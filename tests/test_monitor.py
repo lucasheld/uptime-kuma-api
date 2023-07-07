@@ -1,4 +1,5 @@
 import unittest
+from packaging.version import parse as parse_version
 
 from uptime_kuma_api import UptimeKumaException, MonitorType, AuthMethod, MonitorStatus
 from uptime_kuma_test_case import UptimeKumaTestCase
@@ -300,6 +301,26 @@ class TestMonitor(UptimeKumaTestCase):
             "type": MonitorType.REDIS,
             "name": "monitor 1",
             "databaseConnectionString": "redis://user:password@host:port"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_group(self):
+        if parse_version(self.api.version) < parse_version("1.22"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        # create monitor group
+        expected_monitor = {
+            "type": MonitorType.GROUP,
+            "name": "monitor 1"
+        }
+        group_monitor = self.do_test_monitor_type(expected_monitor)
+        group_monitor_id = group_monitor["id"]
+
+        # use monitor group as parent for another monitor
+        expected_monitor = {
+            "type": MonitorType.PUSH,
+            "name": "monitor 1",
+            "parent": group_monitor_id
         }
         self.do_test_monitor_type(expected_monitor)
 
