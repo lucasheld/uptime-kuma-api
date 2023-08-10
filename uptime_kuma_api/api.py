@@ -500,11 +500,14 @@ class UptimeKumaApi(object):
         return deepcopy(self._event_data[event].copy())
 
     def _call(self, event, data=None) -> Any:
-        r = self.sio.call(event, data, timeout=self.timeout)
-        if isinstance(r, dict) and "ok" in r:
-            if not r["ok"]:
-                raise UptimeKumaException(r.get("msg"))
+        try:
+            r = self.sio.call(event, data, timeout=self.timeout)
             r.pop("ok")
+        except socketio.exceptions.TimeoutError:
+            raise Timeout(f"Timed out while waiting for event {event}")
+        except Exception as e:
+            raise UptimeKumaException(r.get("msg"))
+        
         return r
 
     # event handlers
