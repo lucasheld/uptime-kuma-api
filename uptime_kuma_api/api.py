@@ -304,6 +304,9 @@ def _check_arguments_monitor(kwargs) -> None:
     )
     _check_argument_conditions(conditions, kwargs)
 
+    if kwargs["accepted_statuscodes"] and not all([type(i) == str for i in kwargs["accepted_statuscodes"]]):
+        raise TypeError("Accepted status codes are not all strings")
+
 
 def _check_arguments_notification(kwargs) -> None:
     required_args = ["type", "name"]
