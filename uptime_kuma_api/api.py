@@ -1816,7 +1816,7 @@ class UptimeKumaApi(object):
                             {
                                 'id': 1,
                                 'name': 'monitor 1',
-                                'sendUrl': 0
+                                'sendUrl': False
                             }
                         ],
                         'name': 'Services',
@@ -1847,6 +1847,10 @@ class UptimeKumaApi(object):
             "maintenanceList": r2["maintenanceList"]
         }
         parse_incident_style(data["incident"])
+        # convert sendUrl from int to bool
+        for i in data["publicGroupList"]:
+            for j in i["monitorList"]:
+                int_to_bool(j, ["sendUrl"])
         return data
 
     def add_status_page(self, slug: str, title: str) -> dict:
@@ -1902,7 +1906,7 @@ class UptimeKumaApi(object):
 
         :param str slug: Slug
         :param int id: Id of the status page to save
-        :param str title: Title
+        :param str, optional title: Title, defaults to None
         :param str, optional description: Description, defaults to None
         :param str, optional theme: Switch Theme, defaults to "auto"
         :param bool, optional published: Published, defaults to True
