@@ -59,8 +59,7 @@ class TestMaintenance(UptimeKumaTestCase):
         monitor_id = self.add_monitor(monitor_name)
         monitors = [
             {
-                "id": monitor_id,
-                "name": monitor_name
+                "id": monitor_id
             },
         ]
         r = self.api.add_monitor_maintenance(maintenance_id, monitors)
@@ -76,8 +75,7 @@ class TestMaintenance(UptimeKumaTestCase):
         status_page_id = self.add_status_page(status_page_title)
         status_pages = [
             {
-                "id": status_page_id,
-                "name": status_page_title
+                "id": status_page_id
             }
         ]
         r = self.api.add_status_page_maintenance(maintenance_id, status_pages)

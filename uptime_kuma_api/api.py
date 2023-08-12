@@ -3521,12 +3521,10 @@ class UptimeKumaApi(object):
 
             >>> monitors = [
             ...     {
-            ...         "id": 1,
-            ...         "name": "monitor 1"
+            ...         "id": 1
             ...     },
             ...     {
-            ...         "id": 2,
-            ...         "name": "monitor 2"
+            ...         "id": 2
             ...     }
             ... ]
             >>> api.add_monitor_maintenance(1, monitors)
@@ -3575,12 +3573,10 @@ class UptimeKumaApi(object):
 
             >>> status_pages = [
             ...     {
-            ...         "id": 1,
-            ...         "name": "status page 1"
+            ...         "id": 1
             ...     },
             ...     {
-            ...         "id": 2,
-            ...         "name": "status page 2"
+            ...         "id": 2
             ...     }
             ... ]
             >>> api.add_status_page_maintenance(1, status_pages)
