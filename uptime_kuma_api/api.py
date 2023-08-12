@@ -421,7 +421,7 @@ class UptimeKumaApi(object):
             ssl_verify: bool = True,
             wait_events: float = 0.2
     ) -> None:
-        self.url = url
+        self.url = url.rstrip("/")
         self.timeout = timeout
         self.headers = headers
         self.wait_events = wait_events
@@ -616,9 +616,8 @@ class UptimeKumaApi(object):
 
         :raises UptimeKumaException: When connection to server failed.
         """
-        url = self.url.rstrip("/")
         try:
-            self.sio.connect(f'{url}/socket.io/', wait_timeout=self.timeout, headers=self.headers)
+            self.sio.connect(f'{self.url}/socket.io/', wait_timeout=self.timeout, headers=self.headers)
         except:
             raise UptimeKumaException("unable to connect")
 
