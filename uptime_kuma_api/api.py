@@ -926,6 +926,7 @@ class UptimeKumaApi(object):
             customCSS: str = "",
             footerText: str = None,
             showPoweredBy: bool = True,
+            showCertificateExpiry: bool = False,
 
             icon: str = "/icon.svg",
             publicGroupList: list = None
