@@ -324,6 +324,53 @@ class TestMonitor(UptimeKumaTestCase):
         }
         self.do_test_monitor_type(expected_monitor)
 
+    def test_monitor_type_json_query(self):
+        if parse_version(self.api.version) < parse_version("1.23"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.JSON_QUERY,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+            "jsonPath": "address.country",
+            "expectedValue": "germany",
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_real_browser(self):
+        if parse_version(self.api.version) < parse_version("1.23"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.REAL_BROWSER,
+            "name": "monitor 1",
+            "url": "http://127.0.0.1",
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_kafka_producer(self):
+        if parse_version(self.api.version) < parse_version("1.23"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.KAFKA_PRODUCER,
+            "name": "monitor 1",
+            "kafkaProducerTopic": "topic",
+            "kafkaProducerMessage": "message",
+        }
+        self.do_test_monitor_type(expected_monitor)
+
+    def test_monitor_type_tailscale_ping(self):
+        if parse_version(self.api.version) < parse_version("1.23"):
+            self.skipTest("Unsupported in this Uptime Kuma version")
+
+        expected_monitor = {
+            "type": MonitorType.TAILSCALE_PING,
+            "name": "monitor 1",
+            "hostname": "127.0.0.1"
+        }
+        self.do_test_monitor_type(expected_monitor)
+
     def test_delete_not_existing_monitor(self):
         with self.assertRaises(UptimeKumaException):
             self.api.delete_monitor(42)

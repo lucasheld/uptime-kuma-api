@@ -1,4 +1,5 @@
 import unittest
+from packaging.version import parse as parse_version
 
 from uptime_kuma_api import DockerType, UptimeKumaException
 from uptime_kuma_test_case import UptimeKumaTestCase
@@ -16,8 +17,10 @@ class TestDockerHost(UptimeKumaTestCase):
         }
 
         # test docker host
-        with self.assertRaisesRegex(UptimeKumaException, r'connect ENOENT /var/run/docker.sock'):
-            self.api.test_docker_host(**expected_docker_host)
+        if parse_version(self.api.version) != parse_version("1.23.0"):
+            # test_docker_host does not work in 1.23.0 (https://github.com/louislam/uptime-kuma/issues/3605)
+            with self.assertRaisesRegex(UptimeKumaException, r'connect ENOENT /var/run/docker.sock'):
+                self.api.test_docker_host(**expected_docker_host)
 
         # add docker host
         r = self.api.add_docker_host(**expected_docker_host)

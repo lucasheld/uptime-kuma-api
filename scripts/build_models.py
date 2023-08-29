@@ -1,10 +1,6 @@
 import re
-from pprint import pprint
 
-from utils import deduplicate_list
-
-
-ROOT = "uptime-kuma"
+from utils import deduplicate_list, diff
 
 
 def parse_json_keys(data):
@@ -22,17 +18,8 @@ def parse_json_keys(data):
     return keys
 
 
-# def parse_object_keys(code, object_name):
-#     match = re.findall(object_name + r'\.[0-9a-zA-Z_$]+', code)
-#     keys = []
-#     for m in match:
-#         key = m.replace(object_name + ".", "")
-#         keys.append(key)
-#     return list(set(keys))
-
-
-def parse_heartbeat():
-    with open(f'{ROOT}/server/model/heartbeat.js') as f:
+def parse_heartbeat(root):
+    with open(f'{root}/server/model/heartbeat.js') as f:
         content = f.read()
     all_keys = []
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
@@ -47,8 +34,8 @@ def parse_heartbeat():
     return all_keys
 
 
-def parse_incident():
-    with open(f'{ROOT}/server/model/incident.js') as f:
+def parse_incident(root):
+    with open(f'{root}/server/model/incident.js') as f:
         content = f.read()
     match = re.search(r'toPublicJSON\(\) {\s+return.*{([^}]+)}', content)
     data = match.group(1)
@@ -56,9 +43,9 @@ def parse_incident():
     return keys
 
 
-def parse_monitor():
+def parse_monitor(root):
     # todo: toPublicJSON ???
-    with open(f'{ROOT}/server/model/monitor.js') as f:
+    with open(f'{root}/server/model/monitor.js') as f:
         content = f.read()
     matches = re.findall(r'data = {([^}]+)}', content)
     all_keys = []
@@ -70,8 +57,8 @@ def parse_monitor():
     return all_keys
 
 
-def parse_proxy():
-    with open(f'{ROOT}/server/model/proxy.js') as f:
+def parse_proxy(root):
+    with open(f'{root}/server/model/proxy.js') as f:
         content = f.read()
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
     data = match.group(1)
@@ -102,7 +89,7 @@ def parse_proxy():
 
 # # input (add, edit proxy)
 # def parse_proxy2():
-#     with open(f'{ROOT}/server/proxy.js') as f:
+#     with open(f'{root}/server/proxy.js') as f:
 #         content = f.read()
 #
 #     code = parse_function(r'async save\([^)]+\) ', content)
@@ -110,8 +97,8 @@ def parse_proxy():
 #     return keys
 
 
-def parse_status_page():
-    with open(f'{ROOT}/server/model/status_page.js') as f:
+def parse_status_page(root):
+    with open(f'{root}/server/model/status_page.js') as f:
         content = f.read()
     all_keys = []
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
@@ -126,8 +113,8 @@ def parse_status_page():
     return all_keys
 
 
-def parse_tag():
-    with open(f'{ROOT}/server/model/tag.js') as f:
+def parse_tag(root):
+    with open(f'{root}/server/model/tag.js') as f:
         content = f.read()
     match = re.search(r'toJSON\(\) {\s+return.*{([^}]+)}', content)
     data = match.group(1)
@@ -135,33 +122,22 @@ def parse_tag():
     return keys
 
 
-print("heartbeat")
-pprint(parse_heartbeat())
-print("")
+if __name__ == "__main__":
+    root_old = "uptime-kuma-old"
+    root_new = "uptime-kuma"
 
-print("incident")
-pprint(parse_incident())
-print("")
-
-print("monitor")
-pprint(parse_monitor())
-print("")
-
-print("proxy")
-pprint(parse_proxy())
-print("")
-
-# print("prox2")
-# pprint(parse_proxy2())
-# print("")
-
-print("status page")
-pprint(parse_status_page())
-print("")
-
-print("tag")
-pprint(parse_tag())
-print("")
+    for name, func in [
+        ["heartbeat", parse_heartbeat],
+        ["incident", parse_incident],
+        ["monitor", parse_monitor],
+        ["proxy", parse_proxy],
+        ["status page", parse_status_page],
+        ["tag", parse_tag],
+    ]:
+        keys_old = func(root_old)
+        keys_new = func(root_new)
+        print(f"{name}:")
+        diff(keys_old, keys_new)
 
 
 # TODO:

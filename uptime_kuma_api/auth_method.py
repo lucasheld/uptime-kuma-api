@@ -15,3 +15,6 @@ class AuthMethod(str, Enum):
 
     MTLS = "mtls"
     """mTLS Authentication."""
+
+    OAUTH2_CC = "oauth2-cc"
+    """OAuth2: Client Credentials"""

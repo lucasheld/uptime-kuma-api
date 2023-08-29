@@ -44,12 +44,30 @@ def monitor_docstring(mode) -> str:
         :param str, optional basic_auth_pass: Password for ``authMethod`` :attr:`~.AuthMethod.HTTP_BASIC` and :attr:`~.AuthMethod.NTLM`, defaults to None
         :param str, optional authDomain: Domain for ``authMethod`` :attr:`~.AuthMethod.NTLM`, defaults to None
         :param str, optional authWorkstation: Workstation for ``authMethod`` :attr:`~.AuthMethod.NTLM`, defaults to None
+        :param str, optional oauth_auth_method: Authentication Method, defaults to None
+        :param str, optional oauth_token_url: OAuth Token URL, defaults to None
+        :param str, optional oauth_client_id: Client ID, defaults to None
+        :param str, optional oauth_client_secret: Client Secret, defaults to None
+        :param str, optional oauth_scopes: OAuth Scope, defaults to None
+        :param int, optional timeout: Request Timeout, defaults to None
         :param str, optional keyword: Keyword. Search keyword in plain HTML or JSON response. The search is case-sensitive., defaults to None
+        :param bool, optional invertKeyword: Invert Keyword. Look for the keyword to be absent rather than present., defaults to False
         :param str, optional hostname: Hostname, defaults to None
         :param int, optional packetSize: Packet Size, defaults to None
         :param int, optional port: Port, ``type`` :attr:`~.MonitorType.DNS` defaults to ``53`` and ``type`` :attr:`~.MonitorType.RADIUS` defaults to ``1812``
         :param str, optional dns_resolve_server: Resolver Server, defaults to "1.1.1.1"
-        :param str, optional dns_resolve_type: Resource Record Type, defaults to "A"
+        :param str, optional dns_resolve_type: Resource Record Type, defaults to "A". Available values are:
+            
+            - "A"
+            - "AAAA"
+            - "CAA"
+            - "CNAME"
+            - "MX"
+            - "NS"
+            - "PTR"
+            - "SOA"
+            - "SRV"
+            - "TXT"
         :param str, optional mqttUsername: MQTT Username, defaults to None
         :param str, optional mqttPassword: MQTT Password, defaults to None
         :param str, optional mqttTopic: MQTT Topic, defaults to None
@@ -64,6 +82,29 @@ def monitor_docstring(mode) -> str:
         :param str, optional radiusCalledStationId: Called Station Id. Identifier of the called device., defaults to None
         :param str, optional radiusCallingStationId: Calling Station Id. Identifier of the calling device., defaults to None
         :param str, optional game: Game, defaults to None
+        :param bool, optional gamedigGivenPortOnly: Gamedig: Guess Port. The port used by Valve Server Query Protocol may be different from the client port. Try this if the monitor cannot connect to your server., defaults to False
+        :param str, optional jsonPath: Json Query, defaults to None
+        :param str, optional expectedValue: Expected Value, defaults to None
+        :param str, optional kafkaProducerBrokers: Kafka Broker list, defaults to None
+        :param str, optional kafkaProducerTopic: Kafka Topic Name, defaults to None
+        :param str, optional kafkaProducerMessage: Kafka Producer Message, defaults to None
+        :param bool, optional kafkaProducerSsl: Enable Kafka SSL, defaults to False
+        :param bool, optional kafkaProducerAllowAutoTopicCreation: Enable Kafka Producer Auto Topic Creation, defaults to False
+        :param dict, optional kafkaProducerSaslOptions: Kafka SASL Options
+        
+            - **mechanism** (*str*, *optional*): Mechanism, defaults to "None". Available values are:
+            
+                - "None"
+                - "plain"
+                - "scram-sha-256"
+                - "scram-sha-512"
+                - "aws"
+            - **username** (*str*, *optional*): Username, defaults to None
+            - **password** (*str*, *optional*): Password, defaults to None
+            - **authorizationIdentity** (*str*, *optional*): Authorization Identity, defaults to None
+            - **accessKeyId** (*str*, *optional*): AccessKey Id, defaults to None
+            - **secretAccessKey** (*str*, *optional*): Secret AccessKey, defaults to None
+            - **sessionToken** (*str*, *optional*): Session Token, defaults to None
     """
 
 
@@ -100,6 +141,8 @@ def notification_docstring(mode) -> str:
         :param str, optional discordWebhookUrl: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`.
         :param str discordPrefixMessage: Notification option for ``type`` :attr:`~.NotificationType.DISCORD`.
         :param str, optional feishuWebHookUrl: Notification option for ``type`` :attr:`~.NotificationType.FEISHU`.
+        :param str, optional flashdutySeverity: Notification option for ``type`` :attr:`~.NotificationType.FLASHDUTY`.
+        :param str flashdutyIntegrationKey: Notification option for ``type`` :attr:`~.NotificationType.FLASHDUTY`.
         :param str, optional freemobileUser: Notification option for ``type`` :attr:`~.NotificationType.FREEMOBILE`.
         :param str, optional freemobilePass: Notification option for ``type`` :attr:`~.NotificationType.FREEMOBILE`.
         :param str, optional goAlertBaseURL: Notification option for ``type`` :attr:`~.NotificationType.GOALERT`.
@@ -134,6 +177,9 @@ def notification_docstring(mode) -> str:
         :param str mattermostchannel: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
         :param str mattermosticonemo: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
         :param str mattermosticonurl: Notification option for ``type`` :attr:`~.NotificationType.MATTERMOST`.
+        :param str, optional sender: Notification option for ``type`` :attr:`~.NotificationType.NOSTR`.
+        :param str, optional recipients: Notification option for ``type`` :attr:`~.NotificationType.NOSTR`.
+        :param str, optional relays: Notification option for ``type`` :attr:`~.NotificationType.NOSTR`.
         :param str ntfyAuthenticationMethod: Notification option for ``type`` :attr:`~.NotificationType.NTFY`. Authentication Method.
         :param str ntfyusername: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
         :param str ntfypassword: Notification option for ``type`` :attr:`~.NotificationType.NTFY`.
@@ -192,6 +238,7 @@ def notification_docstring(mode) -> str:
             - ``4``: SMS SPEED - Highest priority in system. Very quick and reliable but costly (about twice of SMS FULL price).
         :param str promosmsSenderName: Notification option for ``type`` :attr:`~.NotificationType.PROMOSMS`.
         :param str, optional pushbulletAccessToken: Notification option for ``type`` :attr:`~.NotificationType.PUSHBULLET`.
+        :param str pushdeerServer: Notification option for ``type`` :attr:`~.NotificationType.PUSHDEER`.
         :param str, optional pushdeerKey: Notification option for ``type`` :attr:`~.NotificationType.PUSHDEER`.
         :param str, optional pushoveruserkey: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
         :param str, optional pushoverapptoken: Notification option for ``type`` :attr:`~.NotificationType.PUSHOVER`.
@@ -214,10 +261,16 @@ def notification_docstring(mode) -> str:
         :param str, optional signalNumber: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`.
         :param str, optional signalRecipients: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`.
         :param str, optional signalURL: Notification option for ``type`` :attr:`~.NotificationType.SIGNAL`.
+        :param bool slackchannelnotify: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
         :param str slackchannel: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
         :param str slackusername: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
         :param str slackiconemo: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
         :param str, optional slackwebhookURL: Notification option for ``type`` :attr:`~.NotificationType.SLACK`.
+        :param str smscTranslit: Notification option for ``type`` :attr:`~.NotificationType.SMSC`.
+        :param str, optional smscLogin: Notification option for ``type`` :attr:`~.NotificationType.SMSC`.
+        :param str, optional smscPassword: Notification option for ``type`` :attr:`~.NotificationType.SMSC`.
+        :param str, optional smscToNumber: Notification option for ``type`` :attr:`~.NotificationType.SMSC`.
+        :param str smscSenderName: Notification option for ``type`` :attr:`~.NotificationType.SMSC`.
         :param bool smseagleEncoding: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. True to send messages in unicode.
         :param int smseaglePriority: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Message priority (0-9, default = 0).
         :param str smseagleRecipientType: Notification option for ``type`` :attr:`~.NotificationType.SMSEAGLE`. Recipient type.
@@ -275,10 +328,12 @@ def notification_docstring(mode) -> str:
         :param str telegramMessageThreadID: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
         :param str, optional telegramBotToken: Notification option for ``type`` :attr:`~.NotificationType.TELEGRAM`.
         :param str, optional twilioAccountSID: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. Account SID.
+        :param str twilioApiKey: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`.
         :param str, optional twilioAuthToken: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. Auth Token.
         :param str, optional twilioToNumber: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. To Number.
         :param str, optional twilioFromNumber: Notification option for ``type`` :attr:`~.NotificationType.TWILIO`. From Number.
         :param str, optional webhookContentType: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
+        :param str webhookCustomBody: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
         :param str webhookAdditionalHeaders: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
         :param str, optional webhookURL: Notification option for ``type`` :attr:`~.NotificationType.WEBHOOK`.
         :param str, optional weComBotKey: Notification option for ``type`` :attr:`~.NotificationType.WECOM`.

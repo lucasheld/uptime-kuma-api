@@ -2,7 +2,10 @@ from enum import Enum
 
 
 class MonitorType(str, Enum):
-{%- for name in monitor_types %}
-    {{ name.upper() }} = "{{ name }}"
-{%- endfor %}
+    """Enumerate monitor types."""
+    {{""}}
+{%- for type_ in monitor_types.values() %}
+    {{ type_["value"].upper().replace("-", "_") }} = "{{ type_["value"] }}"
+    """{{ type_["title"] }}"""
+{% endfor -%}
 

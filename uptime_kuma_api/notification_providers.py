@@ -31,6 +31,9 @@ class NotificationType(str, Enum):
     FEISHU = "Feishu"
     """Feishu"""
 
+    FLASHDUTY = "FlashDuty"
+    """FlashDuty"""
+
     FREEMOBILE = "FreeMobile"
     """FreeMobile (mobile.free.fr)"""
 
@@ -66,6 +69,9 @@ class NotificationType(str, Enum):
 
     MATTERMOST = "mattermost"
     """Mattermost"""
+
+    NOSTR = "nostr"
+    """Nostr"""
 
     NTFY = "ntfy"
     """Ntfy"""
@@ -114,6 +120,9 @@ class NotificationType(str, Enum):
 
     SLACK = "slack"
     """Slack"""
+
+    SMSC = "smsc"
+    """SMSC"""
 
     SMSEAGLE = "SMSEagle"
     """SMSEagle"""
@@ -200,6 +209,10 @@ notification_provider_options = {
     NotificationType.FEISHU: dict(
         feishuWebHookUrl=dict(type="str", required=True),
     ),
+    NotificationType.FLASHDUTY: dict(
+        flashdutySeverity=dict(type="str", required=True),
+        flashdutyIntegrationKey=dict(type="str", required=False),
+    ),
     NotificationType.FREEMOBILE: dict(
         freemobileUser=dict(type="str", required=True),
         freemobilePass=dict(type="str", required=True),
@@ -258,6 +271,11 @@ notification_provider_options = {
         mattermosticonemo=dict(type="str", required=False),
         mattermosticonurl=dict(type="str", required=False),
     ),
+    NotificationType.NOSTR: dict(
+        sender=dict(type="str", required=True),
+        recipients=dict(type="str", required=True),
+        relays=dict(type="str", required=True),
+    ),
     NotificationType.NTFY: dict(
         ntfyAuthenticationMethod=dict(type="str", required=False),
         ntfyusername=dict(type="str", required=False),
@@ -310,6 +328,7 @@ notification_provider_options = {
         pushbulletAccessToken=dict(type="str", required=True),
     ),
     NotificationType.PUSHDEER: dict(
+        pushdeerServer=dict(type="str", required=False),
         pushdeerKey=dict(type="str", required=True),
     ),
     NotificationType.PUSHOVER: dict(
@@ -346,10 +365,18 @@ notification_provider_options = {
         signalURL=dict(type="str", required=True),
     ),
     NotificationType.SLACK: dict(
+        slackchannelnotify=dict(type="bool", required=False),
         slackchannel=dict(type="str", required=False),
         slackusername=dict(type="str", required=False),
         slackiconemo=dict(type="str", required=False),
         slackwebhookURL=dict(type="str", required=True),
+    ),
+    NotificationType.SMSC: dict(
+        smscTranslit=dict(type="str", required=False),
+        smscLogin=dict(type="str", required=True),
+        smscPassword=dict(type="str", required=True),
+        smscToNumber=dict(type="str", required=True),
+        smscSenderName=dict(type="str", required=False),
     ),
     NotificationType.SMSEAGLE: dict(
         smseagleEncoding=dict(type="bool", required=False),
@@ -409,12 +436,14 @@ notification_provider_options = {
     ),
     NotificationType.TWILIO: dict(
         twilioAccountSID=dict(type="str", required=True),
+        twilioApiKey=dict(type="str", required=False),
         twilioAuthToken=dict(type="str", required=True),
         twilioToNumber=dict(type="str", required=True),
         twilioFromNumber=dict(type="str", required=True),
     ),
     NotificationType.WEBHOOK: dict(
         webhookContentType=dict(type="str", required=True),
+        webhookCustomBody=dict(type="str", required=False),
         webhookAdditionalHeaders=dict(type="str", required=False),
         webhookURL=dict(type="str", required=True),
     ),

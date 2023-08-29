@@ -278,7 +278,11 @@ def _check_arguments_monitor(kwargs) -> None:
         MonitorType.MONGODB: [],
         MonitorType.RADIUS: ["radiusUsername", "radiusPassword", "radiusSecret", "radiusCalledStationId", "radiusCallingStationId"],
         MonitorType.REDIS: [],
-        MonitorType.GROUP: []
+        MonitorType.GROUP: [],
+        MonitorType.JSON_QUERY: ["url", "jsonPath", "expectedValue"],
+        MonitorType.REAL_BROWSER: ["url"],
+        MonitorType.KAFKA_PRODUCER: ["kafkaProducerTopic", "kafkaProducerMessage"],
+        MonitorType.TAILSCALE_PING: ["hostname"],
     }
     type_ = kwargs["type"]
     required_args = required_args_by_type[type_]
@@ -304,8 +308,45 @@ def _check_arguments_monitor(kwargs) -> None:
     )
     _check_argument_conditions(conditions, kwargs)
 
-    if kwargs["accepted_statuscodes"] and not all([type(i) == str for i in kwargs["accepted_statuscodes"]]):
-        raise TypeError("Accepted status codes are not all strings")
+    allowed_accepted_statuscodes = [
+        "100-199",
+        "200-299",
+        "300-399",
+        "400-499",
+        "500-599",
+    ] + [
+        str(i) for i in range(100, 999 + 1)
+    ]
+    accepted_statuscodes = kwargs["accepted_statuscodes"]
+    for accepted_statuscode in accepted_statuscodes:
+        if accepted_statuscode not in allowed_accepted_statuscodes:
+            raise ValueError(f"Unknown accepted_statuscodes value: {allowed_accepted_statuscodes}")
+
+    dns_resolve_type = kwargs["dns_resolve_type"]
+    if dns_resolve_type not in [
+        "A",
+        "AAAA",
+        "CAA",
+        "CNAME",
+        "MX",
+        "NS",
+        "PTR",
+        "SOA",
+        "SRV",
+        "TXT",
+    ]:
+        raise ValueError(f"Unknown dns_resolve_type value: {dns_resolve_type}")
+
+    if type_ == MonitorType.KAFKA_PRODUCER:
+        kafkaProducerSaslOptions_mechanism = kwargs["kafkaProducerSaslOptions"]["mechanism"]
+        if kafkaProducerSaslOptions_mechanism not in [
+            "None",
+            "plain",
+            "scram-sha-256",
+            "scram-sha-512",
+            "aws",
+        ]:
+            raise ValueError(f"Unknown kafkaProducerSaslOptions[\"mechanism\"] value: {kafkaProducerSaslOptions_mechanism}")
 
 
 def _check_arguments_notification(kwargs) -> None:
@@ -653,12 +694,16 @@ class UptimeKumaApi(object):
             notificationIDList: list = None,
             httpBodyEncoding: str = "json",
 
-            # HTTP, KEYWORD
+            # HTTP, KEYWORD, JSON_QUERY, REAL_BROWSER
             url: str = None,
+
+            # HTTP, KEYWORD, GRPC_KEYWORD
+            maxredirects: int = 10,
+            accepted_statuscodes: list[str] = None,
+
+            # HTTP, KEYWORD, JSON_QUERY
             expiryNotification: bool = False,
             ignoreTls: bool = False,
-            maxredirects: int = 10,
-            accepted_statuscodes: list = None,
             proxyId: int = None,
             method: str = "GET",
             body: str = None,
@@ -671,9 +716,16 @@ class UptimeKumaApi(object):
             basic_auth_pass: str = None,
             authDomain: str = None,
             authWorkstation: str = None,
+            oauth_auth_method: str = "client_secret_basic",
+            oauth_token_url: str = None,
+            oauth_client_id: str = None,
+            oauth_client_secret: str = None,
+            oauth_scopes: str = None,
+            timeout: int = 48,
 
             # KEYWORD
             keyword: str = None,
+            invertKeyword: bool = False,
 
             # GRPC_KEYWORD
             grpcUrl: str = None,
@@ -684,13 +736,13 @@ class UptimeKumaApi(object):
             grpcBody: str = None,
             grpcMetadata: str = None,
 
-            # DNS, PING, STEAM, MQTT
+            # PORT, PING, DNS, STEAM, MQTT, RADIUS, TAILSCALE_PING
             hostname: str = None,
 
             # PING
             packetSize: int = 56,
 
-            # DNS, STEAM, MQTT, RADIUS
+            # PORT, DNS, STEAM, MQTT, RADIUS
             port: int = None,
 
             # DNS
@@ -698,10 +750,10 @@ class UptimeKumaApi(object):
             dns_resolve_type: str = "A",
 
             # MQTT
-            mqttUsername: str = None,
-            mqttPassword: str = None,
-            mqttTopic: str = None,
-            mqttSuccessMessage: str = None,
+            mqttUsername: str = "",
+            mqttPassword: str = "",
+            mqttTopic: str = "",
+            mqttSuccessMessage: str = "",
 
             # SQLSERVER, POSTGRES, MYSQL, MONGODB, REDIS
             databaseConnectionString: str = None,
@@ -721,8 +773,27 @@ class UptimeKumaApi(object):
             radiusCallingStationId: str = None,
 
             # GAMEDIG
-            game: str = None
+            game: str = None,
+            gamedigGivenPortOnly: bool = True,
+
+            # JSON_QUERY
+            jsonPath: str = None,
+            expectedValue: str = None,
+
+            # KAFKA_PRODUCER
+            kafkaProducerBrokers: list[str] = None,
+            kafkaProducerTopic: str = None,
+            kafkaProducerMessage: str = None,
+            kafkaProducerSsl: bool = False,
+            kafkaProducerAllowAutoTopicCreation: bool = False,
+            kafkaProducerSaslOptions: dict = None,
     ) -> dict:
+        if accepted_statuscodes is None:
+            accepted_statuscodes = ["200-299"]
+
+        if notificationIDList is None:
+            notificationIDList = {}
+
         data = {
             "type": type,
             "name": name,
@@ -733,32 +804,48 @@ class UptimeKumaApi(object):
             "upsideDown": upsideDown,
             "resendInterval": resendInterval,
             "description": description,
-            "httpBodyEncoding": httpBodyEncoding
+            "httpBodyEncoding": httpBodyEncoding,
         }
 
         if parse_version(self.version) >= parse_version("1.22"):
             data.update({
-                "parent": parent
+                "parent": parent,
             })
 
         if type in [MonitorType.KEYWORD, MonitorType.GRPC_KEYWORD]:
             data.update({
                 "keyword": keyword,
             })
+            if parse_version(self.version) >= parse_version("1.23"):
+                data.update({
+                    "invertKeyword": invertKeyword,
+                })
 
-        # HTTP, KEYWORD
+        # HTTP, KEYWORD, JSON_QUERY, REAL_BROWSER
         data.update({
             "url": url,
-            "expiryNotification": expiryNotification,
-            "ignoreTls": ignoreTls,
+        })
+
+        # HTTP, KEYWORD, GRPC_KEYWORD
+        data.update({
             "maxredirects": maxredirects,
             "accepted_statuscodes": accepted_statuscodes,
+        })
+
+        data.update({
+            "expiryNotification": expiryNotification,
+            "ignoreTls": ignoreTls,
             "proxyId": proxyId,
             "method": method,
             "body": body,
             "headers": headers,
             "authMethod": authMethod,
         })
+
+        if parse_version(self.version) >= parse_version("1.23"):
+            data.update({
+                "timeout": timeout,
+            })
 
         if authMethod in [AuthMethod.HTTP_BASIC, AuthMethod.NTLM]:
             data.update({
@@ -779,6 +866,15 @@ class UptimeKumaApi(object):
                 "tlsCa": tlsCa,
             })
 
+        if authMethod == AuthMethod.OAUTH2_CC:
+            data.update({
+                "oauth_auth_method": oauth_auth_method,
+                "oauth_token_url": oauth_token_url,
+                "oauth_client_id": oauth_client_id,
+                "oauth_client_secret": oauth_client_secret,
+                "oauth_scopes": oauth_scopes,
+            })
+
         # GRPC_KEYWORD
         if type == MonitorType.GRPC_KEYWORD:
             data.update({
@@ -791,7 +887,7 @@ class UptimeKumaApi(object):
                 "grpcMetadata": grpcMetadata,
             })
 
-        # PORT, PING, DNS, STEAM, MQTT
+        # PORT, PING, DNS, STEAM, MQTT, RADIUS, TAILSCALE_PING
         data.update({
             "hostname": hostname,
         })
@@ -840,7 +936,7 @@ class UptimeKumaApi(object):
         if type == MonitorType.DOCKER:
             data.update({
                 "docker_container": docker_container,
-                "docker_host": docker_host
+                "docker_host": docker_host,
             })
 
         # RADIUS
@@ -850,15 +946,42 @@ class UptimeKumaApi(object):
                 "radiusPassword": radiusPassword,
                 "radiusSecret": radiusSecret,
                 "radiusCalledStationId": radiusCalledStationId,
-                "radiusCallingStationId": radiusCallingStationId
+                "radiusCallingStationId": radiusCallingStationId,
             })
 
         # GAMEDIG
         if type == MonitorType.GAMEDIG:
             data.update({
-                "game": game
+                "game": game,
+            })
+            if parse_version(self.version) >= parse_version("1.23"):
+                data.update({
+                    "gamedigGivenPortOnly": gamedigGivenPortOnly,
+                })
+
+        # JSON_QUERY
+        if type == MonitorType.JSON_QUERY:
+            data.update({
+                "jsonPath": jsonPath,
+                "expectedValue": expectedValue,
             })
 
+        # KAFKA_PRODUCER
+        if type == MonitorType.KAFKA_PRODUCER:
+            if kafkaProducerBrokers is None:
+                kafkaProducerBrokers = []
+            if not kafkaProducerSaslOptions:
+                kafkaProducerSaslOptions = {
+                    "mechanism": "None",
+                }
+            data.update({
+                "kafkaProducerBrokers": kafkaProducerBrokers,
+                "kafkaProducerTopic": kafkaProducerTopic,
+                "kafkaProducerMessage": kafkaProducerMessage,
+                "kafkaProducerSsl": kafkaProducerSsl,
+                "kafkaProducerAllowAutoTopicCreation": kafkaProducerAllowAutoTopicCreation,
+                "kafkaProducerSaslOptions": kafkaProducerSaslOptions,
+            })
         return data
 
     def _build_maintenance_data(
@@ -926,6 +1049,7 @@ class UptimeKumaApi(object):
             customCSS: str = "",
             footerText: str = None,
             showPoweredBy: bool = True,
+            showCertificateExpiry: bool = False,
 
             icon: str = "/icon.svg",
             publicGroupList: list = None
@@ -954,8 +1078,12 @@ class UptimeKumaApi(object):
             "googleAnalyticsId": googleAnalyticsId,
             "customCSS": customCSS,
             "footerText": footerText,
-            "showPoweredBy": showPoweredBy
+            "showPoweredBy": showPoweredBy,
         }
+        if parse_version(self.version) >= parse_version("1.23"):
+            config.update({
+                "showCertificateExpiry": showCertificateExpiry,
+            })
         return slug, config, icon, publicGroupList
 
     # monitor
@@ -1082,9 +1210,11 @@ class UptimeKumaApi(object):
                 'dns_resolve_type': 'A',
                 'docker_container': None,
                 'docker_host': None,
+                'expectedValue': None,
                 'expiryNotification': False,
                 'forceInactive': False,
                 'game': None,
+                'gamedigGivenPortOnly': True,
                 'grpcBody': None,
                 'grpcEnableTls': False,
                 'grpcMetadata': None,
@@ -1099,17 +1229,30 @@ class UptimeKumaApi(object):
                 'ignoreTls': False,
                 'includeSensitiveData': True,
                 'interval': 60,
+                'invertKeyword': False,
+                'jsonPath': None,
+                'kafkaProducerAllowAutoTopicCreation': False,
+                'kafkaProducerBrokers': None,
+                'kafkaProducerMessage': None,
+                'kafkaProducerSaslOptions': None,
+                'kafkaProducerSsl': False,
+                'kafkaProducerTopic': None,
                 'keyword': None,
                 'maintenance': False,
                 'maxredirects': 10,
                 'maxretries': 0,
                 'method': 'GET',
-                'mqttPassword': None,
-                'mqttSuccessMessage': None,
-                'mqttTopic': None,
-                'mqttUsername': None,
+                'mqttPassword': '',
+                'mqttSuccessMessage': '',
+                'mqttTopic': '',
+                'mqttUsername': '',
                 'name': 'monitor 1',
                 'notificationIDList': [1, 2],
+                'oauth_auth_method': None,
+                'oauth_client_id': None,
+                'oauth_client_secret': None,
+                'oauth_scopes': None,
+                'oauth_token_url': None,
                 'packetSize': 56,
                 'parent': None,
                 'pathName': 'monitor 1',
@@ -1123,7 +1266,9 @@ class UptimeKumaApi(object):
                 'radiusUsername': None,
                 'resendInterval': 0,
                 'retryInterval': 60,
+                'screenshot': None,
                 'tags': [],
+                'timeout': 48,
                 'tlsCa': None,
                 'tlsCert': None,
                 'tlsKey': None,
@@ -1278,6 +1423,23 @@ class UptimeKumaApi(object):
         """
         r = self._call('getGameList')
         return r.get("gameList")
+
+    def test_chrome(self, executable) -> dict:
+        """
+        Test if the chrome executable is valid and return the version.
+
+        :return: The server response.
+        :rtype: dict
+        :raises UptimeKumaException: If the server returns an error.
+
+        Example::
+
+            >>> api.test_chrome("/usr/bin/chromium")
+            {
+                'msg': 'Found Chromium/Chrome. Version: 90.0.4430.212'
+            }
+        """
+        return self._call('testChrome', executable)
 
     @append_docstring(monitor_docstring("add"))
     def add_monitor(self, **kwargs) -> dict:
@@ -1799,8 +1961,8 @@ class UptimeKumaApi(object):
                 'description': 'description 1',
                 'domainNameList': [],
                 'footerText': None,
-                'icon': '/icon.svg',
                 'googleAnalyticsId': '',
+                'icon': '/icon.svg',
                 'id': 1,
                 'incident': {
                     'content': 'content 1',
@@ -1819,7 +1981,8 @@ class UptimeKumaApi(object):
                             {
                                 'id': 1,
                                 'name': 'monitor 1',
-                                'sendUrl': False
+                                'sendUrl': False,
+                                'type': 'http'
                             }
                         ],
                         'name': 'Services',
@@ -1827,6 +1990,7 @@ class UptimeKumaApi(object):
                     }
                 ],
                 'published': True,
+                'showCertificateExpiry': False,
                 'showPoweredBy': False,
                 'showTags': False,
                 'slug': 'slug1',
@@ -1919,6 +2083,7 @@ class UptimeKumaApi(object):
         :param str, optional customCSS: Custom CSS, defaults to ""
         :param str, optional footerText: Custom Footer, defaults to None
         :param bool, optional showPoweredBy: Show Powered By, defaults to True
+        :param bool, optional showCertificateExpiry: Show Certificate Expiry, defaults to False
         :param str, optional icon: Icon, defaults to "/icon.svg"
         :param list, optional publicGroupList: Public Group List, defaults to None
         :return: The server response.
@@ -2327,11 +2492,12 @@ class UptimeKumaApi(object):
 
             >>> api.info()
             {
-                'version': '1.19.2',
-                'latestVersion': '1.19.2',
-                'primaryBaseURL': None,
+                'isContainer': True,
+                'latestVersion': '1.23.1',
+                'primaryBaseURL': '',
                 'serverTimezone': 'Europe/Berlin',
-                'serverTimezoneOffset': '+01:00'
+                'serverTimezoneOffset': '+02:00',
+                'version': '1.23.1'
             }
         """
         r = self._get_event_data(Event.INFO)
@@ -2525,10 +2691,12 @@ class UptimeKumaApi(object):
             {
                 'checkBeta': False,
                 'checkUpdate': False,
+                'chromeExecutable': '',
                 'disableAuth': False,
                 'dnsCache': True,
                 'entryPage': 'dashboard',
                 'keepDataPeriodDays': 180,
+                'nscd': False,
                 'primaryBaseURL': '',
                 'searchEngineIndex': False,
                 'serverTimezone': 'Europe/Berlin',
@@ -2561,7 +2729,9 @@ class UptimeKumaApi(object):
             searchEngineIndex: bool = False,
             primaryBaseURL: str = "",
             steamAPIKey: str = "",
+            nscd: bool = False,
             dnsCache: bool = False,
+            chromeExecutable: str = "",
 
             # notifications
             tlsExpiryNotifyDays: list = None,
@@ -2584,7 +2754,9 @@ class UptimeKumaApi(object):
         :param bool, optional searchEngineIndex: Search Engine Visibility, defaults to False
         :param str, optional primaryBaseURL: Primary Base URL, defaults to ""
         :param str, optional steamAPIKey: Steam API Key. For monitoring a Steam Game Server you need a Steam Web-API key., defaults to ""
+        :param bool, optional nscd: Enable NSCD (Name Service Cache Daemon) for caching all DNS requests, defaults to False
         :param bool, optional dnsCache: True to enable DNS Cache. It may be not working in some IPv6 environments, disable it if you encounter any issues., defaults to False
+        :param str, optional chromeExecutable: Chrome/Chromium Executable, defaults to ""
         :param list, optional tlsExpiryNotifyDays: TLS Certificate Expiry. HTTPS Monitors trigger notification when TLS certificate expires in., defaults to None
         :param bool, optional disableAuth: Disable Authentication, defaults to False
         :param bool, optional trustProxy: Trust Proxy. Trust 'X-Forwarded-\*' headers. If you want to get the correct client IP and your Uptime Kuma is behind such as Nginx or Apache, you should enable this., defaults to False
@@ -2634,6 +2806,16 @@ class UptimeKumaApi(object):
             "disableAuth": disableAuth,
             "trustProxy": trustProxy
         }
+
+        if parse_version(self.version) >= parse_version("1.23"):
+            data.update({
+                "chromeExecutable": chromeExecutable,
+            })
+        if parse_version(self.version) >= parse_version("1.23.1"):
+            data.update({
+                "nscd": nscd,
+            })
+
         return self._call('setSettings', (data, password))
 
     def change_password(self, old_password: str, new_password: str) -> dict:
@@ -2688,7 +2870,7 @@ class UptimeKumaApi(object):
             }
         """
         if import_handle not in ["overwrite", "skip", "keep"]:
-            raise ValueError()
+            raise ValueError(f"Unknown import_handle value: {import_handle}")
         return self._call('uploadBackup', (json_data, import_handle))
 
     # 2FA

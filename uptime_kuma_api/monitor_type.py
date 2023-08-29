@@ -3,6 +3,9 @@ from enum import Enum
 
 class MonitorType(str, Enum):
     """Enumerate monitor types."""
+    
+    GROUP = "group"
+    """Group"""
 
     HTTP = "http"
     """HTTP(s)"""
@@ -16,6 +19,9 @@ class MonitorType(str, Enum):
     KEYWORD = "keyword"
     """HTTP(s) - Keyword"""
 
+    JSON_QUERY = "json-query"
+    """HTTP(s) - Json Query"""
+
     GRPC_KEYWORD = "grpc-keyword"
     """gRPC(s) - Keyword"""
 
@@ -24,6 +30,9 @@ class MonitorType(str, Enum):
 
     DOCKER = "docker"
     """Docker Container"""
+
+    REAL_BROWSER = "real-browser"
+    """HTTP(s) - Browser Engine (Chrome/Chromium)"""
 
     PUSH = "push"
     """Push"""
@@ -36,6 +45,9 @@ class MonitorType(str, Enum):
 
     MQTT = "mqtt"
     """MQTT"""
+
+    KAFKA_PRODUCER = "kafka-producer"
+    """Kafka Producer"""
 
     SQLSERVER = "sqlserver"
     """Microsoft SQL Server"""
@@ -55,5 +67,5 @@ class MonitorType(str, Enum):
     REDIS = "redis"
     """Redis"""
 
-    GROUP = "group"
-    """Group"""
+    TAILSCALE_PING = "tailscale-ping"
+    """Tailscale Ping"""

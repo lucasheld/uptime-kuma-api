@@ -3,7 +3,7 @@ import re
 
 from bs4 import BeautifulSoup
 
-from utils import deduplicate_list, write_to_file
+from utils import deduplicate_list, write_to_file, type_html_to_py
 
 
 # deprecated or wrong inputs
@@ -24,6 +24,10 @@ ignored_inputs = {
     "Splunk": [
         "pagerdutyIntegrationKey"
     ]
+}
+
+input_overwrites = {
+    "showAdditionalHeadersField": "webhookAdditionalHeaders"
 }
 
 titles = {
@@ -48,6 +52,7 @@ titles = {
     "OneBot": "OneBot",
     "Opsgenie": "Opsgenie",
     "PagerDuty": "PagerDuty",
+    "PagerTree": "PagerTree",
     "pushbullet": "Pushbullet",
     "PushByTechulus": "Push by Techulus",
     "pushover": "Pushover",
@@ -76,10 +81,14 @@ titles = {
     "SMSManager": "SmsManager (smsmanager.cz)",
     "WeCom": "WeCom",
     "ServerChan": "ServerChan",
+    "nostr": "Nostr",
+    "FlashDuty": "FlashDuty",
+    "smsc": "SMSC",
 }
 
 
-def build_notification_providers(root):
+def build_notification_providers():
+    root = "uptime-kuma"
     providers = {}
 
     # get providers and input names
@@ -96,7 +105,7 @@ def build_notification_providers(root):
             inputs = [i.strip() for i in inputs]
 
             providers[name] = {
-                "title": titles.get(name, name),
+                "title": titles[name],
                 "inputs": {},
             }
             for input_ in inputs:
@@ -117,15 +126,15 @@ def build_notification_providers(root):
             conditions = {}
             attrs = input_.attrs
             v_model = attrs.get("v-model")
-            param_name = re.match(r'\$parent.notification.(.*)$', v_model).group(1)
+
+            v_model_overwrite = input_overwrites.get(v_model)
+            if v_model_overwrite:
+                param_name = v_model_overwrite
+            else:
+                param_name = re.match(r'\$parent.notification.(.*)$', v_model).group(1)
 
             type_ = attrs.get("type")
-            if type_ == "number":
-                type_ = "int"
-            elif type_ == "checkbox":
-                type_ = "bool"
-            else:
-                type_ = "str"
+            type_ = type_html_to_py(type_)
 
             required_true_values = ['', 'true']
             if attrs.get("required") in required_true_values or attrs.get(":required") in required_true_values:
@@ -157,17 +166,7 @@ def build_notification_providers(root):
     return providers
 
 
-def diff(old, new):
-    for i in new:
-        if i not in old:
-            print("+", i)
-    for i in old:
-        if i not in new:
-            print("-", i)
-    print("")
-
-
-notification_providers = build_notification_providers("uptime-kuma")
+notification_providers = build_notification_providers()
 
 notification_provider_conditions = {}
 for notification_provider in notification_providers:
@@ -181,11 +180,3 @@ write_to_file(
     notification_providers=notification_providers,
     notification_provider_conditions=notification_provider_conditions
 )
-
-# notification_providers_old = build_notification_providers("uptime-kuma-old")
-# notification_providers_new = build_notification_providers("uptime-kuma")
-# diff(notification_providers_old, notification_providers_new)
-#
-# notification_provider_conditions_old = build_notification_provider_conditions("uptime-kuma-old")
-# notification_provider_conditions_new = build_notification_provider_conditions("uptime-kuma")
-# diff(notification_provider_conditions_old, notification_provider_conditions_new)

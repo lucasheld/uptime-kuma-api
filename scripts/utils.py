@@ -24,3 +24,23 @@ def write_to_file(template, destination, **kwargs):
     rendered = template.render(**kwargs)
     with open(destination, "w") as f:
         f.write(rendered)
+
+
+def diff(old, new):
+    for i in new:
+        if i not in old:
+            print("+", i)
+    for i in old:
+        if i not in new:
+            print("-", i)
+    print("")
+
+
+def type_html_to_py(type_):
+    if type_ == "number":
+        type_ = "int"
+    elif type_ == "checkbox":
+        type_ = "bool"
+    else:
+        type_ = "str"
+    return type_
