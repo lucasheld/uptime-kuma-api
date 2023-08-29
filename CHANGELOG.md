@@ -1,8 +1,19 @@
 ## Changelog
 
+### Release 1.2.0
+
+#### Features
+- add support for uptime kuma 1.23.0 and 1.23.1
+
+#### Bugfixes
+- remove `name` from maintenance monitors and status pages
+- rstip url globally
+- convert sendUrl from bool to int
+- validate accepted status codes types
+
 ### Release 1.1.0
 
-#### Feature
+#### Features
 - add support for uptime kuma 1.22.0 and 1.22.1
 
 ### Release 1.0.1
