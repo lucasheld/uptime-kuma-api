@@ -470,6 +470,7 @@ class UptimeKumaApi(object):
         self.headers = headers
         self.wait_events = wait_events
         self.sio = socketio.Client(ssl_verify=ssl_verify)
+        self._version_str = None
 
         self._event_data: dict = {
             Event.MONITOR_LIST: None,
@@ -677,8 +678,10 @@ class UptimeKumaApi(object):
 
     @property
     def version(self) -> str:
-        info = self.info()
-        return info.get("version")
+        if not self._version_str:            
+            info = self.info()
+            self._version_str = info.get("version")
+        return self._version_str
 
     def _build_monitor_data(
             self,
@@ -3012,12 +3015,21 @@ class UptimeKumaApi(object):
         if username is None and password is None:
             with self.wait_for_event(Event.AUTO_LOGIN):
                 return {}
+            
+        
 
-        return self._call('login', {
+        r = self._call('login', {
             "username": username,
             "password": password,
             "token": token
         })
+
+        # Load version that is published after login.
+        self._event_data[Event.INFO] = None
+        # Loads version cache for next 'info' event.
+        self.version
+
+        return r
 
     def login_by_token(self, token: str) -> dict:
         """
