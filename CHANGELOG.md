@@ -1,5 +1,10 @@
 ## Changelog
 
+### Release 1.2.1
+
+#### Bugfixes
+- drop first info event without a version
+
 ### Release 1.2.0
 
 #### Features
