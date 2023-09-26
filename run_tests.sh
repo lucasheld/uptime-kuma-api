@@ -5,7 +5,7 @@ if [ $version ]
 then
   versions=("$version")
 else
-  versions=(1.23.1 1.23.0 1.22.1 1.22.0 1.21.3)
+  versions=(1.23.2 1.23.0 1.22.1 1.22.0 1.21.3)
 fi
 
 for version in ${versions[*]}

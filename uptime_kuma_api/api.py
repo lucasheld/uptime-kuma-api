@@ -626,6 +626,9 @@ class UptimeKumaApi(object):
             self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id] = [data] + self._event_data[Event.IMPORTANT_HEARTBEAT_LIST][monitor_id]
 
     def _event_info(self, data) -> None:
+        if "version" not in data:
+            # wait for the info event that is sent after login and contains the version
+            return
         self._event_data[Event.INFO] = data
 
     def _event_cert_info(self, monitor_id, data) -> None:
