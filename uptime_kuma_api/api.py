@@ -795,7 +795,7 @@ class UptimeKumaApi(object):
             accepted_statuscodes = ["200-299"]
 
         if notificationIDList is None:
-            notificationIDList = {}
+            notificationIDList = []
 
         data = {
             "type": type,
