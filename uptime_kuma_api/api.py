@@ -2995,6 +2995,9 @@ class UptimeKumaApi(object):
 
         If username and password is not provided, auto login is performed if disableAuth is enabled.
 
+        Note that the API Key configured in the Uptime Kuma UI is only for authentication for integration with Prometheus. It
+        cannot be used for authentication to this API.
+
         :param str, optional username: Username. Must be None if disableAuth is enabled., defaults to None
         :param str, optional password: Password. Must be None if disableAuth is enabled., defaults to None
         :param str, optional token: 2FA Token. Required if 2FA is enabled., defaults to ""
