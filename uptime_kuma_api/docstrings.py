@@ -18,7 +18,7 @@ def monitor_docstring(mode) -> str:
     return f"""
         :param MonitorType{", optional" if mode == "edit" else ""} type: Monitor Type
         :param str{", optional" if mode == "edit" else ""} name: Friendly Name
-        :param str, optional parent: Id of the monitor group, defaults to None
+        :param int, optional parent: Id of the monitor group, defaults to None
         :param str, optional description: Description, defaults to None
         :param int, optional interval: Heartbeat Interval, defaults to 60
         :param int, optional retryInterval: Retry every X seconds, defaults to 60
