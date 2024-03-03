@@ -416,6 +416,7 @@ class UptimeKumaApi(object):
 
     Now you can call one of the existing methods of the instance. For example create a new monitor:
 
+        >>> from uptime_kuma_api import MonitorType
         >>> api.add_monitor(
         ...     type=MonitorType.HTTP,
         ...     name="Google",
